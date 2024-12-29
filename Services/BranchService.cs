@@ -23,5 +23,30 @@ namespace HospitalSystemTeamTask.Services
             };
             _branchRepository.AddBranch(branch);
         }
+
+        public IEnumerable<BranchDTO> GetAllBranches()
+        {
+            try
+            {
+                // Get all branches from the repository
+                var branches = _branchRepository.GetAllBranches();
+
+                // Map the branches to BranchDTOs
+                return branches.Select(branch => new BranchDTO
+                {
+                    BranchName = branch.BranchName,
+                    Location = branch.Location
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"An error occurred while fetching branches: {ex.Message}");
+
+
+                throw new ApplicationException("An error occurred while fetching branches.", ex);
+            }
+        }
+
     }
 }
