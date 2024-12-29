@@ -48,5 +48,25 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred." });
             }
         }
+
+        [HttpGet("{branchName}")]
+        public ActionResult<BranchDTO> GetBranchDetails(string branchName)
+        {
+            try
+            {
+                var branchDetails = _branchService.GetBranchDetailsByBranchName(branchName);
+                return Ok(branchDetails);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Handle the case where the branch is not found
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
+            }
+        }
     }
 }

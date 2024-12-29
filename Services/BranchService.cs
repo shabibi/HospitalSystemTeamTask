@@ -56,5 +56,25 @@ namespace HospitalSystemTeamTask.Services
                 }
             }
         }
+
+        public BranchDTO GetBranchDetailsByBranchName(string branchName)
+        {
+            
+            var branch = _branchRepository.GetBranchByBranchName(branchName);
+
+            if (branch == null)
+            {
+               
+                throw new KeyNotFoundException($"Branch with name '{branchName}' not found.");
+            }
+
+          
+            return new BranchDTO
+            {
+                BranchName = branch.BranchName,
+                Location = branch.Location,
+                Status = branch.IsActive ? "Active" : "Inactive"
+            };
+        }
     }
 }
