@@ -73,5 +73,21 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+        [Authorize(Roles = "Admin,Doctor")]
+        [HttpGet("GetClinicById/{CID}")]
+        public IActionResult GetClinicById(int CID)
+        {
+            try
+            {
+                var clinic = _clinicService.GetClinicById(CID);
+                return Ok(clinic);
+
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while retrieving patient. {(ex.Message)}");
+            }
+        }
     }
 }

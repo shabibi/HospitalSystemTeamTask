@@ -36,5 +36,18 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
+
+
+        public Clinic GetClinicById(int Cid)
+        {
+            try
+            {
+                return _context.Clinics.FirstOrDefault(u => u.CID == Cid);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
     }
 }
