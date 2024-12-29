@@ -1,4 +1,5 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,40 +51,65 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
         [HttpGet("{branchName}")]
-        public ActionResult<BranchDTO> GetBranchDetails(string branchName)
+        public IActionResult GetBranchDetails(string branchName)
         {
             try
             {
-                var branchDetails = _branchService.GetBranchDetailsByBranchName(branchName);
-                return Ok(branchDetails);
+                var branch = _branchService.GetBranchDetailsByBranchName(branchName);
+                return Ok(branch);
             }
             catch (KeyNotFoundException ex)
             {
-                // Handle the case where the branch is not found
                 return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                // Handle unexpected errors
                 return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
             }
         }
 
-        [HttpPut("{branchName}")]
-        public IActionResult UpdateBranch(string branchName, [FromBody] BranchDTO updatedBranchDto)
+
+        [HttpPatch("{branchName}")]
+        public IActionResult UpdateBranch(string branchName, [FromBody] UpdateBranchDTO updatedBranchDto)
         {
             try
             {
+                // Call the service to update the branch
                 _branchService.UpdateBranch(branchName, updatedBranchDto);
-                return NoContent(); 
+                return Ok(new { message = $"Branch '{branchName}' updated successfully." });
             }
             catch (KeyNotFoundException ex)
             {
+                // Return 404 if branch is not found
                 return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                // Return 500 for any other errors
                 return StatusCode(500, new { message = "An error occurred while updating the branch.", error = ex.Message });
+            }
+        }
+
+
+
+        [HttpPatch("{branchName}/status")]
+        public IActionResult SetBranchStatus(string branchName, [FromQuery] bool isActive)
+        {
+            try
+            {
+                // Call the service to set the status
+                _branchService.SetBranchStatus(branchName, isActive);
+                return Ok(new { message = $"Branch '{branchName}' status updated to {(isActive ? "Active" : "Inactive")}." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // If the branch is not found, return a 404
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // If any other error occurs, return a 500
+                return StatusCode(500, new { message = "An error occurred while updating the branch status.", error = ex.Message });
             }
         }
 

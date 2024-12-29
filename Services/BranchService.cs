@@ -26,76 +26,89 @@ namespace HospitalSystemTeamTask.Services
 
         public IEnumerable<BranchDTO> GetAllBranches()
         {
+            try
             {
-                try
-                {
-                    // Get all branches from the repository
-                    var branches = _branchRepository.GetAllBranches();
-                    List<BranchDTO> branchDTOs = new List<BranchDTO>();
+                // Get all branches from the repository
+                var branches = _branchRepository.GetAllBranches();
+                List<BranchDTO> branchDTOs = new List<BranchDTO>();
 
-                    foreach (var branch in branches)
+                foreach (var branch in branches)
+                {
+                    // Map the branch to BranchDTO and add it to the list
+                    branchDTOs.Add(new BranchDTO
                     {
-                        // Map the branch to BranchDTO and add it to the list
-                        branchDTOs.Add(new BranchDTO
-                        {
-                            BranchName = branch.BranchName,
-                            Location = branch.Location,
-                            Status = branch.IsActive ? "Active" : "Inactive" 
-                        });
-                    }
-
-                   
-                    return branchDTOs;
+                        BranchName = branch.BranchName,
+                        Location = branch.Location,
+                  
+                    });
                 }
-                catch (Exception ex)
-                {
-               
-                    Console.WriteLine($"An error occurred while fetching branches: {ex.Message}");
 
-                    throw new ApplicationException("An error occurred while fetching branches.", ex);
-                }
+                return branchDTOs;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while fetching branches: {ex.Message}");
+                throw new ApplicationException("An error occurred while fetching branches.", ex);
             }
         }
 
+
         public BranchDTO GetBranchDetailsByBranchName(string branchName)
         {
-            
             var branch = _branchRepository.GetBranchByBranchName(branchName);
 
             if (branch == null)
             {
-               
                 throw new KeyNotFoundException($"Branch with name '{branchName}' not found.");
             }
 
-          
+            // Return BranchDTO instead of the Branch model
             return new BranchDTO
             {
                 BranchName = branch.BranchName,
                 Location = branch.Location,
-                Status = branch.IsActive ? "Active" : "Inactive"
+            
             };
         }
 
-        public void UpdateBranch(string branchName, BranchDTO updatedBranchDto)
-        {
-     
-            var branch = _branchRepository.GetBranchByBranchName(branchName);
 
+        public void UpdateBranch(string branchName, UpdateBranchDTO updatedBranchDto)
+        {
+            // Retrieve the existing branch
+            var branch = _branchRepository.GetBranchByBranchName(branchName);
             if (branch == null)
             {
                 throw new KeyNotFoundException($"Branch with name '{branchName}' not found.");
             }
 
-            // Update the branch's details
-            branch.BranchName = updatedBranchDto.BranchName ?? branch.BranchName;
-            branch.Location = updatedBranchDto.Location ?? branch.Location;
-
-            
-            if (!string.IsNullOrEmpty(updatedBranchDto.Status))
+            // Update only the provided fields
+            if (!string.IsNullOrWhiteSpace(updatedBranchDto.BranchName))
             {
-                branch.IsActive = updatedBranchDto.Status.Equals("Active", StringComparison.OrdinalIgnoreCase);
+                branch.BranchName = updatedBranchDto.BranchName;
             }
+            if (!string.IsNullOrWhiteSpace(updatedBranchDto.Location))
+            {
+                branch.Location = updatedBranchDto.Location;
+            }
+
+            // Save changes
+            _branchRepository.UpdateBranch(branch);
+        }
+
+
+
+
+        public void SetBranchStatus(string branchName, bool isActive)
+        {
+            // Retrieve the branch by name
+            var branch = _branchRepository.GetBranchByBranchName(branchName);
+            if (branch == null)
+            {
+                throw new KeyNotFoundException($"Branch with name '{branchName}' not found.");
+            }
+
+            // Update the IsActive flag
+            branch.IsActive = isActive;
 
             // Save the updated branch
             _branchRepository.UpdateBranch(branch);
