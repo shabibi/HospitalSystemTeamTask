@@ -14,8 +14,15 @@ namespace HospitalSystemTeamTask.Repositories
         // Add a new branch
         public void AddBranch(Branch branch)
         {
-            _context.Branches.Add(branch);
-            _context.SaveChanges();
+            try
+            {
+                _context.Branches.Add(branch);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
         }
 
 

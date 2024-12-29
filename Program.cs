@@ -1,4 +1,6 @@
 
+using HospitalSystemTeamTask.Repositories;
+using HospitalSystemTeamTask.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace HospitalSystemTeamTask
@@ -12,6 +14,9 @@ namespace HospitalSystemTeamTask
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+            builder.Services.AddScoped<IBranchService, BranchService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
