@@ -23,5 +23,18 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
+
+        public void AddClinic(Clinic clinic)
+        {
+            try
+            {
+                _context.Clinics.Add(clinic);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
     }
 }
