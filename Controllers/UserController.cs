@@ -53,7 +53,33 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost("RegisterNewStaff")]
+        public IActionResult RegisterNewStaff(UserInputDTO InputUser)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                if (InputUser == null)
+                    return BadRequest("User data is required");
 
+                // Normalize role by trimming spaces and comparing case-insensitively
+                var normalizedRole = InputUser.Role?.Trim();
+
+                // Add the user
+                _userService.AddStaff(InputUser);
+
+                return Ok("New staff registered successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log and return the error
+                return StatusCode(500, $"An error occurred while adding new staff. {ex.Message}");
+            }
+        }
         [AllowAnonymous]
         [HttpGet("Login")]
         public IActionResult Login(string email, string password)
