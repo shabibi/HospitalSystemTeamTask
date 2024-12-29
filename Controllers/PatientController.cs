@@ -11,12 +11,13 @@ using System.Text;
 
 namespace HospitalSystemTeamTask.Controllers
 {
-    [Authorize]
+    
     [ApiController]
     [Route("api/[Controller]")]
     public class PatientController : ControllerBase
     {
         private readonly IPatientService _PatientService;
+      
         private readonly IConfiguration _configuration;
 
         public PatientController(IPatientService patientService, IConfiguration configuration)
@@ -117,8 +118,8 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-        [Authorize(Roles = "Patient")]
-        
+        // [Authorize(Roles = "Patient")]
+        [AllowAnonymous]
         [HttpPost("AddPatient")]
         public IActionResult AddPatient( PatientInputDTO input)
         {
@@ -130,22 +131,11 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Map DTO to Patient entity
-                var patient = new Patient
-                {
-                    User = new User
-                    {
-                        UserName = input.UserName,
-                        Email = input.Email,
-                        Password = input.Password,
-                        Role = "Patient",
-                        IsActive = true
-                    },
-                    Age = input.Age,
-                    Gender = input.Gender
-                };
+              
 
                 // Add the patient
-                _PatientService.AddPatient(patient);
+                _PatientService.AddPatient(input);
+               
 
                 return Ok("Patient added successfully.");
             }

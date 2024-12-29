@@ -58,9 +58,7 @@ namespace HospitalSystemTeamTask.Repositories
         {
             try
             {
-                // Ensure the User entity is added first
-                _context.Users.Add(patient.User);
-
+          
                 // Add the Patient entity
                 _context.Patients.Add(patient);
 

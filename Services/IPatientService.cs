@@ -1,4 +1,5 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 
 namespace HospitalSystemTeamTask.Services
 {
@@ -7,6 +8,6 @@ namespace HospitalSystemTeamTask.Services
         IEnumerable<Patient> GetAllPatients();
         Patient GetPatientById(int Pid);
         void UpdatePatientDetails(Patient updatedPatient);
-        void AddPatient(Patient patient);
+        void AddPatient(PatientInputDTO patientInput);
     }
 }
