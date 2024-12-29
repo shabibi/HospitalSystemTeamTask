@@ -25,51 +25,51 @@ namespace HospitalSystemTeamTask.Controllers
             _configuration = configuration;
         }
 
-        [AllowAnonymous]
-        [HttpPost("RegisterSupperAdmin")]
-        public IActionResult RegisterSupperAdmin(UserInputDTO InputUser)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            try
-            {
-                if (InputUser == null)
-                    return BadRequest("User data is required");
+        //[AllowAnonymous]
+        //[HttpPost("RegisterSupperAdmin")]
+        //public IActionResult RegisterSupperAdmin(UserInputDTO InputUser)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    try
+        //    {
+        //        if (InputUser == null)
+        //            return BadRequest("User data is required");
 
-                // Normalize role by trimming spaces and comparing case-insensitively
-                var normalizedRole = InputUser.Role?.Trim();
+        //        // Normalize role by trimming spaces and comparing case-insensitively
+        //        var normalizedRole = InputUser.Role?.Trim();
 
-                // Role validation: Only patients can register themselves
-                if (!string.Equals(normalizedRole, "Patient", StringComparison.OrdinalIgnoreCase))
-                    return BadRequest("Only patients can register themselves.");
+        //        // Role validation: Only patients can register themselves
+        //        if (!string.Equals(normalizedRole, "Patient", StringComparison.OrdinalIgnoreCase))
+        //            return BadRequest("Only patients can register themselves.");
 
-                // Check for duplicate email
-                if (_userService.EmailExists(InputUser.Email))
-                    return BadRequest("A user with this email already exists.");
+        //        // Check for duplicate email
+        //        if (_userService.EmailExists(InputUser.Email))
+        //            return BadRequest("A user with this email already exists.");
 
-                // Map the DTO to the User entity
-                var user = new User
-                {
-                    UserName = InputUser.UserName,
-                    Email = InputUser.Email,
-                    Password = InputUser.Password,
-                    Role = "Patient", // Set the role explicitly to "Patient"
-                    IsActive = true // Default to active
-                };
+        //        // Map the DTO to the User entity
+        //        var user = new User
+        //        {
+        //            UserName = InputUser.UserName,
+        //            Email = InputUser.Email,
+        //            Password = InputUser.Password,
+        //            Role = "Patient", // Set the role explicitly to "Patient"
+        //            IsActive = true // Default to active
+        //        };
 
-                // Add the user
-                _userService.AddUser(user);
+        //        // Add the user
+        //        _userService.AddUser(user);
 
-                return Ok("User registered successfully.");
-            }
-            catch (Exception ex)
-            {
-                // Log and return the error
-                return StatusCode(500, $"An error occurred while adding the user. {ex.Message}");
-            }
-        }
+        //        return Ok("User registered successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log and return the error
+        //        return StatusCode(500, $"An error occurred while adding the user. {ex.Message}");
+        //    }
+        //}
 
 
         [AllowAnonymous]

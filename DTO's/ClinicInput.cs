@@ -4,11 +4,11 @@ namespace HospitalSystemTeamTask.DTO_s
 {
     public class ClinicInput
     {
-        [Required]
-        public int DepID { get; set; } // Department ID
+        //[Required]
+        //public int DepID { get; set; } // Department ID
 
-        [Required]
-        public int AssignDoctor { get; set; } 
+        //[Required]
+        //public int AssignDoctor { get; set; } 
 
         [Required]
         public int BID { get; set; } // Branch ID

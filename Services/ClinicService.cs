@@ -52,5 +52,29 @@ namespace HospitalSystemTeamTask.Services
             return clinic;
         }
 
+        public Clinic GetClinicByName(string clinicName)
+        {
+            var clinic = _clinicRepo.GetClinicByName(clinicName);
+            if (clinic == null)
+                throw new KeyNotFoundException($"clinic with name {clinicName} not found.");
+            return clinic;
+        }
+
+        public IEnumerable<Clinic> GetClinicsByBranchName(string branchName)
+        {
+            if (string.IsNullOrEmpty(branchName))
+            {
+                throw new ArgumentException("Branch name is required.");
+            }
+
+            var clinics = _clinicRepo.GetClinicsByBranchName(branchName);
+            if (!clinics.Any())
+            {
+                throw new KeyNotFoundException($"No clinics found for branch: {branchName}");
+            }
+
+            return clinics;
+        }
+
     }
 }

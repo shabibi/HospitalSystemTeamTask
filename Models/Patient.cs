@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace HospitalSystemTeamTask.Models
 {
@@ -8,6 +9,8 @@ namespace HospitalSystemTeamTask.Models
         [Key]
         [ForeignKey("User")]
         public int PID  { get; set; }
+
+        [JsonIgnore]
         public User User { get; set; }
 
         [Required]

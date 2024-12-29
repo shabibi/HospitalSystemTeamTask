@@ -33,7 +33,8 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         [HttpPost("AddClinic")]
         public IActionResult AddClinic(ClinicInput clinicDto)
         {
@@ -47,8 +48,8 @@ namespace HospitalSystemTeamTask.Controllers
                 // Map DTO to Clinic entity
                 var clinic = new Clinic
                 {
-                    DepID = clinicDto.DepID,
-                    AssignDoctor = clinicDto.AssignDoctor,
+                    //DepID = clinicDto.DepID,
+                    //AssignDoctor = clinicDto.AssignDoctor,
                     BID = clinicDto.BID,
                     ClincName = clinicDto.ClincName,
                     Capacity = clinicDto.Capacity,
@@ -80,6 +81,22 @@ namespace HospitalSystemTeamTask.Controllers
             try
             {
                 var clinic = _clinicService.GetClinicById(CID);
+                return Ok(clinic);
+
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while retrieving patient. {(ex.Message)}");
+            }
+        }
+
+        [HttpGet("GetClinicByName/{ClincName}")]
+        public IActionResult GetClinicByName(string ClincName)
+        {
+            try
+            {
+                var clinic = _clinicService.GetClinicByName(ClincName);
                 return Ok(clinic);
 
             }

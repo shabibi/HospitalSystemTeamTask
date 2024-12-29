@@ -25,6 +25,7 @@ namespace HospitalSystemTeamTask.Models
 
         public bool IsActive { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<Patient> Patients { get; set; }
         public virtual ICollection<Doctor> Doctors { get;set; }
     }

@@ -49,5 +49,31 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
+
+        public Clinic GetClinicByName(string ClinicName)
+        {
+            try
+            {
+                return _context.Clinics.FirstOrDefault(u => u.ClincName == ClinicName);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+
+        public IEnumerable<Clinic> GetClinicsByBranchName(string branchName)
+        {
+            try
+            {
+                return _context.Clinics
+                    .Where(c => c.Branch.BranchName == branchName)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
     }
 }
