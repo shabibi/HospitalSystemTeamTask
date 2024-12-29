@@ -25,53 +25,61 @@ namespace HospitalSystemTeamTask.Controllers
             _configuration = configuration;
         }
 
-        //[AllowAnonymous]
-        //[HttpPost("RegisterSupperAdmin")]
-        //public IActionResult RegisterSupperAdmin(UserInputDTO InputUser)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    try
-        //    {
-        //        if (InputUser == null)
-        //            return BadRequest("User data is required");
+        [AllowAnonymous]
+        [HttpPost("RegisterSuperAdmin")]
+        public IActionResult RegisterSuperAdmin(UserInputDTO InputUser)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                if (InputUser == null)
+                    return BadRequest("User data is required");
 
         //        // Normalize role by trimming spaces and comparing case-insensitively
         //        var normalizedRole = InputUser.Role?.Trim();
 
-        //        // Role validation: Only patients can register themselves
-        //        if (!string.Equals(normalizedRole, "Patient", StringComparison.OrdinalIgnoreCase))
-        //            return BadRequest("Only patients can register themselves.");
+                // Add the user
+                _userService.AddSuperAdmin(InputUser);
 
-        //        // Check for duplicate email
-        //        if (_userService.EmailExists(InputUser.Email))
-        //            return BadRequest("A user with this email already exists.");
+                return Ok("Super Admin registered successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log and return the error
+                return StatusCode(500, $"An error occurred while adding the superAdmin. {ex.Message}");
+            }
+        }
 
-        //        // Map the DTO to the User entity
-        //        var user = new User
-        //        {
-        //            UserName = InputUser.UserName,
-        //            Email = InputUser.Email,
-        //            Password = InputUser.Password,
-        //            Role = "Patient", // Set the role explicitly to "Patient"
-        //            IsActive = true // Default to active
-        //        };
+        [AllowAnonymous]
+        [HttpPost("RegisterNewStaff")]
+        public IActionResult RegisterNewStaff(UserInputDTO InputUser)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                if (InputUser == null)
+                    return BadRequest("User data is required");
 
-        //        // Add the user
-        //        _userService.AddUser(user);
+                // Normalize role by trimming spaces and comparing case-insensitively
+                var normalizedRole = InputUser.Role?.Trim();
 
-        //        return Ok("User registered successfully.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log and return the error
-        //        return StatusCode(500, $"An error occurred while adding the user. {ex.Message}");
-        //    }
-        //}
+                // Add the user
+                _userService.AddStaff(InputUser);
 
-
+                return Ok("New staff registered successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log and return the error
+                return StatusCode(500, $"An error occurred while adding new staff. {ex.Message}");
+            }
+        }
         [AllowAnonymous]
         [HttpGet("Login")]
         public IActionResult Login(string email, string password)

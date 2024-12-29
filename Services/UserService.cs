@@ -51,6 +51,30 @@ namespace HospitalSystemTeamTask.Services
         }
          
         
+        //Add hospital stuff (admin or doctor ) 
+        public void AddStaff(UserInputDTO InputUser)
+        {
+            if (InputUser.Role.ToLower() != "doctor" && InputUser.Role.ToLower() != "admin")
+                throw new ArgumentException("Invalid role. Only 'doctor and admin' role is allowed.", nameof(InputUser.Role));
+
+            String defaultPassword = "Staff1234";
+
+            Random random = new Random();
+            int randomNumber = random.Next(1000, 9999);
+            string generatedEmail = $"{InputUser.UserName}{randomNumber}@gmail.com";
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(defaultPassword);
+            var newStaff = new User
+            {
+                UserName = InputUser.UserName,
+                Email = generatedEmail,
+                Phone = InputUser.Phone,
+                Password = hashedPassword,
+                Role = InputUser.Role,
+                IsActive = true
+            };
+            _userRepo.AddUser(newStaff);
+
+        }
 
         // Deactivate user
         public void DeactivateUser(int uid)

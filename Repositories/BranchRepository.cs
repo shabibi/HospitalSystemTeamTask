@@ -37,5 +37,12 @@ namespace HospitalSystemTeamTask.Repositories
             return _context.Branches
         .FirstOrDefault(b => b.BranchName.ToLower() == branchName.ToLower());
         }
+
+        public void UpdateBranch(Branch branch)
+        {
+            _context.Branches.Update(branch);
+            _context.SaveChanges();
+        }
+
     }
 }
