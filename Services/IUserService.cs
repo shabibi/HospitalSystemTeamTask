@@ -20,5 +20,6 @@ namespace HospitalSystemTeamTask.Services
         void AddDoctor(User doctor);
         void UpdatePassword(int uid, string newPassword);
         void AddSuperAdmin(UserInputDTO InputUser);
+        bool EmailExists(string email);
     }
 }

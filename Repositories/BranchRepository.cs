@@ -1,4 +1,6 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalSystemTeamTask.Repositories
 {
@@ -24,7 +26,16 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
+        public IEnumerable<Branch> GetAllBranches()
+        {
+            return _context.Branches.ToList();
+        }
 
+        public Branch GetBranchByBranchName(string branchName)
+        {
 
+            return _context.Branches
+        .FirstOrDefault(b => b.BranchName.ToLower() == branchName.ToLower());
+        }
     }
 }

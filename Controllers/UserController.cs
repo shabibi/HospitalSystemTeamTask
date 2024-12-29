@@ -38,47 +38,38 @@ namespace HospitalSystemTeamTask.Controllers
                 if (InputUser == null)
                     return BadRequest("User data is required");
 
-                _userService.AddSuperAdmin(InputUser);
+                // Normalize role by trimming spaces and comparing case-insensitively
+                var normalizedRole = InputUser.Role?.Trim();
 
-                
-                return Ok("Supper Admin added successfully");
+                // Role validation: Only patients can register themselves
+                if (!string.Equals(normalizedRole, "Patient", StringComparison.OrdinalIgnoreCase))
+                    return BadRequest("Only patients can register themselves.");
+
+                // Check for duplicate email
+                if (_userService.EmailExists(InputUser.Email))
+                    return BadRequest("A user with this email already exists.");
+
+                // Map the DTO to the User entity
+                var user = new User
+                {
+                    UserName = InputUser.UserName,
+                    Email = InputUser.Email,
+                    Password = InputUser.Password,
+                    Role = "Patient", // Set the role explicitly to "Patient"
+                    IsActive = true // Default to active
+                };
+
+                // Add the user
+                _userService.AddUser(user);
+
+                return Ok("User registered successfully.");
             }
             catch (Exception ex)
             {
-                // Return a generic error response
-                return StatusCode(500, $"An error occurred while adding the SupperAdmin. {ex.Message} ");
+                // Log and return the error
+                return StatusCode(500, $"An error occurred while adding the user. {ex.Message}");
             }
         }
-
-        //[AllowAnonymous]
-        //[HttpPost("Register")]
-        //public IActionResult Register(UserInputDTO InputUser)
-        //{
-        //    try
-        //    {
-        //        if (InputUser == null)
-        //            return BadRequest("User data is required");
-
-        //        var user = new User
-        //        {
-        //            UserName = InputUser.UserName,
-        //            Email = InputUser.Email,
-        //            Password = InputUser.Password,
-        //            Role = InputUser.Role,
-             
-                    
-        //        };
-
-        //        _userService.AddUser(user);
-
-        //        return Ok(user);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Return a generic error response
-        //        return StatusCode(500, $"An error occurred while adding the user. {ex.Message} ");
-        //    }
-        //}
 
 
         [AllowAnonymous]
