@@ -1,4 +1,5 @@
 ﻿
+using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -116,5 +117,47 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+        [Authorize(Roles = "Patient")]
+        
+        [HttpPost("AddPatient")]
+        public IActionResult AddPatient( PatientInputDTO input)
+        {
+            try
+            {
+                if (input == null)
+                {
+                    return BadRequest("Patient details are required.");
+                }
+
+                // Map DTO to Patient entity
+                var patient = new Patient
+                {
+                    User = new User
+                    {
+                        UserName = input.UserName,
+                        Email = input.Email,
+                        Password = input.Password,
+                        Role = "Patient",
+                        IsActive = true
+                    },
+                    Age = input.Age,
+                    Gender = input.Gender
+                };
+
+                // Add the patient
+                _PatientService.AddPatient(patient);
+
+                return Ok("Patient added successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

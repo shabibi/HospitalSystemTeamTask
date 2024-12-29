@@ -53,5 +53,25 @@ namespace HospitalSystemTeamTask.Repositories
 
 
         }
+
+        public void AddPatient(Patient patient)
+        {
+            try
+            {
+                // Ensure the User entity is added first
+                _context.Users.Add(patient.User);
+
+                // Add the Patient entity
+                _context.Patients.Add(patient);
+
+                // Save changes to the database
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+
     }
 }

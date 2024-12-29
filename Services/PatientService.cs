@@ -66,6 +66,34 @@ namespace HospitalSystemTeamTask.Services
             // Save changes via the repository
             _PatientRepo.UpdatePatient(existingPatient);
         }
+
+
+        public void AddPatient(Patient patient)
+        {
+            if (patient == null || patient.User == null)
+            {
+                throw new ArgumentException("Patient or User information is missing.");
+            }
+
+            // Validate User fields
+            if (string.IsNullOrEmpty(patient.User.UserName) || string.IsNullOrEmpty(patient.User.Email) || string.IsNullOrEmpty(patient.User.Password))
+            {
+                throw new ArgumentException("UserName, Email, and Password are required for the User.");
+            }
+
+            // Hash the user's password
+            patient.User.Password = BCrypt.Net.BCrypt.HashPassword(patient.User.Password);
+
+            // Validate Patient fields
+            if (string.IsNullOrEmpty(patient.Gender) || patient.Age <= 0)
+            {
+                throw new ArgumentException("Gender and valid Age are required for the Patient.");
+            }
+
+            // Delegate to repository
+            _PatientRepo.AddPatient(patient);
+        }
+
     }
 
 
