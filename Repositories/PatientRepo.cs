@@ -26,6 +26,19 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
-        
+        //Get Patients by id
+        public Patient GetPatientsById(int Pid)
+        {
+            try
+            {
+                return _context.Patients.FirstOrDefault(u => u.PID == Pid);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+
+
     }
 }

@@ -19,8 +19,17 @@ namespace HospitalSystemTeamTask.Services
         public IEnumerable<Patient> GetAllPatients()
         {
             return _PatientRepo.GetAllPatients();
+
         }
-        
+
+        public Patient GetPatientById(int Pid)
+        {
+            var patient = _PatientRepo.GetPatientsById(Pid);
+            if (patient == null)
+                throw new KeyNotFoundException($"Patient with ID {Pid} not found.");
+            return patient;
+        }
+
 
     }
 
