@@ -22,6 +22,12 @@ namespace HospitalSystemTeamTask
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IUserService, UserService>();
 
+            builder.Services.AddScoped<IPatientRepo, PatientRepo>();
+            builder.Services.AddScoped<IPatientService, PatientService>();
+
+            builder.Services.AddScoped<IClinicRepocs, ClinicRepo>();
+            builder.Services.AddScoped<IClinicService, ClinicService>();
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
