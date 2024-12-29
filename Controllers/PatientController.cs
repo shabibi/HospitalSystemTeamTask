@@ -34,7 +34,7 @@ namespace HospitalSystemTeamTask.Controllers
 
 
 
-
+        [AllowAnonymous]
         [HttpGet("GetPatientById/{PID}")]
         public IActionResult GetPatientById(int PID)
         {
