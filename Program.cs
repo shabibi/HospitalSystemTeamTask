@@ -11,14 +11,12 @@ namespace HospitalSystemTeamTask
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Add services to the container.
+
             builder.Services.AddControllers();
 
-            // Add services to the container.
-            builder.Services.AddScoped<IUserRepo, UserRepo>();
-            builder.Services.AddScoped<IUserService, UserService>();
-
-
-            
+            builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+            builder.Services.AddScoped<IBranchService, BranchService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
