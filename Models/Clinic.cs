@@ -21,6 +21,9 @@ namespace HospitalSystemTeamTask.Models
         public int 	BID  { get; set; }
         public Branch Branch { get; set; }
 
+
+        public string ClincName { get; set; } 
+
         [Required]
         public int Capacity { get; set; }
         [Required]

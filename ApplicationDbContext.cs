@@ -24,7 +24,16 @@ namespace HospitalSystemTeamTask
             modelBuilder.Entity<User>()
                         .HasIndex(u => u.Email)
                         .IsUnique();
-        }
 
+            modelBuilder.Entity<Clinic>()
+                       .HasIndex(u => u.ClincName)
+                       .IsUnique();
+
+            modelBuilder.Entity<Branch>()
+                       .HasIndex(u => u.BranchName)
+                       .IsUnique();
+          
+        }
+       
     }
 }
