@@ -78,5 +78,10 @@ namespace HospitalSystemTeamTask.Services
             _userRepo.UpdatePassword(uid, newPassword);
         }
 
+        public bool EmailExists(string email)
+        {
+            return _userRepo.EmailExists(email);
+        }
+
     }
 }

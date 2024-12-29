@@ -18,5 +18,6 @@ namespace HospitalSystemTeamTask.Services
         User GetUSer(string email, string password);
         void AddDoctor(User doctor);
         void UpdatePassword(int uid, string newPassword);
+        bool EmailExists(string email);
     }
 }
