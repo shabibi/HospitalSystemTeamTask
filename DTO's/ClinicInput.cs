@@ -8,14 +8,14 @@ namespace HospitalSystemTeamTask.DTO_s
         public int DepID { get; set; } // Department ID
 
         [Required]
-        public int AssignDoctor { get; set; } // Assigned Doctor ID
+        public int AssignDoctor { get; set; } 
 
         [Required]
         public int BID { get; set; } // Branch ID
 
         [Required]
        
-        public string ClincName { get; set; } // Clinic Name
+        public string ClincName { get; set; } // 
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0.")]
@@ -33,8 +33,8 @@ namespace HospitalSystemTeamTask.DTO_s
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Cost must be greater than 0.")]
-        public decimal Cost { get; set; } // Cost for a slot
+        public decimal Cost { get; set; } 
 
-        public bool IsActive { get; set; } // Whether the clinic is active
+        public bool IsActive { get; set; }
     }
 }

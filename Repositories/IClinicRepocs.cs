@@ -6,5 +6,6 @@ namespace HospitalSystemTeamTask.Repositories
     {
         public IEnumerable<Clinic> GetAllClinic();
         void AddClinic(Clinic clinic);
+        Clinic GetClinicById(int Cid);
     }
 }
