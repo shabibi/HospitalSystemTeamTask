@@ -7,7 +7,7 @@ namespace HospitalSystemTeamTask.Repositories
        
         IEnumerable<Patient> GetAllPatients();
         public Patient GetPatientsById(int Pid);
-
+        void UpdatePatient(Patient patient);
 
 
     }

@@ -1,4 +1,5 @@
 ﻿
+using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,45 @@ namespace HospitalSystemTeamTask.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
+        [Authorize(Roles = "Patient")]
+        [HttpPut("UpdatePatientDetails")]
+        public IActionResult UpdatePatientDetails(Patient updatedPatient)
+        {
+            try
+            {
+                if (updatedPatient == null)
+                {
+                    return BadRequest("Patient details are required.");
+                }
+
+                // Extract user ID from the token to ensure the patient is updating their own details
+                var tokenUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                if (updatedPatient.PID != tokenUserId)
+                {
+                    return Unauthorized("You can only update your own details.");
+                }
+
+                // Update patient details
+                _PatientService.UpdatePatientDetails(updatedPatient);
+
+                return Ok("Patient details updated successfully.");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }
