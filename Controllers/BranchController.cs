@@ -68,5 +68,24 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
             }
         }
+
+        [HttpPut("{branchName}")]
+        public IActionResult UpdateBranch(string branchName, [FromBody] BranchDTO updatedBranchDto)
+        {
+            try
+            {
+                _branchService.UpdateBranch(branchName, updatedBranchDto);
+                return NoContent(); 
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the branch.", error = ex.Message });
+            }
+        }
+
     }
 }

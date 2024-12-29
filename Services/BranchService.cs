@@ -76,5 +76,30 @@ namespace HospitalSystemTeamTask.Services
                 Status = branch.IsActive ? "Active" : "Inactive"
             };
         }
+
+        public void UpdateBranch(string branchName, BranchDTO updatedBranchDto)
+        {
+     
+            var branch = _branchRepository.GetBranchByBranchName(branchName);
+
+            if (branch == null)
+            {
+                throw new KeyNotFoundException($"Branch with name '{branchName}' not found.");
+            }
+
+            // Update the branch's details
+            branch.BranchName = updatedBranchDto.BranchName ?? branch.BranchName;
+            branch.Location = updatedBranchDto.Location ?? branch.Location;
+
+            
+            if (!string.IsNullOrEmpty(updatedBranchDto.Status))
+            {
+                branch.IsActive = updatedBranchDto.Status.Equals("Active", StringComparison.OrdinalIgnoreCase);
+            }
+
+            // Save the updated branch
+            _branchRepository.UpdateBranch(branch);
+        }
+
     }
 }

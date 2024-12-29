@@ -7,5 +7,6 @@ namespace HospitalSystemTeamTask.Services
         void AddBranch(BranchDTO branchDto);
         IEnumerable<BranchDTO> GetAllBranches();
         BranchDTO GetBranchDetailsByBranchName(string branchName);
+        void UpdateBranch(string branchName, BranchDTO updatedBranchDto);
     }
 }
