@@ -6,5 +6,6 @@ namespace HospitalSystemTeamTask.Services
     {
         IEnumerable<Clinic> GetAllClinic();
         void AddClinic(Clinic clinic);
+        Clinic GetClinicById(int Cid);
     }
 }

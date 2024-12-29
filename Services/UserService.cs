@@ -1,4 +1,5 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
 
 namespace HospitalSystemTeamTask.Services
@@ -15,8 +16,41 @@ namespace HospitalSystemTeamTask.Services
         // Add user
         public void AddUser(User user)
         {
+            //hashing Password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             _userRepo.AddUser(user);
         }
+
+        public void AddSuperAdmin(UserInputDTO InputUser)
+        {
+            if (InputUser.Role != "superAdmin")
+                throw new ArgumentException("Invalid role. Only 'superAdmin' role is allowed.", nameof(InputUser.Role));
+            //check if there is any active supper admin
+            var existingSuperAdmins = _userRepo.GetUserByRole(InputUser.Role);
+                if (existingSuperAdmins != null && existingSuperAdmins.Any(u => u.IsActive))
+                {
+                    throw new InvalidOperationException("Only one active super admin is allowed in the system.");
+                }
+                else
+                {
+                    String defaultPassword = "Super1234";
+                    string generatedEmail =$"{InputUser.UserName}@gmail.com";
+                    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(defaultPassword);
+                    var newSupperAdmin = new User
+                    {
+                        UserName = InputUser.UserName,
+                        Email = generatedEmail,
+                        Phone = InputUser.Phone,
+                        Password = hashedPassword,
+                        Role = InputUser.Role,
+                        IsActive = true
+                    };
+                    _userRepo.AddUser(newSupperAdmin);
+                }
+                   
+        }
+         
+        
 
         // Deactivate user
         public void DeactivateUser(int uid)

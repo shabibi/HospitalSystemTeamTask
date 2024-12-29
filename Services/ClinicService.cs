@@ -44,7 +44,13 @@ namespace HospitalSystemTeamTask.Services
             // Call repository to add the clinic
             _clinicRepo.AddClinic(clinic);
         }
-    
+        public Clinic GetClinicById(int Cid)
+        {
+            var clinic = _clinicRepo.GetClinicById(Cid);
+            if (clinic == null)
+                throw new KeyNotFoundException($"clinic with ID {Cid} not found.");
+            return clinic;
+        }
 
-}
+    }
 }
