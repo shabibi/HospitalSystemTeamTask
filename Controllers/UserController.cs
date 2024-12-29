@@ -26,9 +26,13 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("Register")]
-        public IActionResult Register(UserInputDTO InputUser)
+        [HttpPost("RegisterSupperAdmin")]
+        public IActionResult RegisterSupperAdmin(UserInputDTO InputUser)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 if (InputUser == null)
@@ -68,7 +72,6 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-
         [AllowAnonymous]
         [HttpGet("Login")]
         public IActionResult Login(string email, string password)
@@ -105,33 +108,33 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("AddDoctor")]
-        public IActionResult AddDoctor(UserInputDTO inputDoctor)
-        {
-            try
-            {
-                if (inputDoctor == null)
-                    return BadRequest("Doctor data is required.");
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost("AddDoctor")]
+        //public IActionResult AddDoctor(UserInputDTO inputDoctor)
+        //{
+        //    try
+        //    {
+        //        if (inputDoctor == null)
+        //            return BadRequest("Doctor data is required.");
 
-                var doctor = new User
-                {
-                    UserName = inputDoctor.UserName,
-                    Email = inputDoctor.Email,
-                    Password = inputDoctor.Password, // Temporary password
-                    Role = "Doctor",
-                    IsActive = true
-                };
+        //        var doctor = new User
+        //        {
+        //            UserName = inputDoctor.UserName,
+        //            Email = inputDoctor.Email,
+        //            Password = inputDoctor.Password, // Temporary password
+        //            Role = "Doctor",
+        //            IsActive = true
+        //        };
 
-                _userService.AddDoctor(doctor);
+        //        _userService.AddDoctor(doctor);
 
-                return Ok("Doctor added successfully. Share the email and temporary password with the doctor.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while adding the doctor: {ex.Message}");
-            }
-        }
+        //        return Ok("Doctor added successfully. Share the email and temporary password with the doctor.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred while adding the doctor: {ex.Message}");
+        //    }
+        //}
         [Authorize]
         [HttpPut("UpdatePassword")]
         public IActionResult UpdatePassword(UpdatePasswordDTO passwordDto)

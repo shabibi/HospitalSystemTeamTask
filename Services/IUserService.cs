@@ -1,4 +1,5 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 
 namespace HospitalSystemTeamTask.Services
 {
@@ -18,6 +19,7 @@ namespace HospitalSystemTeamTask.Services
         User GetUSer(string email, string password);
         void AddDoctor(User doctor);
         void UpdatePassword(int uid, string newPassword);
+        void AddSuperAdmin(UserInputDTO InputUser);
         bool EmailExists(string email);
     }
 }

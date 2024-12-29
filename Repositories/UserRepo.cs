@@ -32,7 +32,6 @@ namespace HospitalSystemTeamTask.Repositories
             try
             {
                 // Hash the password before saving
-                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
                 _context.Users.Add(user);
                 _context.SaveChanges();
             }
@@ -138,6 +137,17 @@ namespace HospitalSystemTeamTask.Repositories
                 {
                     throw new KeyNotFoundException("User not found.");
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+        public IEnumerable<User> GetUserByRole(string roleName)
+        {
+            try
+            {
+               return _context.Users.Where(u => u.Role == roleName).ToList();
             }
             catch (Exception ex)
             {
