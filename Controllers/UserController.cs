@@ -26,34 +26,59 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("Register")]
-        public IActionResult Register(UserInputDTO InputUser)
+        [HttpPost("RegisterSupperAdmin")]
+        public IActionResult RegisterSupperAdmin(UserInputDTO InputUser)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 if (InputUser == null)
                     return BadRequest("User data is required");
 
-                var user = new User
-                {
-                    UserName = InputUser.UserName,
-                    Email = InputUser.Email,
-                    Password = InputUser.Password,
-                    Role = InputUser.Role,
-             
-                    
-                };
+                _userService.AddSuperAdmin(InputUser);
 
-                _userService.AddUser(user);
-
-                return Ok(user);
+                
+                return Ok("Supper Admin added successfully");
             }
             catch (Exception ex)
             {
                 // Return a generic error response
-                return StatusCode(500, $"An error occurred while adding the user. {ex.Message} ");
+                return StatusCode(500, $"An error occurred while adding the SupperAdmin. {ex.Message} ");
             }
         }
+
+        //[AllowAnonymous]
+        //[HttpPost("Register")]
+        //public IActionResult Register(UserInputDTO InputUser)
+        //{
+        //    try
+        //    {
+        //        if (InputUser == null)
+        //            return BadRequest("User data is required");
+
+        //        var user = new User
+        //        {
+        //            UserName = InputUser.UserName,
+        //            Email = InputUser.Email,
+        //            Password = InputUser.Password,
+        //            Role = InputUser.Role,
+             
+                    
+        //        };
+
+        //        _userService.AddUser(user);
+
+        //        return Ok(user);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Return a generic error response
+        //        return StatusCode(500, $"An error occurred while adding the user. {ex.Message} ");
+        //    }
+        //}
 
 
         [AllowAnonymous]
@@ -92,33 +117,33 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("AddDoctor")]
-        public IActionResult AddDoctor(UserInputDTO inputDoctor)
-        {
-            try
-            {
-                if (inputDoctor == null)
-                    return BadRequest("Doctor data is required.");
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost("AddDoctor")]
+        //public IActionResult AddDoctor(UserInputDTO inputDoctor)
+        //{
+        //    try
+        //    {
+        //        if (inputDoctor == null)
+        //            return BadRequest("Doctor data is required.");
 
-                var doctor = new User
-                {
-                    UserName = inputDoctor.UserName,
-                    Email = inputDoctor.Email,
-                    Password = inputDoctor.Password, // Temporary password
-                    Role = "Doctor",
-                    IsActive = true
-                };
+        //        var doctor = new User
+        //        {
+        //            UserName = inputDoctor.UserName,
+        //            Email = inputDoctor.Email,
+        //            Password = inputDoctor.Password, // Temporary password
+        //            Role = "Doctor",
+        //            IsActive = true
+        //        };
 
-                _userService.AddDoctor(doctor);
+        //        _userService.AddDoctor(doctor);
 
-                return Ok("Doctor added successfully. Share the email and temporary password with the doctor.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while adding the doctor: {ex.Message}");
-            }
-        }
+        //        return Ok("Doctor added successfully. Share the email and temporary password with the doctor.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred while adding the doctor: {ex.Message}");
+        //    }
+        //}
         [Authorize]
         [HttpPut("UpdatePassword")]
         public IActionResult UpdatePassword(UpdatePasswordDTO passwordDto)
