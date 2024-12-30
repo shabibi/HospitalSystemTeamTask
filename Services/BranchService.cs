@@ -113,6 +113,22 @@ namespace HospitalSystemTeamTask.Services
             // Save the updated branch
             _branchRepository.UpdateBranch(branch);
         }
+        public BranchDTO GetBranchById(int id)
+        {
+            var branch = _branchRepository.GetBranchById(id);
+            if (branch == null)
+            {
+                return null; // or throw an exception, depending on your design
+            }
+
+            // Map Branch to BranchDTO
+            return new BranchDTO
+            {
+                BID = branch.BID,
+                BranchName = branch.BranchName,
+                Location = branch.Location
+            };
+        }
 
     }
 }

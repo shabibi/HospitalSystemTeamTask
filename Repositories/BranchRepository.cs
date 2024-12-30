@@ -43,6 +43,11 @@ namespace HospitalSystemTeamTask.Repositories
             _context.Branches.Update(branch);
             _context.SaveChanges();
         }
+        public Branch GetBranchById(int id)  
+        {
+            return _context.Branches
+                .FirstOrDefault(b => b.BID == id);
+        }
 
     }
 }

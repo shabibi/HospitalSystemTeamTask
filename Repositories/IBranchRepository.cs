@@ -8,5 +8,6 @@ namespace HospitalSystemTeamTask.Repositories
         IEnumerable<Branch> GetAllBranches();
         Branch GetBranchByBranchName(string branchName);
         void UpdateBranch(Branch branch);
+        Branch GetBranchById(int id);
     }
 }

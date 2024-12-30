@@ -4,6 +4,8 @@
     {
         public string BranchName { get; set; }
         public string Location { get; set; }
+        public int BID { get; set; }
+
      
     }
 }
