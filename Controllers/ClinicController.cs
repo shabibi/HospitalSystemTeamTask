@@ -137,5 +137,37 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpPut("UpdateClinicDetails/{CID}")]
+        public IActionResult UpdateClinicDetails(int CID,  ClinicInput input)
+        {
+            try
+            {
+                if (input == null)
+                {
+                    return BadRequest("Updated clinic details are required.");
+                }
+
+                if (CID <= 0)
+                {
+                    return BadRequest("Invalid Clinic ID.");
+                }
+
+                _clinicService.UpdateClinicDetails(CID, input);
+                return Ok("Clinic details updated successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }
