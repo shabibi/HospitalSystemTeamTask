@@ -38,11 +38,11 @@ namespace HospitalSystemTeamTask.Repositories
         }
 
 
-        public Clinic GetClinicById(int Cid)
+        public Clinic GetClinicById(int clinicId)
         {
             try
             {
-                return _context.Clinics.FirstOrDefault(u => u.CID == Cid);
+                return _context.Clinics.FirstOrDefault(u => u.CID == clinicId);
             }
             catch (Exception ex)
             {

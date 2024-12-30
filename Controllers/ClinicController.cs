@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalSystemTeamTask.Controllers
 {
-    [Authorize]
+
     [ApiController]
     [Route("api/[Controller]")]
     public class ClinicController : ControllerBase
@@ -36,34 +36,21 @@ namespace HospitalSystemTeamTask.Controllers
         //[Authorize(Roles = "Admin")]
         [AllowAnonymous]
         [HttpPost("AddClinic")]
-        public IActionResult AddClinic(ClinicInput clinicDto)
+        public IActionResult AddClinic(ClinicInput input)
         {
             try
             {
-                if (clinicDto == null)
+                if (input == null)
                 {
-                    return BadRequest("Clinic details are required.");
+                    return BadRequest("clinic details are required.");
                 }
 
-                // Map DTO to Clinic entity
-                var clinic = new Clinic
-                {
-                    //DepID = clinicDto.DepID,
-                    //AssignDoctor = clinicDto.AssignDoctor,
-                    BID = clinicDto.BID,
-                    ClincName = clinicDto.ClincName,
-                    Capacity = clinicDto.Capacity,
-                    StartTime = clinicDto.StartTime,
-                    EndTime = clinicDto.EndTime,
-                    SlotDuration = clinicDto.SlotDuration,
-                    Cost = clinicDto.Cost,
-                    IsActive = clinicDto.IsActive
-                };
 
-                // Call service to add the clinic
-                _clinicService.AddClinic(clinic);
 
-                return Ok("Clinic added successfully.");
+                _clinicService.AddClinic(input);
+
+
+                return Ok("Patient added successfully.");
             }
             catch (ArgumentException ex)
             {
@@ -74,7 +61,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-        [Authorize(Roles = "Admin,Doctor")]
+        //[Authorize(Roles = "Admin,Doctor")]
         [HttpGet("GetClinicById/{CID}")]
         public IActionResult GetClinicById(int CID)
         {
