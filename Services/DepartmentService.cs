@@ -34,6 +34,22 @@ namespace HospitalSystemTeamTask.Services
             _departmentRepository.AddDepartment(department);
         }
 
+        public void UpdateDepartment(int departmentId, DepartmentDTO departmentDto)
+        {
+            var updatedDepartment = new Department
+            {
+                DepartmentName = departmentDto.DepartmentName,
+                Description = departmentDto.Description
+            };
+
+            _departmentRepository.UpdateDepartment(departmentId, updatedDepartment);
+        }
+
+        public void SetDepartmentActiveStatus(int departmentId, bool isActive)
+        {
+            _departmentRepository.SetDepartmentActiveStatus(departmentId, isActive);
+        }
+
 
     }
 }
