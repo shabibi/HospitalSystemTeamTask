@@ -82,19 +82,11 @@ namespace HospitalSystemTeamTask.Repositories
 
 
         // Get user by email and password
-        public User GetUser(string email, string password)
+        public User GetUserByEmail(string email)
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Email == email);
-
-                // Verify password
-                if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
-                {
-                    return user;
-                }
-
-                return null; // Invalid credentials
+                return _context.Users.FirstOrDefault(u => u.Email == email);
             }
             catch (Exception ex)
             {
