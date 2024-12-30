@@ -142,15 +142,44 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while adding the product: {ex.Message}");
             }
         }
-
-        [HttpGet("GetUserById/{UserID}")]
-        public IActionResult GetUserById(int UserID)
+        
+        [HttpGet("GetUser")]
+        public IActionResult GetUser(int? UserID, string ? UserName)
         {
             try
             {
-                var user = _userService.GetUserById(UserID);
-                return Ok(user);
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                var userId =int.Parse( JwtHelper.GetClaimValue(token, "sub"));
 
+                // Check if the user's role allows them to perform this action
+                if (userRole == null && userRole != "admin" && userRole != "superAdmin" && userRole != "doctor")
+                    return BadRequest("You are not authorized to perform this action.");
+
+                // Validate the user ID
+                if (UserID < 0)
+                    return BadRequest("Invalid input");
+
+                // Validate input: At least one parameter must be provided
+                if (!UserID.HasValue && string.IsNullOrWhiteSpace(UserName))
+                    return BadRequest(new { message = "Invalid input. Provide either UserID or UserName." });
+
+                // Validate input: Ensure only one field is used for search
+                if (UserID.HasValue && !string.IsNullOrWhiteSpace(UserName))
+                    return BadRequest(new { message = "Invalid input. Provide only one field (UserID or UserName) to search." });
+
+                var user = _userService.GetUserData(UserName,UserID);
+
+
+                if (userRole == "patient" && userId != user.UID)
+                    return BadRequest("You are not authorized to get data of other patients .");
+
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Return 404 if the user is not found
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

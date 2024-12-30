@@ -121,5 +121,16 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
+        public User GetUserByName(string userName)
+        {
+            try
+            {
+                return _context.Users.FirstOrDefault(u => u.UserName == userName);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
     }
 }

@@ -106,6 +106,46 @@ namespace HospitalSystemTeamTask.Services
             return user;
         }
 
+        public User GetUserByName(string userName)
+        {
+            var user = _userRepo.GetUserByName(userName);
+            if (user == null)
+                throw new KeyNotFoundException($"User with Name {userName} not found.");
+            return user;
+        }
+        
+        public UserOutputDTO GetUserData(string ? userName, int ? uid)
+        {
+            User user = null;
+
+            // Validate that at least one parameter is provided
+            if (string.IsNullOrWhiteSpace(userName) && !uid.HasValue)
+                throw new ArgumentException("Either username or user ID must be provided.");
+
+            // Retrieve user based on username 
+            if (!string.IsNullOrEmpty(userName))
+                 user = GetUserByName(userName);
+
+            // Retrieve user based on UID
+            if (uid.HasValue)
+                user = GetUserById(uid.Value);
+
+
+            if(user == null)
+                throw new KeyNotFoundException($"User not found.");
+
+            var outputData = new UserOutputDTO
+            {
+                UID = user.UID,
+                UserName = user.UserName,
+                Email = user.Email,
+                Phone = user.Phone,
+                Role = user.Role,
+                IsActive = user.IsActive
+            };
+
+            return (outputData);
+        }
         public void UpdateUser(User user)
         {
             var existingUser = _userRepo.GetUserById(user.UID);
