@@ -7,5 +7,6 @@ namespace HospitalSystemTeamTask.Repositories
         void AddDepartment(Department department);
         IEnumerable<Department> GetAllDepartments();
         void SaveChanges();
+        Department GetDepartmentByName(string departmentName);
     }
 }
