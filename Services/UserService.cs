@@ -90,7 +90,11 @@ namespace HospitalSystemTeamTask.Services
             if (user == null)
                 throw new KeyNotFoundException($"User with ID {uid} not found.");
 
-            _userRepo.UpdateUserStatus(uid, false); // Deactivate the user
+            if(!user.IsActive)
+                throw new ArgumentException("User already not active.");
+            
+            user.IsActive = false;
+            _userRepo.UpdateUser(user); // Deactivate the user
         }
 
         // Get user by ID
