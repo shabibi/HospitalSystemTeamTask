@@ -169,5 +169,27 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpPost("SetClinicStatus/{clinicId}")]
+        public IActionResult SetClinicStatus(int clinicId,  bool isActive)
+        {
+            try
+            {
+                _clinicService.SetClinicStatus(clinicId, isActive);
+                return Ok($"Clinic status updated to {(isActive ? "Active" : "Inactive")}.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

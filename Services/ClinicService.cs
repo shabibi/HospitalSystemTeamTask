@@ -141,7 +141,27 @@ namespace HospitalSystemTeamTask.Services
             // Persist changes
             _clinicRepo.UpdateClinic(existingClinic);
         }
-        
+
+        public void SetClinicStatus(int clinicId, bool isActive)
+        {
+            if (clinicId <= 0)
+            {
+                throw new ArgumentException("Invalid Clinic ID.");
+            }
+
+            // Fetch the clinic
+            var clinic = _clinicRepo.GetClinicById(clinicId);
+            if (clinic == null)
+            {
+                throw new KeyNotFoundException($"Clinic with ID {clinicId} not found.");
+            }
+
+            // Update the IsActive flag
+            clinic.IsActive = isActive;
+
+            // Persist changes
+            _clinicRepo.UpdateClinic(clinic);
+        }
     }
 
 }
