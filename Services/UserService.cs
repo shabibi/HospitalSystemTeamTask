@@ -1,16 +1,23 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace HospitalSystemTeamTask.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepo _userRepo;
+        private readonly IConfiguration _configuration;
 
-        public UserService(IUserRepo userRepo)
+        public UserService(IUserRepo userRepo, IConfiguration configuration)
         {
             _userRepo = userRepo;
+            _configuration = configuration;
         }
 
         // Add user
@@ -95,7 +102,6 @@ namespace HospitalSystemTeamTask.Services
             return user;
         }
 
-        
         public void UpdateUser(User user)
         {
             var existingUser = _userRepo.GetUserById(user.UID);
@@ -105,26 +111,24 @@ namespace HospitalSystemTeamTask.Services
             _userRepo.UpdateUser(user);
         }
 
-        public User GetUSer(string email, string password)
+        public string AuthenticateUser(string email, string password)
         {
-            var user = _userRepo.GetUser(email, password);
+            // Retrieve the user from the repository using the provided email
+            var user = _userRepo.GetUserByEmail(email);
+
+            // Check if a user with the given email exists
             if (user == null)
-            {
-                throw new UnauthorizedAccessException("Invalid email or password.");
-            }
-            return user;
-        }
+                throw new UnauthorizedAccessException("Invalid email");
 
-        //adding Doctor:
-        public void AddDoctor(User doctor)
-        {
-            if (doctor.Role != "Doctor")
-                throw new InvalidOperationException("Invalid role. Only doctors can be added via this method.");
+            // Verify the provided password against the stored hashed password
+            if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
+                throw new ArgumentException("Incorrect Password");
 
-            if (_userRepo.EmailExists(doctor.Email))
-                throw new InvalidOperationException("Email already exists.");
+            // Ensure the user's account is active
+            if (!user.IsActive)
+                throw new ArgumentException("This user account is inactive");
 
-            _userRepo.AddUser(doctor);
+            return GenerateJwtToken(user.UID.ToString(), user.UserName, user.Role);
         }
 
         public void UpdatePassword(int uid, string newPassword)
@@ -140,6 +144,33 @@ namespace HospitalSystemTeamTask.Services
         {
             return _userRepo.EmailExists(email);
         }
+
+        public string GenerateJwtToken(string userId, string username , string role)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var secretKey = jwtSettings["SecretKey"];
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, userId),
+                new Claim(JwtRegisteredClaimNames.Name, username),
+                new Claim(JwtRegisteredClaimNames.UniqueName, role),
+
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+             };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpiryInMinutes"])),
+                signingCredentials: creds
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
 
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace HospitalSystemTeamTask.Controllers
@@ -81,42 +82,36 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-        [Authorize(Roles = "Patient")]
+        [AllowAnonymous]
         [HttpPut("UpdatePatientDetails")]
-        public IActionResult UpdatePatientDetails(Patient updatedPatient)
+        public IActionResult UpdatePatientDetails( int UID, PatientUpdate input)
         {
             try
             {
-                if (updatedPatient == null)
+                if (input == null)
                 {
                     return BadRequest("Patient details are required.");
                 }
-
-                // Extract user ID from the token to ensure the patient is updating their own details
-                var tokenUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
-                if (updatedPatient.PID != tokenUserId)
+                if (UID <= 0)
                 {
-                    return Unauthorized("You can only update your own details.");
+                    return BadRequest("Valid Patient ID (PID) is required.");
                 }
 
-                // Update patient details
-                _PatientService.UpdatePatientDetails(updatedPatient);
+
+                _PatientService.UpdatePatientDetails(UID, input);
 
                 return Ok("Patient details updated successfully.");
             }
-            catch (UnauthorizedAccessException ex)
+            catch (ArgumentException ex)
             {
-                return StatusCode(403, ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
+
+
         }
         // [Authorize(Roles = "Patient")]
         [AllowAnonymous]
