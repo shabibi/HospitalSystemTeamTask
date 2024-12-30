@@ -1,5 +1,7 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Repositories;
 using HospitalSystemTeamTask.Services;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalSystemTeamTask.Controllers
@@ -9,6 +11,7 @@ namespace HospitalSystemTeamTask.Controllers
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
+       
 
         public DepartmentController(IDepartmentService departmentService)
         {
@@ -26,6 +29,21 @@ namespace HospitalSystemTeamTask.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while creating the department.", error = ex.Message });
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult GetAllDepartments()
+        {
+            try
+            {
+                var departments = _departmentService.GetAllDepartments();
+                return Ok(departments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving departments.", error = ex.Message });
             }
         }
     }

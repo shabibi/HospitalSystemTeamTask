@@ -5,5 +5,6 @@ namespace HospitalSystemTeamTask.Services
     public interface IDepartmentService
     {
         void CreateDepartment(DepartmentDTO departmentDto);
+        IEnumerable<DepartmentDTO> GetAllDepartments();
     }
 }

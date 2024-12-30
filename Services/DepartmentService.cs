@@ -12,6 +12,15 @@ namespace HospitalSystemTeamTask.Services
         {
             _departmentRepository = departmentRepository;
         }
+        public IEnumerable<DepartmentDTO> GetAllDepartments()
+        {
+            return _departmentRepository.GetAllDepartments()
+                .Select(dept => new DepartmentDTO
+                {
+                    DepartmentName = dept.DepartmentName,
+                    Description = dept.Description
+                }).ToList();
+        }
 
         public void CreateDepartment(DepartmentDTO departmentDto)
         {
@@ -24,5 +33,7 @@ namespace HospitalSystemTeamTask.Services
 
             _departmentRepository.AddDepartment(department);
         }
+
+
     }
 }

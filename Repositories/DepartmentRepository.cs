@@ -16,6 +16,12 @@ namespace HospitalSystemTeamTask.Repositories
             _context.Departments.Add(department);
             SaveChanges();
         }
+        public IEnumerable<Department> GetAllDepartments()
+        {
+            return _context.Departments.ToList();
+        }
+
+
         public void SaveChanges()
         {
             _context.SaveChanges();
