@@ -144,7 +144,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
         
         [HttpGet("GetUser")]
-        public IActionResult GetUserById(int? UserID, string ? UserName)
+        public IActionResult GetUser(int? UserID, string ? UserName)
         {
             try
             {
