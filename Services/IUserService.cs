@@ -22,5 +22,6 @@ namespace HospitalSystemTeamTask.Services
         bool EmailExists(string email);
         void AddStaff(UserInputDTO InputUser);
         UserOutputDTO GetUserData(string? userName, int? uid);
+        IEnumerable<UserOutputDTO> GetUserByRole(string roleName);
     }
 }
