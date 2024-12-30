@@ -33,5 +33,25 @@ namespace HospitalSystemTeamTask.Repositories
         {
             _context.SaveChanges();
         }
+        public void UpdateDepartment(int departmentId, Department updatedDepartment)
+        {
+            var existingDepartment = _context.Departments.Find(departmentId);
+            if (existingDepartment != null)
+            {
+                existingDepartment.DepartmentName = updatedDepartment.DepartmentName;
+                existingDepartment.Description = updatedDepartment.Description;
+                SaveChanges();
+            }
+        }
+
+        public void SetDepartmentActiveStatus(int departmentId, bool isActive)
+        {
+            var department = _context.Departments.Find(departmentId);
+            if (department != null)
+            {
+                department.IsActive = isActive;
+                SaveChanges();
+            }
+        }
     }
 }

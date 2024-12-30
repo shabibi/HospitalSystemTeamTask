@@ -46,5 +46,41 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving departments.", error = ex.Message });
             }
         }
+        [HttpPatch("{id}")]
+        public IActionResult UpdateDepartment(int id, [FromBody] DepartmentDTO departmentDto)
+        {
+            try
+            {
+                _departmentService.UpdateDepartment(id, departmentDto);
+                return Ok(new { message = "Department updated successfully." });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Department not found." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the department.", error = ex.Message });
+            }
+        }
+
+        [HttpPatch("{id}/set-status")]
+        public IActionResult SetDepartmentStatus(int id, [FromQuery] bool isActive)
+        {
+            try
+            {
+                _departmentService.SetDepartmentActiveStatus(id, isActive);
+                var statusMessage = isActive ? "activated" : "deactivated";
+                return Ok(new { message = $"Department {statusMessage} successfully." });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Department not found." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the department status.", error = ex.Message });
+            }
+        }
     }
 }
