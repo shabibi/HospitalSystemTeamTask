@@ -64,16 +64,24 @@ namespace HospitalSystemTeamTask.Repositories
 
         public IEnumerable<Clinic> GetClinicsByBranchName(string branchName)
         {
-            try
+            if (string.IsNullOrEmpty(branchName))
             {
-                return _context.Clinics
-                    .Where(c => c.Branch.BranchName == branchName)
-                    .ToList();
+                throw new ArgumentException("Branch name is required.");
             }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Database error: {ex.Message}");
-            }
+
+            return _context.Clinics
+                .Join(
+                    _context.Branches,
+                    clinic => clinic.BID,
+                    branch => branch.BID,
+                    (clinic, branch) => new { Clinic = clinic, Branch = branch }
+                )
+                .Where(cb => cb.Branch.BranchName.ToLower() == branchName.ToLower())
+                .Select(cb => cb.Clinic)
+                .ToList();
         }
+
+
+
     }
 }

@@ -50,7 +50,7 @@ namespace HospitalSystemTeamTask.Controllers
                 _clinicService.AddClinic(input);
 
 
-                return Ok("Patient added successfully.");
+                return Ok("Clinic added successfully.");
             }
             catch (ArgumentException ex)
             {
@@ -91,6 +91,28 @@ namespace HospitalSystemTeamTask.Controllers
             {
                 // Return a generic error response
                 return StatusCode(500, $"An error occurred while retrieving patient. {(ex.Message)}");
+            }
+        }
+
+        [HttpGet("GetClinicsByBranchName/{branchName}")]
+        public IActionResult GetClinicsByBranchName(string branchName)
+        {
+            try
+            {
+                var clinics = _clinicService.GetClinicsByBranchName(branchName);
+                return Ok(clinics);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
     }
