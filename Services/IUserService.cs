@@ -13,13 +13,14 @@ namespace HospitalSystemTeamTask.Services
 
        
         User GetUserById(int uid);
+        User GetUserByName(string userName);
 
-        
         void UpdateUser(User user);
         string AuthenticateUser(string email, string password);
         void UpdatePassword(int uid, string newPassword);
         void AddSuperAdmin(UserInputDTO InputUser);
         bool EmailExists(string email);
         void AddStaff(UserInputDTO InputUser);
+        UserOutputDTO GetUserData(string? userName, int? uid);
     }
 }
