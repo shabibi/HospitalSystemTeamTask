@@ -1,5 +1,6 @@
 ﻿
 using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -112,6 +113,34 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while login. {(ex.Message)}");
             }
 
+        }
+
+        [Authorize]
+        [HttpPut("DeactivateUser")]
+        public IActionResult DeactivateUser(int userId)
+        {
+            try
+            {
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null && userRole != "admin" && userRole != "superAdmin")
+                    return BadRequest("You are not authorized to perform this action.");
+
+                // Validate the user ID
+                if (userId < 0)
+                    return BadRequest("Invalid input");
+
+                _userService.DeactivateUser(userId);
+                return Ok(new { message = "User deactivated successfully." });
+
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while adding the product: {ex.Message}");
+            }
         }
 
         [HttpGet("GetUserById/{UserID}")]

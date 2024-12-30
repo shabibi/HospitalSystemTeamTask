@@ -41,36 +41,11 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
-        // Update user active status
-        public void UpdateUserStatus(int uid, bool isActive)
-        {
-            try
-            {
-                var user = GetUserById(uid);
-                if (user != null)
-                {
-                    user.IsActive = isActive;
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    throw new InvalidOperationException("User not found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Database error: {ex.Message}");
-            }
-        }
+        // Update user status
         public void UpdateUser(User user)
         {
             try
             {
-                // Only hash the password if it is updated
-                if (!string.IsNullOrEmpty(user.Password))
-                {
-                    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-                }
                 _context.Users.Update(user);
                 _context.SaveChanges();
             }
@@ -79,7 +54,6 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
-
 
         // Get user by email and password
         public User GetUserByEmail(string email)

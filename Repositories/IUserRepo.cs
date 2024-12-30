@@ -11,9 +11,6 @@ namespace HospitalSystemTeamTask.Repositories
         
         void AddUser(User user);
 
-        void UpdateUserStatus(int uid, bool isActive);
-
-        
         User GetUserByEmail(string email);
 
         bool IsValidRole(string roleName);
