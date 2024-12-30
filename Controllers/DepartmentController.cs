@@ -18,12 +18,22 @@ namespace HospitalSystemTeamTask.Controllers
         {
             _departmentService = departmentService;
         }
-
+        [Authorize]
         [HttpPost]
         public IActionResult CreateDepartment([FromBody] DepartmentDTO departmentDto)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 _departmentService.CreateDepartment(departmentDto);
                 return Ok(new { message = "Department created successfully." });
             }
