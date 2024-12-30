@@ -115,6 +115,54 @@ namespace HospitalSystemTeamTask.Services
             return clinics;
         }
 
+        public void UpdateClinicDetails( int CID,ClinicInput input)
+        {
+            var existingClinic = _clinicRepo.GetClinicById(CID);
+            TimeSpan totalDuration = input.EndTime - input.StartTime;
+            if (input.Capacity <= 0)
+            {
+                throw new ArgumentException("Capacity must be greater than 0.");
+            }
+
+            int slotTime = (int)(totalDuration.TotalMinutes / input.Capacity);
+
+            // Map updated properties
+            existingClinic.ClincName = input.ClincName;
+            existingClinic.Capacity = input.Capacity;
+            existingClinic.StartTime = input.StartTime;
+            existingClinic.EndTime = input.EndTime;
+            existingClinic.SlotDuration = slotTime;
+            existingClinic.Cost = input.Cost;
+            existingClinic.IsActive = input.IsActive;
+            existingClinic.DepID = input.DepID;
+            existingClinic.BID = input.BID;
+            existingClinic.AssignDoctor = input.AssignDoctor;
+
+            // Persist changes
+            _clinicRepo.UpdateClinic(existingClinic);
+        }
+
+        public void SetClinicStatus(int clinicId, bool isActive)
+        {
+            if (clinicId <= 0)
+            {
+                throw new ArgumentException("Invalid Clinic ID.");
+            }
+
+            // Fetch the clinic
+            var clinic = _clinicRepo.GetClinicById(clinicId);
+            if (clinic == null)
+            {
+                throw new KeyNotFoundException($"Clinic with ID {clinicId} not found.");
+            }
+
+            // Update the IsActive flag
+            clinic.IsActive = isActive;
+
+            // Persist changes
+            _clinicRepo.UpdateClinic(clinic);
+        }
     }
+
 }
 

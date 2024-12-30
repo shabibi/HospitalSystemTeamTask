@@ -93,6 +93,12 @@ namespace HospitalSystemTeamTask.Repositories
                 .ToList();
         }
 
+        public void UpdateClinic(Clinic clinic)
+        {
+            _context.Clinics.Update(clinic);
+            _context.SaveChanges();
+        }
+
 
 
     }
