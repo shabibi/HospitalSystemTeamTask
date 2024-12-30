@@ -1,27 +1,40 @@
 ﻿using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask;
 using HospitalSystemTeamTask.Repositories;
-
-public class DoctorRepo : IDoctorRepo
+namespace HospitalSystemTeamTask.Repositories
 {
-    private readonly ApplicationDbContext _context;
-
-    public DoctorRepo(ApplicationDbContext context)
+    public class DoctorRepo : IDoctorRepo
     {
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public IEnumerable<Doctor> GetAllDoctors()
-    {
-        try
+        public DoctorRepo(ApplicationDbContext context)
         {
-            return _context.Doctors.ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Database error: {ex.Message}");
+            _context = context;
         }
 
+        public IEnumerable<Doctor> GetAllDoctors()
+        {
+            try
+            {
+                return _context.Doctors.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+        public Doctor GetDoctorById(int Did)
+        {
+            try
+            {
+                return _context.Doctors.FirstOrDefault(u => u.DID == Did);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
 
     }
 }
+

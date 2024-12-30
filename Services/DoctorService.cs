@@ -22,6 +22,14 @@ namespace HospitalSystemTeamTask.Services
                 return _DoctorRepo.GetAllDoctors();
 
             }
+        public Doctor GetDoctorById(int uid)
+        {
+            var doctor = _DoctorRepo.GetDoctorById(uid);
+            if (doctor == null)
+                throw new KeyNotFoundException($"User with ID {uid} not found.");
+            return doctor;
+        }
 
 
-        } }
+
+    } }
