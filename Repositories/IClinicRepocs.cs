@@ -9,5 +9,6 @@ namespace HospitalSystemTeamTask.Repositories
         Clinic GetClinicById(int Cid);
         Clinic GetClinicByName(string ClinicName);
         IEnumerable<Clinic> GetClinicsByBranchName(string branchName);
+        IEnumerable<Clinic> GetClinicsByDepartmentID(int depId);
     }
 }

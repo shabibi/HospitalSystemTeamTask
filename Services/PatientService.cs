@@ -2,6 +2,7 @@
 using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
+using System.Security.Cryptography;
 
 
 namespace HospitalSystemTeamTask.Services
@@ -33,41 +34,21 @@ namespace HospitalSystemTeamTask.Services
             return patient;
         }
 
-        public void UpdatePatientDetails(Patient updatedPatient)
+        public void UpdatePatientDetails( int UID, PatientUpdate patientInput)
         {
-            // Fetch the existing patient
-            var existingPatient = _PatientRepo.GetPatientsById(updatedPatient.PID);
+            //get patient data from user table
+            var existingUser = _userService.GetUserById(UID);
 
-            if (existingPatient == null)
+            //update patient data (only accept to update user name and phone number)
+            existingUser.Password = patientInput.Password;
+            existingUser.Phone = patientInput.Phone;
+
+            if (existingUser == null)
             {
                 throw new KeyNotFoundException("Patient not found.");
             }
 
-            // Update patient-specific fields
-            existingPatient.Age = updatedPatient.Age;
-            existingPatient.Gender = updatedPatient.Gender;
-
-            // Update user-specific fields if provided
-            if (updatedPatient.User != null)
-            {
-                if (!string.IsNullOrEmpty(updatedPatient.User.UserName))
-                {
-                    existingPatient.User.UserName = updatedPatient.User.UserName;
-                }
-
-                if (!string.IsNullOrEmpty(updatedPatient.User.Email))
-                {
-                    existingPatient.User.Email = updatedPatient.User.Email;
-                }
-
-                if (!string.IsNullOrEmpty(updatedPatient.User.Password))
-                {
-                    existingPatient.User.Password = BCrypt.Net.BCrypt.HashPassword(updatedPatient.User.Password);
-                }
-            }
-
-            // Save changes via the repository
-            _PatientRepo.UpdatePatient(existingPatient);
+            _userService.UpdateUser(existingUser);
         }
 
 

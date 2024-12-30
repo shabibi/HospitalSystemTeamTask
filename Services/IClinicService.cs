@@ -1,13 +1,15 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 
 namespace HospitalSystemTeamTask.Services
 {
     public interface IClinicService
     {
         IEnumerable<Clinic> GetAllClinic();
-        void AddClinic(Clinic clinic);
-        Clinic GetClinicById(int Cid);
+        void AddClinic(ClinicInput input);
+        Clinic GetClinicById(int clinicId);
         Clinic GetClinicByName(string clinicName);
         IEnumerable<Clinic> GetClinicsByBranchName(string branchName);
+        IEnumerable<Clinic> GetClinicsByDepartmentId(int departmentId);
     }
 }

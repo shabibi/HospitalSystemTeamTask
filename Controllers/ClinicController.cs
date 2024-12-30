@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalSystemTeamTask.Controllers
 {
-    [Authorize]
+
     [ApiController]
     [Route("api/[Controller]")]
     public class ClinicController : ControllerBase
@@ -36,32 +36,19 @@ namespace HospitalSystemTeamTask.Controllers
         //[Authorize(Roles = "Admin")]
         [AllowAnonymous]
         [HttpPost("AddClinic")]
-        public IActionResult AddClinic(ClinicInput clinicDto)
+        public IActionResult AddClinic(ClinicInput input)
         {
             try
             {
-                if (clinicDto == null)
+                if (input == null)
                 {
-                    return BadRequest("Clinic details are required.");
+                    return BadRequest("clinic details are required.");
                 }
 
-                // Map DTO to Clinic entity
-                var clinic = new Clinic
-                {
-                    //DepID = clinicDto.DepID,
-                    //AssignDoctor = clinicDto.AssignDoctor,
-                    BID = clinicDto.BID,
-                    ClincName = clinicDto.ClincName,
-                    Capacity = clinicDto.Capacity,
-                    StartTime = clinicDto.StartTime,
-                    EndTime = clinicDto.EndTime,
-                    SlotDuration = clinicDto.SlotDuration,
-                    Cost = clinicDto.Cost,
-                    IsActive = clinicDto.IsActive
-                };
 
-                // Call service to add the clinic
-                _clinicService.AddClinic(clinic);
+
+                _clinicService.AddClinic(input);
+
 
                 return Ok("Clinic added successfully.");
             }
@@ -74,7 +61,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-        [Authorize(Roles = "Admin,Doctor")]
+        //[Authorize(Roles = "Admin,Doctor")]
         [HttpGet("GetClinicById/{CID}")]
         public IActionResult GetClinicById(int CID)
         {
@@ -106,5 +93,49 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while retrieving patient. {(ex.Message)}");
             }
         }
+
+        [HttpGet("GetClinicsByBranchName/{branchName}")]
+        public IActionResult GetClinicsByBranchName(string branchName)
+        {
+            try
+            {
+                var clinics = _clinicService.GetClinicsByBranchName(branchName);
+                return Ok(clinics);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+        [HttpGet("GetClinicsByDepartmentID/{departmentId}")]
+        public IActionResult GetClinicsByDepartmentID(int departmentId)
+        {
+            try
+            {
+                var clinics = _clinicService.GetClinicsByDepartmentId(departmentId);
+                return Ok(clinics);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

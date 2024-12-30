@@ -13,6 +13,7 @@ namespace HospitalSystemTeamTask.Services
         BranchDTO GetBranchDetailsByBranchName(string branchName);
         void UpdateBranch(string branchName, UpdateBranchDTO updatedBranchDto);
         void SetBranchStatus(string branchName, bool isActive);
+        BranchDTO GetBranchById(int id);
     }
 
     

@@ -2,6 +2,7 @@
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
 using HospitalSystemTeamTask;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalSystemTeamTask.Repositories
 {
@@ -27,17 +28,18 @@ namespace HospitalSystemTeamTask.Repositories
         }
 
         //Get Patients by id
-        public Patient GetPatientsById(int Pid)
+        public Patient GetPatientsById(int PID)
         {
             try
             {
-                return _context.Patients.FirstOrDefault(u => u.PID == Pid);
+                return _context.Patients.FirstOrDefault(u => u.PID == PID);
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
+
 
         public void UpdatePatient(Patient patient)
         {
