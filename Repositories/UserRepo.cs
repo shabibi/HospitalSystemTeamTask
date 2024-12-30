@@ -113,7 +113,7 @@ namespace HospitalSystemTeamTask.Repositories
         {
             try
             {
-               return _context.Users.Where(u => u.Role == roleName).ToList();
+               return _context.Users.Where(u => u.Role == roleName&& u.IsActive == true).ToList();
             }
             catch (Exception ex)
             {

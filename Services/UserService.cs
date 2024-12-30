@@ -175,6 +175,29 @@ namespace HospitalSystemTeamTask.Services
             return GenerateJwtToken(user.UID.ToString(), user.UserName, user.Role);
         }
 
+        public IEnumerable<UserOutputDTO> GetUserByRole(string roleName)
+        {
+           var users =  _userRepo.GetUserByRole(roleName);
+            if (users == null)
+                throw new KeyNotFoundException($"No Users found");
+
+            List<UserOutputDTO> output = new List<UserOutputDTO>();
+
+            foreach (var user in users)
+            {
+                // Transform active users into DTOs
+                output.Add(new UserOutputDTO
+                {
+                    UID = user.UID,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                    Role = user.Role,
+                    IsActive = user.IsActive
+                });
+            }
+            return (output);    
+        }
         public void UpdatePassword(int uid, string newPassword)
         {
             var user = _userRepo.GetUserById(uid);

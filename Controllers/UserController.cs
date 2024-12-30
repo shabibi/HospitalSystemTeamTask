@@ -188,6 +188,38 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpGet("GetUsersByRole")]
+        public IActionResult GetUsersByRole( string role)
+        {
+            try
+            {
+                // Validate input
+                if (string.IsNullOrWhiteSpace(role))
+                    return BadRequest(new { message = "Invalid input" });
+
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null && userRole != "admin" && userRole != "superAdmin")
+                    return BadRequest("You are not authorized to perform this action.");
+
+                var users= _userService.GetUserByRole(role);
+
+                return Ok(users);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Return 404 if the user is not found
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while retrieving user. {(ex.Message)}");
+            }
+        }
+
         [Authorize]
         [HttpPut("UpdatePassword")]
         public IActionResult UpdatePassword(UpdatePasswordDTO passwordDto)
