@@ -99,6 +99,22 @@ namespace HospitalSystemTeamTask.Services
             return clinics;
         }
 
+        public IEnumerable<Clinic> GetClinicsByDepartmentId(int departmentId)
+        {
+            if (departmentId <= 0)
+            {
+                throw new ArgumentException("Department ID must be greater than 0.");
+            }
+
+            var clinics = _clinicRepo.GetClinicsByDepartmentID(departmentId);
+            if (!clinics.Any())
+            {
+                throw new KeyNotFoundException($"No clinics found for Department ID: {departmentId}");
+            }
+
+            return clinics;
+        }
+
     }
 }
 

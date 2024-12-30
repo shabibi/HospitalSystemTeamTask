@@ -81,6 +81,18 @@ namespace HospitalSystemTeamTask.Repositories
                 .ToList();
         }
 
+        public IEnumerable<Clinic> GetClinicsByDepartmentID(int depId)
+        {
+            if (depId <= 0)
+            {
+                throw new ArgumentException("Department ID must be greater than 0.");
+            }
+
+            return _context.Clinics
+                .Where(clinic => clinic.DepID == depId)
+                .ToList();
+        }
+
 
 
     }
