@@ -11,7 +11,6 @@ using System.Text;
 
 namespace HospitalSystemTeamTask.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[Controller]")]
     public class UserController : ControllerBase
@@ -37,9 +36,6 @@ namespace HospitalSystemTeamTask.Controllers
             {
                 if (InputUser == null)
                     return BadRequest("User data is required");
-
-        //        // Normalize role by trimming spaces and comparing case-insensitively
-        //        var normalizedRole = InputUser.Role?.Trim();
 
                 // Add the user
                 _userService.AddSuperAdmin(InputUser);
@@ -80,16 +76,35 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while adding new staff. {ex.Message}");
             }
         }
+
         [AllowAnonymous]
         [HttpGet("Login")]
         public IActionResult Login(string email, string password)
         {
+            // Validate the email input
+            if (string.IsNullOrEmpty(email))
+                return BadRequest(new { message = "Email is required." });
+
+            // Validate the password input
+            if (string.IsNullOrWhiteSpace(password))
+                return BadRequest(new { message = "Password is required." });
+
             try
             {
-                var user = _userService.GetUSer(email, password);
-                string token = GenerateJwtToken(user.UID.ToString(), user.UserName, user.Role);
-                return Ok(token);
+                // Attempt to authenticate the user and generate a token
+                string token = _userService.AuthenticateUser(email, password);
+                return Ok(token );
 
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return an HTTP 400 response if the user account is inactive or invalid
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Return an HTTP 401 response if authentication fails due to invalid credentials
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -98,7 +113,6 @@ namespace HospitalSystemTeamTask.Controllers
             }
 
         }
-
 
         [HttpGet("GetUserById/{UserID}")]
         public IActionResult GetUserById(int UserID)
@@ -116,33 +130,6 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin")]
-        //[HttpPost("AddDoctor")]
-        //public IActionResult AddDoctor(UserInputDTO inputDoctor)
-        //{
-        //    try
-        //    {
-        //        if (inputDoctor == null)
-        //            return BadRequest("Doctor data is required.");
-
-        //        var doctor = new User
-        //        {
-        //            UserName = inputDoctor.UserName,
-        //            Email = inputDoctor.Email,
-        //            Password = inputDoctor.Password, // Temporary password
-        //            Role = "Doctor",
-        //            IsActive = true
-        //        };
-
-        //        _userService.AddDoctor(doctor);
-
-        //        return Ok("Doctor added successfully. Share the email and temporary password with the doctor.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"An error occurred while adding the doctor: {ex.Message}");
-        //    }
-        //}
         [Authorize]
         [HttpPut("UpdatePassword")]
         public IActionResult UpdatePassword(UpdatePasswordDTO passwordDto)
@@ -160,36 +147,6 @@ namespace HospitalSystemTeamTask.Controllers
             {
                 return StatusCode(500, $"An error occurred while updating the password: {ex.Message}");
             }
-        }
-
-
-
-
-        [NonAction]
-        public string GenerateJwtToken(string userId, string username, string role)
-        {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["SecretKey"];
-
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.Name, username),
-                new Claim(JwtRegisteredClaimNames.UniqueName, role),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpiryInMinutes"])),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
 
