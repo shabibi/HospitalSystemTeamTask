@@ -123,12 +123,22 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-
+        [Authorize]
         [HttpPatch("{branchName}/status")]
         public IActionResult SetBranchStatus(string branchName, [FromQuery] bool isActive)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 // Call the service to set the status
                 _branchService.SetBranchStatus(branchName, isActive);
                 return Ok(new { message = $"Branch '{branchName}' status updated to {(isActive ? "Active" : "Inactive")}." });
