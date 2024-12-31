@@ -2,7 +2,7 @@
 {
     public class UpdatePatientRecordDto
     {
-        public int RID { get; set; }
+        public int PatientRecordID { get; set; }
         public int PID { get; set; }
         public int BID { get; set; }
         public int DID { get; set; }

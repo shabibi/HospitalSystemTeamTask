@@ -2,7 +2,7 @@
 {
     public class PatientRecordDto
     {
-        public int RID { get; set; }
+        public int PatientRecordID { get; set; }
         public int PID { get; set; }
         public string PatientName { get; set; }
         public int BID { get; set; }

@@ -32,7 +32,7 @@ namespace HospitalSystemTeamTask.Controllers
                 // Map PatientRecord to PatientRecordDto
                 var recordDto = new PatientRecordDto
                 {
-                    RID = record.RID,
+                    PatientRecordID = record.RID,
                     PID = record.PID,
                     PatientName = record.Patient?.User?.UserName,
                     BID = record.BID,
@@ -64,7 +64,7 @@ namespace HospitalSystemTeamTask.Controllers
             var records = _service.GetAllRecords()
                 .Select(record => new PatientRecordDto
                 {
-                    RID = record.RID,
+                    PatientRecordID = record.RID,
                     PID = record.PID,
                     PatientName = record.Patient?.User?.UserName, 
                     BID = record.BID,
@@ -123,7 +123,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var records = _service.GetRecordsByDoctorId(doctorId)
                     .Select(record => new PatientRecordDto
                     {
-                        RID = record.RID,
+                        PatientRecordID = record.RID,
                         PID = record.PID,
                         PatientName = record.Patient?.User?.UserName,
                         BID = record.BID,
@@ -160,7 +160,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var records = _service.GetRecordsByBranchId(branchId)
                     .Select(record => new PatientRecordDto
                     {
-                        RID = record.RID,
+                        PatientRecordID = record.RID,
                         PID = record.PID,
                         PatientName = record.Patient?.User?.UserName,
                         BID = record.BID,

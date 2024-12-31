@@ -1,6 +1,7 @@
 ﻿using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask;
 using HospitalSystemTeamTask.Repositories;
+using Microsoft.EntityFrameworkCore;
 namespace HospitalSystemTeamTask.Repositories
 {
     public class DoctorRepo : IDoctorRepo
@@ -23,6 +24,8 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
+       
+
         public Doctor GetDoctorById(int Did)
         {
             try
@@ -34,6 +37,76 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
         }
+        public Doctor GetDoctorByEmail(string email)
+        {
+            try
+            {
+               
+                var doctor = _context.Doctors
+                    .Include(d => d.User) 
+                    .FirstOrDefault(d => d.User.Email == email);
+
+                return doctor;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+
+        public bool EmailExists(string email)
+        {
+            try
+            {
+                return _context.Users.Any(u => u.Email == email);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+        public Doctor GetDoctorByName(string docName)
+        {
+            if (string.IsNullOrEmpty(docName))
+            {
+                throw new ArgumentException("Doctor name cannot be null or empty.", nameof(docName));
+            }
+
+            try
+            {
+                // Use Include to join User with Doctor and filter by UserName
+                var doctor = _context.Doctors
+                    .Include(d => d.User) // Join with User table
+                    .FirstOrDefault(d => d.User.UserName == docName);
+
+                return doctor;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("An error occurred while accessing the database.", ex);
+            }
+        }
+
+
+        public void AddDoctor(Doctor doctor)
+        {
+            try
+            {
+
+                // Add the Patient entity
+                _context.Doctors.Add(doctor);
+
+                // Save changes to the database
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+
+
+
 
     }
 }
