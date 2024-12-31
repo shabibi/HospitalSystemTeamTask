@@ -6,5 +6,6 @@ namespace HospitalSystemTeamTask.Services
     public interface IBranchDepartmentService
     {
         void AddDepartmentToBranch(BranchDepDTO department);
+        
     }
 }
