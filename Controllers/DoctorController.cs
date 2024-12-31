@@ -40,61 +40,54 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [HttpGet("GetDoctorByEmail")]
-        public IActionResult GetDoctorByEmail(string email)
-        {
-            try
-            {
-                var doctor = _doctorServicee.GetDoctorByEmail(email);
-                if (doctor == null)
-                {
-                    return NotFound("Doctor not found.");
-                }
+        //[HttpGet("GetDoctorByEmail")]
+        //public IActionResult GetDoctorByEmail(string email)
+        //{
+        //    try
+        //    {
+        //        var doctor = _doctorServicee.GetDoctorByEmail(email);
+        //        if (doctor == null)
+        //        {
+        //            return NotFound("Doctor not found.");
+        //        }
 
-                return Ok(doctor);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+        //        return Ok(doctor);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ex.Message);
+        //    }
+        //}
 
-        [HttpGet("GetDoctorByName")]
-        public IActionResult GetDoctorByName(string docName)
-        {
-            try
-            {
-                var doctor = _doctorServicee.GetDoctorByName(docName);
-                if (doctor == null)
-                {
-                    return NotFound("Doctor not found.");
-                }
+        //[HttpGet("GetDoctorByName")]
+        //public IActionResult GetDoctorByName(string docName)
+        //{
+        //    try
+        //    {
+        //        var doctor = _doctorServicee.GetDoctorByName(docName);
+        //        if (doctor == null)
+        //        {
+        //            return NotFound("Doctor not found.");
+        //        }
 
-                return Ok(doctor);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An error occurred while processing your request.");
-            }
-        }
+        //        return Ok(doctor);
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, "An error occurred while processing your request.");
+        //    }
+        //}
 
         [HttpGet("GetDoctor")]
         public IActionResult GetDoctor(int? DocID, string? DocName)
         {
             try
             {
-                string token = JwtHelper.ExtractToken(Request);
-                var doctorRole = JwtHelper.GetClaimValue(token, "unique_name");
-                var DID = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
-
-                // Check if the user's role allows them to perform this action
-                if (doctorRole == null && doctorRole != "admin" && doctorRole != "superAdmin" && doctorRole != "doctor")
-                    return BadRequest("You are not authorized to perform this action.");
-
+             
                 // Validate the user ID
                 if (DocID < 0)
                     return BadRequest("Invalid input");
@@ -110,8 +103,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var doctor = _doctorServicee.GetDoctorData(DocName, DocID);
 
 
-                if (doctorRole == "patient" && DocID != doctor.UID)
-                    return BadRequest("You are not authorized to get data of other patients .");
+              
 
                 return Ok(doctor);
             }
