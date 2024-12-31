@@ -91,6 +91,26 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+
+        [HttpGet("GetDepartmentsByBranch")]
+        public IActionResult DepartmentsByBranch(string branchName)
+        {
+            try
+            {
+                if(string.IsNullOrEmpty(branchName))
+                    return NotFound("Branch name required");
+                var branch = _branchDepartmentService.GetDepartmentsByBranch(branchName);
+                return Ok(branch);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
+            }
+        }
         [Authorize]
         [HttpPatch("{branchName}")]
         public IActionResult UpdateBranch(string branchName, [FromBody] UpdateBranchDTO updatedBranchDto)

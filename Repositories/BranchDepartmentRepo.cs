@@ -1,4 +1,5 @@
 ﻿using HospitalSystemTeamTask.Models;
+using System.Linq;
 
 namespace HospitalSystemTeamTask.Repositories
 {
@@ -21,6 +22,23 @@ namespace HospitalSystemTeamTask.Repositories
             {
                 throw new InvalidOperationException($"Database error: {ex.Message}");
             }
+        }
+
+        public IEnumerable<Department> GetDepartmentsByBranch(int BranchID)
+        {
+            try
+            {
+                // Query the departments associated with the branch
+                return _context.branchDepartments
+                               .Where(b => b.BID == BranchID)
+                               .Select(b => b.Department) // Assuming a navigation property exists
+                               .ToList(); // Execute the query
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+
         }
     }
 }
