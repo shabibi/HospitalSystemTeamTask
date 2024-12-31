@@ -1,6 +1,8 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalSystemTeamTask.Controllers
@@ -15,11 +17,21 @@ namespace HospitalSystemTeamTask.Controllers
         {
             _branchService = branchService;
         }
+        [Authorize]
         [HttpPost]
         public IActionResult AddBranch([FromBody] BranchDTO branchDto)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 _branchService.AddBranch(branchDto);
                 return Ok("Branch added successfully");
             }
