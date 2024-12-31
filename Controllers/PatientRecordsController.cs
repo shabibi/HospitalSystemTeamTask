@@ -72,5 +72,67 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An error occurred while adding the patient record.", details = ex.Message });
             }
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Check if the record exists
+                var existingRecord = _service.GetRecordById(id);
+                if (existingRecord == null)
+                {
+                    return NotFound(new { message = "Patient record not found." });
+                }
+
+                // Update the existing entity with the new data
+                existingRecord.PID = dto.PID;
+                existingRecord.BID = dto.BID;
+                existingRecord.DID = dto.DID;
+                existingRecord.VisitDate = dto.VisitDate;
+                existingRecord.VisitTime = dto.VisitTime;
+                existingRecord.Inspection = dto.Inspection;
+                existingRecord.Treatment = dto.Treatment;
+                existingRecord.Cost = dto.Cost;
+
+                // Call the service to update the record
+                _service.UpdateRecord(existingRecord);
+
+                return Ok(new { message = "Patient record updated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the patient record.", details = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteRecord(int id)
+        {
+            try
+            {
+                // Get the record to delete
+                var recordToDelete = _service.GetRecordById(id);
+                if (recordToDelete == null)
+                {
+                    return NotFound(new { message = "Patient record not found." });
+                }
+
+                // Call the service to delete the record
+                _service.DeleteRecord(recordToDelete);
+
+                return Ok(new { message = "Patient record deleted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error message
+                return StatusCode(500, new { message = "An error occurred while deleting the patient record.", details = ex.Message });
+            }
+        }
     }
 }

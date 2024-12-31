@@ -27,6 +27,17 @@ namespace HospitalSystemTeamTask.Repositories
             _context.PatientRecords.Add(record);
             _context.SaveChanges();
         }
+        public void UpdateRecord(PatientRecord record)
+        {
+            _context.PatientRecords.Update(record);
+            _context.SaveChanges();
+        }
+
+        public void DeleteRecord(PatientRecord record)
+        {
+            _context.PatientRecords.Remove(record);
+            _context.SaveChanges();
+        }
 
     }
 }

@@ -26,5 +26,15 @@ namespace HospitalSystemTeamTask.Services
         {
             _repository.Add(record);
         }
+
+        public void UpdateRecord(PatientRecord record)
+        {
+            _repository.UpdateRecord(record);
+        }
+
+        public void DeleteRecord(PatientRecord record)
+        {
+            _repository.DeleteRecord(record);
+        }
     }
 }

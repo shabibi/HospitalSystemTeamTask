@@ -7,5 +7,7 @@ namespace HospitalSystemTeamTask.Repositories
         IEnumerable<PatientRecord> GetAll();
         PatientRecord GetById(int id);
         void Add(PatientRecord record);
+        void UpdateRecord(PatientRecord record);
+        void DeleteRecord(PatientRecord record);
     }
 }
