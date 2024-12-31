@@ -127,6 +127,30 @@ namespace HospitalSystemTeamTask.Services
         }
 
 
+        public IEnumerable<DoctorOutPutDTO> GetDoctorsByBranchName(string branchName)
+        {
+            if (string.IsNullOrWhiteSpace(branchName))
+                throw new ArgumentException("Branch name is required.");
+
+            // Fetch doctors from the repository
+            var doctors = _DoctorRepo.GetDoctorByBranchName(branchName);
+
+            // Transform to DTOs
+            var doctorDtos = doctors.Select(doctor => new DoctorOutPutDTO
+            {
+                UID = doctor.DID,
+                CurrentBrunch = doctor.CurrentBrunch,
+                Level = doctor.Level,
+                Degree = doctor.Degree,
+                WorkingYear = doctor.WorkingYear,
+                JoiningDate = doctor.JoiningDate,
+                DepId = doctor.DepId
+            });
+
+            return doctorDtos;
+        }
+
+
 
     }
 

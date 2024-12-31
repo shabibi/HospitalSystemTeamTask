@@ -105,6 +105,21 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
+        public IEnumerable<Doctor> GetDoctorByBranchName(string branchName)
+        {
+            if (string.IsNullOrEmpty(branchName))
+            {
+                throw new ArgumentException("Branch name is required.");
+            }
+
+            return _context.Doctors
+                .Include(d => d.Branch)
+                .Where(d => d.Branch.BranchName.ToLower() == branchName.ToLower())
+                .ToList();
+        }
+
+
+
 
 
 

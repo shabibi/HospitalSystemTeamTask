@@ -141,6 +141,24 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpGet("GetDoctorsByBranch")]
+        public IActionResult GetDoctorsByBranch(string branchName)
+        {
+            try
+            {
+                var doctors = _doctorServicee.GetDoctorsByBranchName(branchName);
+                return Ok(doctors);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred while retrieving doctors. {ex.Message}" });
+            }
+        }
+
 
     }
 }
