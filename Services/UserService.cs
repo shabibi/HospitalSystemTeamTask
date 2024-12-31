@@ -41,7 +41,7 @@ namespace HospitalSystemTeamTask.Services
                 {
                     String defaultPassword = "Super1234";
                     string generatedEmail =$"{InputUser.UserName}@gmail.com";
-                    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(defaultPassword);
+                    string hashedPassword = HashingPassword.Hshing(defaultPassword);
                     var newSupperAdmin = new User
                     {
                         UserName = InputUser.UserName,
