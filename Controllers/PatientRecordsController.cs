@@ -150,6 +150,43 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+
+        [HttpGet("by-branch/{branchId}")]
+        public IActionResult GetByBranchId(int branchId)
+        {
+            try
+            {
+                // Retrieve patient records by branch ID
+                var records = _service.GetRecordsByBranchId(branchId)
+                    .Select(record => new PatientRecordDto
+                    {
+                        RID = record.RID,
+                        PID = record.PID,
+                        PatientName = record.Patient?.User?.UserName,
+                        BID = record.BID,
+                        BranchName = record.Branch?.BranchName,
+                        DID = record.DID,
+                        DoctorName = record.Doctor?.User?.UserName,
+                        VisitDate = record.VisitDate,
+                        VisitTime = record.VisitTime,
+                        Inspection = record.Inspection,
+                        Treatment = record.Treatment,
+                        Cost = record.Cost
+                    });
+
+                if (!records.Any())
+                {
+                    return NotFound(new { message = "No patient records found for the specified branch." });
+                }
+
+                return Ok(records);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving patient records.", details = ex.Message });
+            }
+        }
+
         [HttpPatch("{id}")]
         public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
         {

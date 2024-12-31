@@ -34,6 +34,13 @@ namespace HospitalSystemTeamTask.Services
                 .ToList();
         }
 
+        public IEnumerable<PatientRecord> GetRecordsByBranchId(int branchId)
+        {
+            return _repository.GetAll()
+                .Where(record => record.BID == branchId)
+                .ToList();
+        }
+
         public void UpdateRecord(PatientRecord record)
         {
             _repository.UpdateRecord(record);

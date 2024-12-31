@@ -10,6 +10,7 @@ namespace HospitalSystemTeamTask.Services
         void UpdateRecord(PatientRecord record);
         void DeleteRecord(PatientRecord record);
         IEnumerable<PatientRecord> GetRecordsByDoctorId(int doctorId);
+        IEnumerable<PatientRecord> GetRecordsByBranchId(int branchId);
 
     }
 }
