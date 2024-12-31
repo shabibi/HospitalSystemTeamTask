@@ -40,5 +40,22 @@ namespace HospitalSystemTeamTask.Repositories
             }
 
         }
+
+        public IEnumerable<Branch> GetBranchByDepartments(int departmentId)
+        {
+            try
+            {
+                // Query the branches associated with the department
+                return _context.branchDepartments
+                               .Where(b => b.DepID == departmentId)
+                               .Select(b => b.Branch) // Assuming navigation property
+                               .ToList(); // Materialize the results
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+
+        }
     }
 }

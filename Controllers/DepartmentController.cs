@@ -12,11 +12,12 @@ namespace HospitalSystemTeamTask.Controllers
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
-       
+        private readonly IBranchDepartmentService _branchDepartmentService;
 
-        public DepartmentController(IDepartmentService departmentService)
+        public DepartmentController(IDepartmentService departmentService, IBranchDepartmentService branchDepartmentService)
         {
             _departmentService = departmentService;
+            _branchDepartmentService = branchDepartmentService;
         }
         [Authorize]
         [HttpPost]
@@ -57,6 +58,26 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving departments.", error = ex.Message });
             }
         }
+
+        [HttpGet("GetBranchesByDepartment")]
+        public IActionResult GetBranchesByDepartment(string departmentName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(departmentName))
+                    return NotFound("Branch name required");
+                var branch = _branchDepartmentService.GetBranchsByDepartment(departmentName);
+                return Ok(branch);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
+            }
+        }
         [Authorize]
         [HttpPatch("{id}")]
         public IActionResult UpdateDepartment(int id, [FromBody] DepartmentDTO departmentDto)
@@ -86,6 +107,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the department.", error = ex.Message });
             }
         }
+
         [Authorize]
         [HttpPatch("{id}/set-status")]
         public IActionResult SetDepartmentStatus(int id, [FromQuery] bool isActive)
@@ -115,5 +137,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the department status.", error = ex.Message });
             }
         }
+
+
     }
 }
