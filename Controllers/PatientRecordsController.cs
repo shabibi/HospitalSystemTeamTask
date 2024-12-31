@@ -114,6 +114,42 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpGet("by-doctor/{doctorId}")]
+        public IActionResult GetByDoctorId(int doctorId)
+        {
+            try
+            {
+                // Retrieve patient records by doctor ID
+                var records = _service.GetRecordsByDoctorId(doctorId)
+                    .Select(record => new PatientRecordDto
+                    {
+                        RID = record.RID,
+                        PID = record.PID,
+                        PatientName = record.Patient?.User?.UserName,
+                        BID = record.BID,
+                        BranchName = record.Branch?.BranchName,
+                        DID = record.DID,
+                        DoctorName = record.Doctor?.User?.UserName,
+                        VisitDate = record.VisitDate,
+                        VisitTime = record.VisitTime,
+                        Inspection = record.Inspection,
+                        Treatment = record.Treatment,
+                        Cost = record.Cost
+                    });
+
+                if (!records.Any())
+                {
+                    return NotFound(new { message = "No patient records found for the specified doctor." });
+                }
+
+                return Ok(records);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving patient records.", details = ex.Message });
+            }
+        }
+
         [HttpPatch("{id}")]
         public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
         {
