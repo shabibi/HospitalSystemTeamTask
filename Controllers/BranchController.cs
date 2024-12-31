@@ -12,10 +12,11 @@ namespace HospitalSystemTeamTask.Controllers
     public class BranchController : ControllerBase
     {
         private readonly IBranchService _branchService;
-
-        public BranchController(IBranchService branchService)
+        private readonly IBranchDepartmentService _branchDepartmentService;
+        public BranchController(IBranchService branchService, IBranchDepartmentService branchDepartmentService)
         {
             _branchService = branchService;
+            _branchDepartmentService = branchDepartmentService;
         }
         [Authorize]
         [HttpPost]
@@ -155,6 +156,36 @@ namespace HospitalSystemTeamTask.Controllers
             }
 
 
+        }
+
+        
+        [HttpPost("AddDepartmentToBranch")]
+        public IActionResult AddDepartmentToBranch (BranchDepDTO branchDepartment)
+        {
+            try
+            {
+                if (branchDepartment == null)
+                    return BadRequest("data is required.");
+                _branchDepartmentService.AddDepartmentToBranch(branchDepartment);
+
+                return Ok("Department added to Branch successfully");
+
+            }
+            catch (ArgumentNullException ex)
+            {
+                // Handle specific exceptions, e.g., null input
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                // Handle validation-related exceptions
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while adding the Department to Branch: {ex.Message}");
+            }
         }
 
     }

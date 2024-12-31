@@ -33,6 +33,9 @@ namespace HospitalSystemTeamTask
             builder.Services.AddScoped<IClinicRepocs, ClinicRepo>();
             builder.Services.AddScoped<IClinicService, ClinicService>();
 
+            builder.Services.AddScoped<IBranchDepartmentRepo, BranchDepartmentRepo>();
+            builder.Services.AddScoped<IBranchDepartmentService, BranchDepartmentService>();
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
