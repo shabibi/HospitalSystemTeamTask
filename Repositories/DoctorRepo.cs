@@ -112,11 +112,22 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new ArgumentException("Branch name is required.");
             }
 
-            return _context.Doctors
+            branchName = branchName.Trim(); // Normalize input
+
+            var doctors = _context.Doctors
                 .Include(d => d.Branch)
-                .Where(d => d.Branch.BranchName.ToLower() == branchName.ToLower())
+                .Where(d => EF.Functions.Like(d.Branch.BranchName, branchName)) // Case-insensitive matching
                 .ToList();
+
+            if (!doctors.Any())
+            {
+                Console.WriteLine("No doctors found for the branch name: " + branchName);
+            }
+
+            return doctors;
         }
+
+
 
 
 
