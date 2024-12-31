@@ -39,6 +39,8 @@ namespace HospitalSystemTeamTask.Services
                     {
                         BranchName = branch.BranchName,
                         Location = branch.Location,
+                        BID = branch.BID,
+                        BranchStatus = branch.IsActive
                   
                     });
                 }

@@ -1,5 +1,6 @@
 ﻿
 using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
 using System.Security.Cryptography;
@@ -58,22 +59,9 @@ namespace HospitalSystemTeamTask.Services
             {
                 throw new ArgumentException("Patient or User information is missing.");
             }
-
-            //// Validate User fields
-            //if (string.IsNullOrEmpty(patientInput.User.UserName) || string.IsNullOrEmpty(patient.User.Email) || string.IsNullOrEmpty(patient.User.Password))
-            //{
-            //    throw new ArgumentException("UserName, Email, and Password are required for the User.");
-            //}
-
-            // Hash the user's password
-
-           var hashedPasswor = BCrypt.Net.BCrypt.HashPassword(patientInput.Password);
-            // Validate Patient fields
-            //if (string.IsNullOrEmpty(patient.Gender) || patient.Age <= 0)
-            //{
-            //    throw new ArgumentException("Gender and valid Age are required for the Patient.");
-            //}
-
+            var pass = "Pass1234";
+           var hashedPasswor = HashingPassword.Hshing(patientInput.Password);
+          
             var user = new User { 
                 UserName = patientInput.UserName, 
                 Password = hashedPasswor,

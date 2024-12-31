@@ -17,8 +17,11 @@ namespace HospitalSystemTeamTask.Services
             return _departmentRepository.GetAllDepartments()
                 .Select(dept => new DepartmentDTO
                 {
+                    DepId = dept.DepID,
                     DepartmentName = dept.DepartmentName,
-                    Description = dept.Description
+                    Description = dept.Description,
+                    DepartmentStatus = dept.IsActive
+                   
                 }).ToList();
         }
 

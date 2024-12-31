@@ -1,6 +1,8 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalSystemTeamTask.Controllers
@@ -10,16 +12,27 @@ namespace HospitalSystemTeamTask.Controllers
     public class BranchController : ControllerBase
     {
         private readonly IBranchService _branchService;
-
-        public BranchController(IBranchService branchService)
+        private readonly IBranchDepartmentService _branchDepartmentService;
+        public BranchController(IBranchService branchService, IBranchDepartmentService branchDepartmentService)
         {
             _branchService = branchService;
+            _branchDepartmentService = branchDepartmentService;
         }
+        [Authorize]
         [HttpPost]
         public IActionResult AddBranch([FromBody] BranchDTO branchDto)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 _branchService.AddBranch(branchDto);
                 return Ok("Branch added successfully");
             }
@@ -78,12 +91,22 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpPatch("{branchName}")]
         public IActionResult UpdateBranch(string branchName, [FromBody] UpdateBranchDTO updatedBranchDto)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 // Call the service to update the branch
                 _branchService.UpdateBranch(branchName, updatedBranchDto);
                 return Ok(new { message = $"Branch '{branchName}' updated successfully." });
@@ -101,12 +124,22 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-
+        [Authorize]
         [HttpPatch("{branchName}/status")]
         public IActionResult SetBranchStatus(string branchName, [FromQuery] bool isActive)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 // Call the service to set the status
                 _branchService.SetBranchStatus(branchName, isActive);
                 return Ok(new { message = $"Branch '{branchName}' status updated to {(isActive ? "Active" : "Inactive")}." });
@@ -123,6 +156,45 @@ namespace HospitalSystemTeamTask.Controllers
             }
 
 
+        }
+
+        [Authorize]
+        [HttpPost("AddDepartmentToBranch")]
+        public IActionResult AddDepartmentToBranch (BranchDepDTO branchDepartment)
+        {
+            try
+            {
+                if (branchDepartment == null)
+                    return BadRequest("data is required.");
+
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+                _branchDepartmentService.AddDepartmentToBranch(branchDepartment);
+
+                return Ok("Department added to Branch successfully");
+
+            }
+            catch (ArgumentNullException ex)
+            {
+                // Handle specific exceptions, e.g., null input
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                // Handle validation-related exceptions
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while adding the Department to Branch: {ex.Message}");
+            }
         }
 
     }
