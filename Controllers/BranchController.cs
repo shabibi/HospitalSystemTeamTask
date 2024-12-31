@@ -158,7 +158,7 @@ namespace HospitalSystemTeamTask.Controllers
 
         }
 
-        
+        [Authorize]
         [HttpPost("AddDepartmentToBranch")]
         public IActionResult AddDepartmentToBranch (BranchDepDTO branchDepartment)
         {
@@ -166,6 +166,15 @@ namespace HospitalSystemTeamTask.Controllers
             {
                 if (branchDepartment == null)
                     return BadRequest("data is required.");
+
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 _branchDepartmentService.AddDepartmentToBranch(branchDepartment);
 
                 return Ok("Department added to Branch successfully");
