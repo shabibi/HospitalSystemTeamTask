@@ -1,4 +1,5 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -23,8 +24,6 @@ namespace HospitalSystemTeamTask.Services
         // Add user
         public void AddUser(User user)
         {
-            //hashing Password
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             _userRepo.AddUser(user);
         }
 
@@ -69,7 +68,7 @@ namespace HospitalSystemTeamTask.Services
             Random random = new Random();
             int randomNumber = random.Next(1000, 9999);
             string generatedEmail = $"{InputUser.UserName}{randomNumber}@gmail.com";
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(defaultPassword);
+            string hashedPassword = HashingPassword.Hshing(defaultPassword);
             var newStaff = new User
             {
                 UserName = InputUser.UserName,
@@ -165,7 +164,8 @@ namespace HospitalSystemTeamTask.Services
                 throw new UnauthorizedAccessException("Invalid email");
 
             // Verify the provided password against the stored hashed password
-            if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
+            string HashedPassword = HashingPassword.Hshing(password);
+            if (HashedPassword != user.Password)
                 throw new ArgumentException("Incorrect Password");
 
             // Ensure the user's account is active
