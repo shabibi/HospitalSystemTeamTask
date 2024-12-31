@@ -24,6 +24,9 @@ namespace HospitalSystemTeamTask
             builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 
+            builder.Services.AddScoped<IPatientRecordRepository, PatientRecordRepository>();
+            builder.Services.AddScoped< IPatientRecordService, PatientRecordService> ();
+
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IUserService, UserService>();
 
