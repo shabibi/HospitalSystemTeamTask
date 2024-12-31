@@ -1,4 +1,5 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 
 namespace HospitalSystemTeamTask.Services
 {
@@ -6,5 +7,11 @@ namespace HospitalSystemTeamTask.Services
     {
         IEnumerable<Doctor> GetAllDoctors();
         Doctor GetDoctorById(int uid);
+        Doctor GetDoctorByEmail(string email);
+        bool EmailExists(string email);
+        Doctor GetDoctorByName(string docName);
+        DoctorOutPutDTO GetDoctorData(string? docName, int? Did);
+        void AddDoctor(DoctorOutPutDTO input);
+
     }
 }
