@@ -16,6 +16,47 @@ namespace HospitalSystemTeamTask.Controllers
             _service = service;
         }
 
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            try
+            {
+                // Get the patient record by ID
+                var record = _service.GetRecordById(id);
+
+                if (record == null)
+                {
+                    return NotFound(new { message = "Patient record not found." });
+                }
+
+                // Map PatientRecord to PatientRecordDto
+                var recordDto = new PatientRecordDto
+                {
+                    RID = record.RID,
+                    PID = record.PID,
+                    PatientName = record.Patient?.User?.UserName,
+                    BID = record.BID,
+                    BranchName = record.Branch?.BranchName,
+                    DID = record.DID,
+                    DoctorName = record.Doctor?.User?.UserName,
+                    VisitDate = record.VisitDate,
+                    VisitTime = record.VisitTime,
+                    Inspection = record.Inspection,
+                    Treatment = record.Treatment,
+                    Cost = record.Cost
+                };
+
+                // Return the record if found
+                return Ok(recordDto);
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error message if something goes wrong
+                return StatusCode(500, new { message = "An error occurred while retrieving the patient record.", details = ex.Message });
+            }
+        }
+
+
 
         [HttpGet]
         public IActionResult GetAll()
@@ -73,7 +114,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
         {
             if (!ModelState.IsValid)
