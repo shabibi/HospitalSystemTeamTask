@@ -27,6 +27,13 @@ namespace HospitalSystemTeamTask.Services
             _repository.Add(record);
         }
 
+        public IEnumerable<PatientRecord> GetRecordsByDoctorId(int doctorId)
+        {
+            return _repository.GetAll()
+                .Where(record => record.DID == doctorId)
+                .ToList();
+        }
+
         public void UpdateRecord(PatientRecord record)
         {
             _repository.UpdateRecord(record);

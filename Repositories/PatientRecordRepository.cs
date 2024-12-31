@@ -20,8 +20,13 @@ namespace HospitalSystemTeamTask.Repositories
 
         public PatientRecord GetById(int id)
         {
-            return _context.PatientRecords.Include(pr => pr.Patient).Include(pr => pr.Doctor).Include(pr => pr.Branch).FirstOrDefault(pr => pr.RID == id);
+            return _context.PatientRecords
+                .Include(pr => pr.Patient)
+                .Include(pr => pr.Doctor)
+                .Include(pr => pr.Branch)
+                .FirstOrDefault(pr => pr.RID == id);
         }
+
         public void Add(PatientRecord record)
         {
             _context.PatientRecords.Add(record);
