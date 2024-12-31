@@ -60,5 +60,26 @@ namespace HospitalSystemTeamTask.Services
             }
             return result;
         }
+
+        public IEnumerable<BranchDTO> GetBranchsByDepartment(string DepartmentName)
+        {
+            var department = _departmentService.GetDepartmentByName(DepartmentName);
+            if (department == null || !department.IsActive)
+                throw new Exception($"{DepartmentName} Not Found");
+
+            var branchs = _branchDepartmentRepo.GetBranchByDepartments(department.DepID);
+            List<BranchDTO> result = new List<BranchDTO>();
+            foreach (var branch in branchs)
+            {
+                result.Add(new BranchDTO
+                {
+                    BID = branch.BID,
+                    BranchName = branch.BranchName,
+                    Location = branch.Location,
+                    BranchStatus = branch.IsActive
+                });
+            }
+            return result;
+        }
     }
 }

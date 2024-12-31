@@ -6,5 +6,6 @@ namespace HospitalSystemTeamTask.Repositories
     {
         void AddDepartmentToBranch(BranchDepartment branchDepartment);
         IEnumerable<Department> GetDepartmentsByBranch(int BranchID);
+        IEnumerable<Branch> GetBranchByDepartments(int departmentId);
     }
 }

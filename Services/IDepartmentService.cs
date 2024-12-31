@@ -1,4 +1,5 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 
 namespace HospitalSystemTeamTask.Services
 {
@@ -8,5 +9,6 @@ namespace HospitalSystemTeamTask.Services
         IEnumerable<DepartmentDTO> GetAllDepartments();
         void UpdateDepartment(int departmentId, DepartmentDTO departmentDto);
         void SetDepartmentActiveStatus(int departmentId, bool isActive);
+        Department GetDepartmentByName(string department);
     }
 }

@@ -24,10 +24,7 @@ namespace HospitalSystemTeamTask.Repositories
 
         public Department GetDepartmentByName(string departmentName)
         {
-            return _context.Departments
-                .Include(d => d.BranchDepartments)
-                    .ThenInclude(bd => bd.Branch)
-                .FirstOrDefault(d => d.DepartmentName.Equals(departmentName, StringComparison.OrdinalIgnoreCase));
+            return _context.Departments.FirstOrDefault(d => d.DepartmentName == departmentName);
         }
         public void SaveChanges()
         {

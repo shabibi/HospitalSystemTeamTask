@@ -53,6 +53,11 @@ namespace HospitalSystemTeamTask.Services
             _departmentRepository.SetDepartmentActiveStatus(departmentId, isActive);
         }
 
+        public Department GetDepartmentByName(string department)
+        {
+           return _departmentRepository.GetDepartmentByName(department);
+        }
+
 
     }
 }
