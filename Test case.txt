@@ -36,3 +36,42 @@ UID = 0
 GetPatientById:
 PID = 0
 
+
+AddClinic:
+Missing Required Fields (ClinicName)
+{
+  "depID": 2,
+  "assignDoctor": 10,
+  "bid": 1,
+  "clincName": "",
+  "capacity": 11,
+  "startTime": "5:00:00",
+  "endTime": "8:00:00",
+  "cost": 13,
+  "isActive": true
+}
+
+Invalid Capacity:
+
+{
+  "depID": 2,
+  "assignDoctor": 10,
+  "bid": 1,
+  "clincName": "x",
+  "capacity": -11,
+  "startTime": "5:00:00",
+  "endTime": "8:00:00",
+  "cost": 13,
+  "isActive": true
+}
+
+GetClinicByID:
+
+CID = 0
+
+GetClinicByName:
+ClinicName = "Unknown Clinic"
+
+GetClinicsByDepartmentID:
+DepId = -1
+
