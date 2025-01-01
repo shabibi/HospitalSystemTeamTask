@@ -13,6 +13,7 @@ namespace HospitalSystemTeamTask.Services
         DoctorOutPutDTO GetDoctorData(string? docName, int? Did);
         void AddDoctor(DoctorOutPutDTO input);
         IEnumerable<DoctorOutPutDTO> GetDoctorsByBranchName(string branchName);
+        IEnumerable<DoctorOutPutDTO> GetDoctorsByDepartmentName(string departmentName);
 
     }
 }

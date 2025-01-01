@@ -87,7 +87,7 @@ namespace HospitalSystemTeamTask.Controllers
         {
             try
             {
-             
+
                 // Validate the user ID
                 if (DocID < 0)
                     return BadRequest("Invalid input");
@@ -103,7 +103,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var doctor = _doctorServicee.GetDoctorData(DocName, DocID);
 
 
-              
+
 
                 return Ok(doctor);
             }
@@ -159,6 +159,33 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpGet("by-department")]
+        public ActionResult<IEnumerable<DoctorOutPutDTO>> GetDoctorsByDepartmentName([FromQuery] string departmentName)
+        {
+            if (string.IsNullOrWhiteSpace(departmentName))
+            {
+                return BadRequest("Department name is required.");
+            }
 
+            try
+            {
+                var doctors = _doctorServicee.GetDoctorsByDepartmentName(departmentName);
+                return Ok(doctors);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+
+
+        }
     }
 }

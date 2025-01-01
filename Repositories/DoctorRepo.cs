@@ -127,6 +127,13 @@ namespace HospitalSystemTeamTask.Repositories
             return doctors;
         }
 
+        public IEnumerable<Doctor> GetDoctorsByDepartmentName(string departmentName)
+        {
+            return _context.Doctors
+                .Where(doc => doc.Department.DepartmentName == departmentName)
+                .ToList();
+        }
+
 
 
 

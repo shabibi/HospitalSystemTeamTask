@@ -150,6 +150,32 @@ namespace HospitalSystemTeamTask.Services
             return doctorDtos;
         }
 
+        public IEnumerable<DoctorOutPutDTO> GetDoctorsByDepartmentName(string departmentName)
+        {
+            if (string.IsNullOrWhiteSpace(departmentName))
+                throw new ArgumentException("Department name is required.");
+
+            // Retrieve doctors from the repository
+            var doctors = _DoctorRepo.GetDoctorsByDepartmentName(departmentName);
+
+            if (doctors == null || !doctors.Any())
+                throw new KeyNotFoundException($"No doctors found for department '{departmentName}'.");
+
+            // Transform to DTOs
+            var doctorDtos = doctors.Select(doctor => new DoctorOutPutDTO
+            {
+                UID = doctor.DID,
+                CurrentBrunch = doctor.CurrentBrunch,
+                Level = doctor.Level,
+                Degree = doctor.Degree,
+                WorkingYear = doctor.WorkingYear,
+                JoiningDate = doctor.JoiningDate,
+                DepId = doctor.DepId
+            });
+
+            return doctorDtos;
+        }
+
 
 
     }
