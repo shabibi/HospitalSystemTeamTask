@@ -1,4 +1,5 @@
 
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Repositories;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,9 +46,11 @@ namespace HospitalSystemTeamTask
             builder.Services.AddScoped<IBookingRepo, BookingRepo>();
             builder.Services.AddScoped<IBookingService, BookingService>();
 
+            builder.Services.AddScoped<ISendEmail, SendEmail>();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+          
             builder.Services.AddControllers();
 
 
