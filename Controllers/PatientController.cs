@@ -30,14 +30,6 @@ namespace HospitalSystemTeamTask.Controllers
 
 
 
-
-
-
-
-
-
-
-
         //admin
         [HttpGet("GetPatientById/{PID}")]
         public IActionResult GetPatientById(int PID)
@@ -106,7 +98,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
                 // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                if (userRole == null || (userRole != "patient"))
                 {
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }

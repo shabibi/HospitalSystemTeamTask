@@ -77,6 +77,17 @@ namespace HospitalSystemTeamTask.Controllers
         {
             try
             {
+
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 var clinic = _clinicService.GetClinicById(CID);
                 return Ok(clinic);
 
@@ -104,11 +115,23 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        //(admin,doctor)
         [HttpGet("GetClinicsByBranchName/{branchName}")]
         public IActionResult GetClinicsByBranchName(string branchName)
         {
             try
             {
+
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 var clinics = _clinicService.GetClinicsByBranchName(branchName);
                 return Ok(clinics);
             }
@@ -125,7 +148,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-        //admin
+        //admin,doctor
         [HttpGet("GetClinicsByDepartmentID/{departmentId}")]
         public IActionResult GetClinicsByDepartmentID(int departmentId)
         {
@@ -137,7 +160,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
                 // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
                 {
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }
@@ -158,11 +181,23 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        //Admin only
         [HttpPut("UpdateClinicDetails/{CID}")]
         public IActionResult UpdateClinicDetails(int CID,  ClinicInput input)
         {
             try
             {
+
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 if (input == null)
                 {
                     return BadRequest("Updated clinic details are required.");
