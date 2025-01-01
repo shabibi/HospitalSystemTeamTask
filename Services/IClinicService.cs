@@ -14,5 +14,6 @@ namespace HospitalSystemTeamTask.Services
         void UpdateClinicDetails(int CID, ClinicInput input);
         void SetClinicStatus(int clinicId, bool isActive);
         decimal GetPrice(int clinicId);
+        string GetClinicName(int cid);
     }
 }

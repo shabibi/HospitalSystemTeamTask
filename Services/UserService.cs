@@ -260,6 +260,10 @@ namespace HospitalSystemTeamTask.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public string GetUserName(int userId)
+        {
+            return _userRepo.GetUserName(userId);
+        }
 
     }
 }

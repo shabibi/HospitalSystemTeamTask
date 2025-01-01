@@ -9,17 +9,46 @@ namespace HospitalSystemTeamTask.Services
         private readonly IPatientRecordRepository _repository;
         private readonly IDoctorService _doctorService;
         private readonly IClinicService _clinicService;
+        private readonly IUserService _userService;
+        private readonly IBranchService _branchService;
 
-        public PatientRecordService(IPatientRecordRepository repository, IDoctorService doctorService,IClinicService clinicService)
+        public PatientRecordService(IPatientRecordRepository repository, IDoctorService doctorService,
+            IClinicService clinicService, IUserService userService, IBranchService branchService)
         {
             _repository = repository;
             _doctorService = doctorService;
             _clinicService = clinicService;
+            _userService = userService;
+            _branchService = branchService;
         }
 
-        public IEnumerable<PatientRecord> GetAllRecords()
+        public IEnumerable<PatientRecordOutput> GetAllRecords()
         {
-            return _repository.GetAll();
+            var records = _repository.GetAll();
+            List<PatientRecordOutput> output = new List<PatientRecordOutput>();
+            Doctor doctor = null;
+             
+            
+            foreach (var record in records)
+            {
+                doctor = _doctorService.GetDoctorById(record.DID);
+                output.Add(new PatientRecordOutput
+                {
+                    RecordId = record.RID,
+                    PatientId = record.PID,
+                    PatientName = _userService.GetUserName(record.PID),
+                    DoctorName = _userService.GetUserName(record.DID),
+                    BranchName = _branchService.GetBranchName(record.BID),
+                    ClinicName = _clinicService.GetClinicName(doctor.CID.Value),
+                    VisitDate = record.VisitDate,
+                    VisitTime = record.VisitTime,
+                    Inspection = record.Inspection,
+                    Treatment = record.Treatment,
+                    Price = record.Cost,
+                });
+               
+            }
+            return output;
         }
 
         public PatientRecord GetRecordById(int id)
