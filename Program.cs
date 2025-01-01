@@ -1,5 +1,4 @@
 
-using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Repositories;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -50,7 +49,6 @@ namespace HospitalSystemTeamTask
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-          
             builder.Services.AddControllers();
 
 
