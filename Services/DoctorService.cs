@@ -118,12 +118,16 @@ namespace HospitalSystemTeamTask.Services
                 Degree = input.Degree,
                 WorkingYear = input.WorkingYear,
                 JoiningDate = DateOnly.FromDateTime(DateTime.Now), // Automatically set the current date
+                CID = input.CID,
             };
 
        
 
             // Save the doctor
             _DoctorRepo.AddDoctor(doctor);
+
+
+
         }
 
 
@@ -208,6 +212,7 @@ namespace HospitalSystemTeamTask.Services
             existingDoctor.Degree = input.Degree;
             existingDoctor.DepId = input.DepId;
             existingDoctor.WorkingYear = input.WorkingYear;
+            existingDoctor.CID = input.CID;
 
             _DoctorRepo.UpdateDoctor(existingDoctor);
         }

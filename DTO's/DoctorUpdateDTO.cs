@@ -21,7 +21,8 @@ namespace HospitalSystemTeamTask.DTO_s
         public string Degree { get; set; }
         [Required]
         public int WorkingYear { get; set; }
-       
+        public int CID { get; set; }
+
 
     }
 }

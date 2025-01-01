@@ -15,5 +15,6 @@ namespace HospitalSystemTeamTask.DTO_s
         [JsonIgnore]
         public DateOnly JoiningDate { get; set; }
         public int DepId { get; set; }
+        public int? CID { get; set; }
     }
 }
