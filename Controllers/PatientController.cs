@@ -38,12 +38,21 @@ namespace HospitalSystemTeamTask.Controllers
 
 
 
-        [AllowAnonymous]
+        //admin
         [HttpGet("GetPatientById/{PID}")]
         public IActionResult GetPatientById(int PID)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 var patient = _PatientService.GetPatientById(PID);
                 return Ok(patient);
 

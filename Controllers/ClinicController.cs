@@ -1,4 +1,5 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -33,13 +34,22 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin")]
-        [AllowAnonymous]
+        
         [HttpPost("AddClinic")]
         public IActionResult AddClinic(ClinicInput input)
         {
             try
             {
+
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 if (input == null)
                 {
                     return BadRequest("clinic details are required.");
@@ -115,11 +125,22 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+        //admin
         [HttpGet("GetClinicsByDepartmentID/{departmentId}")]
         public IActionResult GetClinicsByDepartmentID(int departmentId)
         {
             try
             {
+
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 var clinics = _clinicService.GetClinicsByDepartmentId(departmentId);
                 return Ok(clinics);
             }
@@ -169,11 +190,21 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        //admin
         [HttpPost("SetClinicStatus/{clinicId}")]
         public IActionResult SetClinicStatus(int clinicId,  bool isActive)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 _clinicService.SetClinicStatus(clinicId, isActive);
                 return Ok($"Clinic status updated to {(isActive ? "Active" : "Inactive")}.");
             }
