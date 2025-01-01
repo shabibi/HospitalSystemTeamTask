@@ -65,32 +65,25 @@ namespace HospitalSystemTeamTask.Services
             return booking;
         }
 
-        //public void UpdateBookingDetails(int BookingID, BookingInputDTO input)
-        //{
-        //    var existingClinic = _bookingRepo.GetBookingById(bookingID);
-        //    TimeSpan totalDuration = input.EndTime - input.StartTime;
-        //    if (input.Capacity <= 0)
-        //    {
-        //        throw new ArgumentException("Capacity must be greater than 0.");
-        //    }
+        public void UpdateBookingDetails(int BookingID, BookingInputDTO input)
+        {
+            var existingBooking = _bookingRepo.GetBookingById(BookingID);
 
-        //    int slotTime = (int)(totalDuration.TotalMinutes / input.Capacity);
 
-        //    // Map updated properties
-        //    existingClinic.ClincName = input.ClincName;
-        //    existingClinic.Capacity = input.Capacity;
-        //    existingClinic.StartTime = input.StartTime;
-        //    existingClinic.EndTime = input.EndTime;
-        //    existingClinic.SlotDuration = slotTime;
-        //    existingClinic.Cost = input.Cost;
-        //    existingClinic.IsActive = input.IsActive;
-        //    existingClinic.DepID = input.DepID;
-        //    existingClinic.BID = input.BID;
-        //    existingClinic.AssignDoctor = input.AssignDoctor;
 
-        //    // Persist changes
-        //    _clinicRepo.UpdateClinic(existingClinic);
-        //}
+            // Map updated properties
+            existingBooking.BookingDate = input.BookingDate;
+            existingBooking.CID = input.CID;
+            existingBooking.StartTime = input.StartTime;
+            existingBooking.EndTime = input.EndTime;
+            existingBooking.Staus = input.Staus;
+            existingBooking.PID = input.PID;
+            existingBooking.Date = input.Date;
+            
+
+            // Persist changes
+            _bookingRepo.UpdateBooking(existingBooking);
+        }
 
 
 
