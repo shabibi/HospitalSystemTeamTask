@@ -36,7 +36,7 @@ namespace HospitalSystemTeamTask.Controllers
             catch (Exception ex)
             {
                 // Return a generic error response
-                return StatusCode(500, $"An error occurred while retrieving doctor. {(ex.Message)}");
+                return StatusCode(500, $"This person not a doctor!!. {(ex.Message)}");
             }
         }
 
@@ -151,7 +151,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = $"No doctor in this branch. {ex.Message}" });
             }
             catch (Exception ex)
             {
@@ -160,7 +160,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
         [HttpGet("GetDoctorsByDepartmentName")]
-        public ActionResult<IEnumerable<DoctorOutPutDTO>> GetDoctorsByDepartmentName([FromQuery] string departmentName)
+        public ActionResult<IEnumerable<DoctorOutPutDTO>> GetDoctorsByDepartmentName( string departmentName)
         {
             if (string.IsNullOrWhiteSpace(departmentName))
             {
@@ -189,7 +189,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
         //[Authorize(Roles = "admin,doctor")]
         [HttpPut("UpdateDoctorDetails/{UID}/{DID}")]
-        public IActionResult UpdateDoctorDetails(int UID, int DID, [FromBody] DoctorUpdateDTO input)
+        public IActionResult UpdateDoctorDetails(int UID, int DID,  DoctorUpdateDTO input)
         {
             try
             {
