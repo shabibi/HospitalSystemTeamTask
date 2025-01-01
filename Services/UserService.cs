@@ -59,7 +59,7 @@ namespace HospitalSystemTeamTask.Services
                     IsActive = true
                 };
                 // Email subject and body
-                string subject = "Confirm Signing In!";
+                string subject = "Hospital System Signing In";
                 string body = $"Dear {InputUser.UserName},\n\nYour Super Admin account has been created successfully.\n\nYour default password is: " +
                $"{defaultPassword}\nPlease change your password after logging in.\n\nBest Regards,\nYour System Team";
                 
@@ -93,6 +93,13 @@ namespace HospitalSystemTeamTask.Services
                 Role = InputUser.Role,
                 IsActive = true
             };
+
+            // Email subject and body
+            string subject = "Hospital System ";
+            string body = $"Dear {InputUser.UserName},\n\nYour  account has been created successfully for Hospital System.\n\nEmail: {generatedEmail}\nYour default password is: " +
+           $"{defaultPassword}\nPlease change your password after logging in.\n\nBest Regards,\nYour Super Admin";
+
+            _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
             _userRepo.AddUser(newStaff);
 
         }

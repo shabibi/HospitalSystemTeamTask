@@ -12,19 +12,18 @@ namespace HospitalSystemTeamTask.Services
     {
         private readonly IPatientRepo _PatientRepo;
         private readonly IUserService _userService;
+        private readonly ISendEmail _sendEmail;
 
-        public PatientService(IPatientRepo PatientRepo, IUserService userService)
+        public PatientService(IPatientRepo PatientRepo, IUserService userService, ISendEmail sendEmail)
         {
             _PatientRepo = PatientRepo;
             _userService = userService;
+            _sendEmail = sendEmail;
         }
-
-
 
         public IEnumerable<Patient> GetAllPatients()
         {
             return _PatientRepo.GetAllPatients();
-
         }
 
         public Patient GetPatientById(int Pid)
@@ -74,7 +73,13 @@ namespace HospitalSystemTeamTask.Services
             // Delegate to repository
            
             var patient = new Patient {PID= user.UID, Age = patientInput.Age, Gender = patientInput.Gender };
+
+            string subject = "Hospital System Signing In";
+            string body = $"Dear {patientInput.UserName},\n\nYour  account has been created successfully for Hospital System.\n\n\nBest Regards,\nHospital System";
+
+            _sendEmail.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
             _PatientRepo.AddPatient(patient);
+
         }
 
     }
