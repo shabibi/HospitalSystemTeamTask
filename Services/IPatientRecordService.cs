@@ -1,4 +1,5 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 
 namespace HospitalSystemTeamTask.Services
 {
@@ -6,7 +7,7 @@ namespace HospitalSystemTeamTask.Services
     {
         IEnumerable<PatientRecord> GetAllRecords();
         PatientRecord GetRecordById(int id);
-        void CreateRecord(PatientRecord record);
+        void CreateRecord(PatientRecordInputDTO record, int doctorId);
         void UpdateRecord(PatientRecord record);
         void DeleteRecord(PatientRecord record);
         IEnumerable<PatientRecord> GetRecordsByDoctorId(int doctorId);

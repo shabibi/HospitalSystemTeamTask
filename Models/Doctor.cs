@@ -14,7 +14,10 @@ namespace HospitalSystemTeamTask.Models
         public int DepId { get; set; }
         public Department Department { get; set; }
 
-     
+        [ForeignKey("Clinic")]
+        public int? CID { get; set; } 
+        public Clinic Clinic { get; set; } 
+
         [ForeignKey("Branch")]
         public int CurrentBrunch { get; set; }
         public Branch Branch { get; set; }
@@ -26,7 +29,7 @@ namespace HospitalSystemTeamTask.Models
         public int 	WorkingYear {  get; set; }  
         public DateOnly JoiningDate  { get; set; }
 
-        public virtual ICollection <Clinic> Clinic { get; set; }
+        
         public virtual ICollection<PatientRecord> PatientRecords { get; set; }
 
     }

@@ -74,7 +74,16 @@ namespace HospitalSystemTeamTask.Services
             return clinic;
         }
 
+        public decimal GetPrice(int clinicId)
+        {
+            var clinic = GetClinicById(clinicId);
+            return clinic.Cost;
+        }
 
+        //public Clinic GetClinicByDoctor (int doctorId)
+        //{
+            
+        //}
         public Clinic GetClinicByName(string clinicName)
         {
             var clinic = _clinicRepo.GetClinicByName(clinicName);

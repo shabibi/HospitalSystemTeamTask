@@ -1,4 +1,5 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,41 @@ namespace HospitalSystemTeamTask.Controllers
             _service = service;
         }
 
+
+        [HttpPost("CreatePatientRecord")]
+        public IActionResult Create([FromBody] PatientRecordInputDTO inputRecord)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                string token = JwtHelper.ExtractToken(Request);
+                int doctorId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "doctor"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+                _service.CreateRecord(inputRecord, doctorId);
+
+
+                return CreatedAtAction(nameof(GetAll), new { message = "Patient record added successfully!" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while adding the patient record.", details = ex.Message });
+            }
+        }
+
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -30,24 +66,24 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Map PatientRecord to PatientRecordDto
-                var recordDto = new PatientRecordDto
-                {
-                    PatientRecordID = record.RID,
-                    PID = record.PID,
-                    PatientName = record.Patient?.User?.UserName,
-                    BID = record.BID,
-                    BranchName = record.Branch?.BranchName,
-                    DID = record.DID,
-                    DoctorName = record.Doctor?.User?.UserName,
-                    VisitDate = record.VisitDate,
-                    VisitTime = record.VisitTime,
-                    Inspection = record.Inspection,
-                    Treatment = record.Treatment,
-                    Cost = record.Cost
-                };
+                //var recordDto = new PatientRecordDto
+                //{
+                //    PatientRecordID = record.RID,
+                //    PID = record.PID,
+                //    PatientName = record.Patient?.User?.UserName,
+                //    BID = record.BID,
+                //    BranchName = record.Branch?.BranchName,
+                //    DID = record.DID,
+                //    DoctorName = record.Doctor?.User?.UserName,
+                //    VisitDate = record.VisitDate,
+                //    VisitTime = record.VisitTime,
+                //    Inspection = record.Inspection,
+                //    Treatment = record.Treatment,
+                //    Cost = record.Cost
+                //};
 
                 // Return the record if found
-                return Ok(recordDto);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -61,58 +97,26 @@ namespace HospitalSystemTeamTask.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var records = _service.GetAllRecords()
-                .Select(record => new PatientRecordDto
-                {
-                    PatientRecordID = record.RID,
-                    PID = record.PID,
-                    PatientName = record.Patient?.User?.UserName, 
-                    BID = record.BID,
-                    BranchName = record.Branch?.BranchName, 
-                    DID = record.DID,
-                    DoctorName = record.Doctor?.User?.UserName, 
-                    VisitDate = record.VisitDate,
-                    VisitTime = record.VisitTime,
-                    Inspection = record.Inspection,
-                    Treatment = record.Treatment,
-                    Cost = record.Cost
-                });
+            //var records = _service.GetAllRecords()
+            //    .Select(record => new PatientRecordDto
+            //    {
+            //        PatientRecordID = record.RID,
+            //        PID = record.PID,
+            //        PatientName = record.Patient?.User?.UserName, 
+            //        BID = record.BID,
+            //        BranchName = record.Branch?.BranchName, 
+            //        DID = record.DID,
+            //        DoctorName = record.Doctor?.User?.UserName, 
+            //        VisitDate = record.VisitDate,
+            //        VisitTime = record.VisitTime,
+            //        Inspection = record.Inspection,
+            //        Treatment = record.Treatment,
+            //        Cost = record.Cost
+            //    });
 
-            return Ok(records);
+            return Ok();
         }
 
-        [HttpPost]
-        public IActionResult Create([FromBody] CreatePatientRecordDto dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var record = new PatientRecord
-                {
-                    PID = dto.PID,
-                    BID = dto.BID,
-                    DID = dto.DID,
-                    VisitDate = dto.VisitDate,
-                    VisitTime = dto.VisitTime,
-                    Inspection = dto.Inspection,
-                    Treatment = dto.Treatment,
-                    Cost = dto.Cost
-                };
-
-                _service.CreateRecord(record);
-
-                
-                return CreatedAtAction(nameof(GetAll), new { id = record.RID }, new { message = "Patient record added successfully!", record });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while adding the patient record.", details = ex.Message });
-            }
-        }
 
         [HttpGet("by-doctor/{doctorId}")]
         public IActionResult GetByDoctorId(int doctorId)
@@ -120,29 +124,29 @@ namespace HospitalSystemTeamTask.Controllers
             try
             {
                 // Retrieve patient records by doctor ID
-                var records = _service.GetRecordsByDoctorId(doctorId)
-                    .Select(record => new PatientRecordDto
-                    {
-                        PatientRecordID = record.RID,
-                        PID = record.PID,
-                        PatientName = record.Patient?.User?.UserName,
-                        BID = record.BID,
-                        BranchName = record.Branch?.BranchName,
-                        DID = record.DID,
-                        DoctorName = record.Doctor?.User?.UserName,
-                        VisitDate = record.VisitDate,
-                        VisitTime = record.VisitTime,
-                        Inspection = record.Inspection,
-                        Treatment = record.Treatment,
-                        Cost = record.Cost
-                    });
+                //var records = _service.GetRecordsByDoctorId(doctorId)
+                    //.Select(record => new PatientRecordDto
+                    //{
+                    //    PatientRecordID = record.RID,
+                    //    PID = record.PID,
+                    //    PatientName = record.Patient?.User?.UserName,
+                    //    BID = record.BID,
+                    //    BranchName = record.Branch?.BranchName,
+                    //    DID = record.DID,
+                    //    DoctorName = record.Doctor?.User?.UserName,
+                    //    VisitDate = record.VisitDate,
+                    //    VisitTime = record.VisitTime,
+                    //    Inspection = record.Inspection,
+                    //    Treatment = record.Treatment,
+                    //    Cost = record.Cost
+                    //});
 
-                if (!records.Any())
-                {
-                    return NotFound(new { message = "No patient records found for the specified doctor." });
-                }
+                //if (!records.Any())
+                //{
+                //    return NotFound(new { message = "No patient records found for the specified doctor." });
+                //}
 
-                return Ok(records);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -157,29 +161,29 @@ namespace HospitalSystemTeamTask.Controllers
             try
             {
                 // Retrieve patient records by branch ID
-                var records = _service.GetRecordsByBranchId(branchId)
-                    .Select(record => new PatientRecordDto
-                    {
-                        PatientRecordID = record.RID,
-                        PID = record.PID,
-                        PatientName = record.Patient?.User?.UserName,
-                        BID = record.BID,
-                        BranchName = record.Branch?.BranchName,
-                        DID = record.DID,
-                        DoctorName = record.Doctor?.User?.UserName,
-                        VisitDate = record.VisitDate,
-                        VisitTime = record.VisitTime,
-                        Inspection = record.Inspection,
-                        Treatment = record.Treatment,
-                        Cost = record.Cost
-                    });
+                //var records = _service.GetRecordsByBranchId(branchId)
+                    //.Select(record => new PatientRecordDto
+                    //{
+                    //    PatientRecordID = record.RID,
+                    //    PID = record.PID,
+                    //    PatientName = record.Patient?.User?.UserName,
+                    //    BID = record.BID,
+                    //    BranchName = record.Branch?.BranchName,
+                    //    DID = record.DID,
+                    //    DoctorName = record.Doctor?.User?.UserName,
+                    //    VisitDate = record.VisitDate,
+                    //    VisitTime = record.VisitTime,
+                    //    Inspection = record.Inspection,
+                    //    Treatment = record.Treatment,
+                    //    Cost = record.Cost
+                    //});
 
-                if (!records.Any())
-                {
-                    return NotFound(new { message = "No patient records found for the specified branch." });
-                }
+                //if (!records.Any())
+                //{
+                //    return NotFound(new { message = "No patient records found for the specified branch." });
+                //}
 
-                return Ok(records);
+                return Ok();
             }
             catch (Exception ex)
             {

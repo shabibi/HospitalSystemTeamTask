@@ -13,5 +13,6 @@ namespace HospitalSystemTeamTask.Services
         IEnumerable<Clinic> GetClinicsByDepartmentId(int departmentId);
         void UpdateClinicDetails(int CID, ClinicInput input);
         void SetClinicStatus(int clinicId, bool isActive);
+        decimal GetPrice(int clinicId);
     }
 }

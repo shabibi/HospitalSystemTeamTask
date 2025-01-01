@@ -4,6 +4,7 @@ using HospitalSystemTeamTask;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HospitalSystemTeamTask.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250101105101_AddDoctorClinicOneToOne")]
+    partial class AddDoctorClinicOneToOne
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,7 +190,7 @@ namespace HospitalSystemTeamTask.Migrations
                     b.Property<int>("DID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CID")
+                    b.Property<int>("CID")
                         .HasColumnType("int");
 
                     b.Property<int>("CurrentBrunch")
@@ -391,7 +394,9 @@ namespace HospitalSystemTeamTask.Migrations
                 {
                     b.HasOne("HospitalSystemTeamTask.Models.Clinic", "Clinic")
                         .WithMany()
-                        .HasForeignKey("CID");
+                        .HasForeignKey("CID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HospitalSystemTeamTask.Models.Branch", "Branch")
                         .WithMany("Doctors")
