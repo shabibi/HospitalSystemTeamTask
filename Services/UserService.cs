@@ -14,11 +14,13 @@ namespace HospitalSystemTeamTask.Services
     {
         private readonly IUserRepo _userRepo;
         private readonly IConfiguration _configuration;
+        private readonly ISendEmail _email;
 
-        public UserService(IUserRepo userRepo, IConfiguration configuration)
+        public UserService(IUserRepo userRepo, IConfiguration configuration, ISendEmail email)
         {
             _userRepo = userRepo;
             _configuration = configuration;
+            _email = email;
         }
 
         // Add user
@@ -31,6 +33,7 @@ namespace HospitalSystemTeamTask.Services
         {
             if (InputUser.Role != "superAdmin")
                 throw new ArgumentException("Invalid role. Only 'superAdmin' role is allowed.", nameof(InputUser.Role));
+           
             //check if there is any active supper admin
             var existingSuperAdmins = _userRepo.GetUserByRole(InputUser.Role);
                 if (existingSuperAdmins != null && existingSuperAdmins.Any(u => u.IsActive))
@@ -39,20 +42,32 @@ namespace HospitalSystemTeamTask.Services
                 }
                 else
                 {
-                    String defaultPassword = "Super1234";
-                    string generatedEmail =$"{InputUser.UserName}@gmail.com";
-                    string hashedPassword = HashingPassword.Hshing(defaultPassword);
-                    var newSupperAdmin = new User
-                    {
-                        UserName = InputUser.UserName,
-                        Email = generatedEmail,
-                        Phone = InputUser.Phone,
-                        Password = hashedPassword,
-                        Role = InputUser.Role,
-                        IsActive = true
-                    };
-                    _userRepo.AddUser(newSupperAdmin);
-                }
+                // Default password and email generation
+                String defaultPassword = "Super1234";
+                string generatedEmail = $"{InputUser.UserName}@gmail.com";
+                string hashedPassword = HashingPassword.Hshing(defaultPassword);
+
+
+                // Create new super admin user
+                var newSupperAdmin = new User
+                {
+                    UserName = InputUser.UserName,
+                    Email = generatedEmail,
+                    Phone = InputUser.Phone,
+                    Password = hashedPassword,
+                    Role = InputUser.Role,
+                    IsActive = true
+                };
+                // Email subject and body
+                string subject = "Confirm Signing In!";
+                string body = $"Dear {InputUser.UserName},\n\nYour Super Admin account has been created successfully.\n\nYour default password is: " +
+               $"{defaultPassword}\nPlease change your password after logging in.\n\nBest Regards,\nYour System Team";
+                
+                // Add the new super admin to the repository
+                _userRepo.AddUser(newSupperAdmin);
+                // Send email
+                _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+            }
                    
         }
          
