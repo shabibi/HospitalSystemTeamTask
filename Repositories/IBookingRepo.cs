@@ -6,5 +6,7 @@ namespace HospitalSystemTeamTask.Repositories
     {
         IEnumerable<Booking> GetAllBooking();
         void AddBooking(Booking booking);
+        void UpdateBooking(Booking booking);
+        Booking GetBookingById(int bookingId);
     }
 }

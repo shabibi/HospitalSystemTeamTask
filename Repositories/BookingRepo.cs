@@ -38,6 +38,23 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
+        public void UpdateBooking(Booking booking)
+        {
+            _context.Bookings.Update(booking);
+            _context.SaveChanges();
+        }
+        public Booking GetBookingById(int bookingId)
+        {
+            try
+            {
+                return _context.Bookings.FirstOrDefault(u => u.BookingID == bookingId);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+
 
 
     } }

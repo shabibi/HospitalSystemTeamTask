@@ -7,5 +7,6 @@ namespace HospitalSystemTeamTask.Services
     {
         IEnumerable<Booking> GetAllBooking();
         void AddBooking(BookingInputDTO input);
+        Booking GetBookingById(int bookingId);
     }
 }
