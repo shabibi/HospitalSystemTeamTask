@@ -112,11 +112,45 @@ namespace HospitalSystemTeamTask.Repositories
                 throw new ArgumentException("Branch name is required.");
             }
 
-            return _context.Doctors
+            branchName = branchName.Trim(); // Normalize input
+
+            var doctors = _context.Doctors
                 .Include(d => d.Branch)
-                .Where(d => d.Branch.BranchName.ToLower() == branchName.ToLower())
+                .Where(d => EF.Functions.Like(d.Branch.BranchName, branchName)) // Case-insensitive matching
+                .ToList();
+
+            if (!doctors.Any())
+            {
+                Console.WriteLine("No doctors found for the branch name: " + branchName);
+            }
+
+            return doctors;
+        }
+
+        public IEnumerable<Doctor> GetDoctorsByDepartmentName(string departmentName)
+        {
+            return _context.Doctors
+                .Where(doc => doc.Department.DepartmentName == departmentName)
                 .ToList();
         }
+
+
+        public void UpdateDoctor(Doctor doctor)
+        {
+            try
+            {
+                _context.Doctors.Update(doctor);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+
+
+        }
+
+
 
 
 

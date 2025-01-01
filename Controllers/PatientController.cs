@@ -1,5 +1,6 @@
 ﻿
 using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ using System.Text;
 
 namespace HospitalSystemTeamTask.Controllers
 {
-    
+   
     [ApiController]
     [Route("api/[Controller]")]
     public class PatientController : ControllerBase
@@ -50,7 +51,7 @@ namespace HospitalSystemTeamTask.Controllers
             catch (Exception ex)
             {
                 // Return a generic error response
-                return StatusCode(500, $"An error occurred while retrieving patient. {(ex.Message)}");
+                return StatusCode(500, $"This ID not a patient!. {(ex.Message)}");
             }
         }
 
@@ -82,12 +83,24 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-        [AllowAnonymous]
+       
         [HttpPut("UpdatePatientDetails")]
         public IActionResult UpdatePatientDetails( int UID, PatientUpdate input)
         {
             try
             {
+
+
+
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
                 if (input == null)
                 {
                     return BadRequest("Patient details are required.");

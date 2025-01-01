@@ -36,7 +36,7 @@ namespace HospitalSystemTeamTask.Controllers
             catch (Exception ex)
             {
                 // Return a generic error response
-                return StatusCode(500, $"An error occurred while retrieving doctor. {(ex.Message)}");
+                return StatusCode(500, $"This person not a doctor!!. {(ex.Message)}");
             }
         }
 
@@ -87,7 +87,7 @@ namespace HospitalSystemTeamTask.Controllers
         {
             try
             {
-             
+
                 // Validate the user ID
                 if (DocID < 0)
                     return BadRequest("Invalid input");
@@ -103,7 +103,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var doctor = _doctorServicee.GetDoctorData(DocName, DocID);
 
 
-              
+
 
                 return Ok(doctor);
             }
@@ -151,7 +151,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = $"No doctor in this branch. {ex.Message}" });
             }
             catch (Exception ex)
             {
@@ -159,6 +159,66 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpGet("GetDoctorsByDepartmentName")]
+        public ActionResult<IEnumerable<DoctorOutPutDTO>> GetDoctorsByDepartmentName( string departmentName)
+        {
+            if (string.IsNullOrWhiteSpace(departmentName))
+            {
+                return BadRequest("Department name is required.");
+            }
 
+            try
+            {
+                var doctors = _doctorServicee.GetDoctorsByDepartmentName(departmentName);
+                return Ok(doctors);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+
+
+        }
+        //[Authorize(Roles = "admin,doctor")]
+        [HttpPut("UpdateDoctorDetails/{UID}/{DID}")]
+        public IActionResult UpdateDoctorDetails(int UID, int DID,  DoctorUpdateDTO input)
+        {
+            try
+            {
+                if (input == null)
+                {
+                    return BadRequest("Updated doctor details are required.");
+                }
+
+                if (UID <= 0 || DID <= 0)
+                {
+                    return BadRequest("Invalid UID or DID.");
+                }
+
+                _doctorServicee.UpdateDoctorDetails(UID, DID, input);
+                return Ok("Doctor details updated successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+
+        }
     }
 }
