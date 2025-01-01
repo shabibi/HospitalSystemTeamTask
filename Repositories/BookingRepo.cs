@@ -25,9 +25,20 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
+        public void AddBooking(Booking booking)
+        {
+            try
+            {
+                _context.Bookings.Add(booking);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
 
 
 
-
-        } }
+    } }
        

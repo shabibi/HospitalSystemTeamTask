@@ -1,4 +1,5 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -23,6 +24,26 @@ namespace HospitalSystemTeamTask.Services
             return _bookingRepo.GetAllBooking();
         }
 
+        public void AddBooking(BookingInputDTO input)
+        {
+            if (input == null)
+            {
+                throw new ArgumentException("Booking details are required.");
+            }
+
+            var booking = new Booking
+            {
+                StartTime = input.StartTime,
+                EndTime = input.EndTime,
+          
+                Staus = input.Staus,
+                Date = input.Date,
+                CID = input.CID,
+                PID = input.PID,
+                BookingDate = input.BookingDate
+            };
+            _bookingRepo.AddBooking(booking);
+        }
 
 
 
