@@ -1,0 +1,38 @@
+AddPatient:
+{
+    "UserName": "JohnDoe",
+    "Password": "Secure123!",
+    "Email": "john.doe@example.com",
+    "Phone": "1234567890",
+    "Age": 30,
+    "Gender": "M"
+}
+
+{
+    "UserName": "JohnDoe",
+    "Password": "Secure123!",
+    "Phone": "1234567890",
+    "Age": 30,
+    "Gender": "Male"
+}
+{
+    "UserName": "JohnDoe",
+    "Password": "Secure123!",
+    "Email": "john.doe.com",
+    "Phone": "1234567890",
+    "Age": 30,
+    "Gender": "Male"
+}
+
+UpdatePatientDetails:
+
+UID = 0
+{
+    "Phone": "9876543210",
+    "Password": "NewPassword123!"
+}
+
+
+GetPatientById:
+PID = 0
+
