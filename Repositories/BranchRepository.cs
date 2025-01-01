@@ -49,5 +49,18 @@ namespace HospitalSystemTeamTask.Repositories
                 .FirstOrDefault(b => b.BID == id);
         }
 
+        public string GetBranchName(int branchId)
+        {
+            try
+            {
+                var branch = GetBranchById(branchId);
+
+               return branch.BranchName ;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
     }
 }

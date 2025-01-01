@@ -19,5 +19,6 @@ namespace HospitalSystemTeamTask.Repositories
         void UpdatePassword(int uid, string newPassword);
         IEnumerable<User> GetUserByRole(string roleName);
         User GetUserByName(string userName);
+        string GetUserName(int uid);
     }
 }

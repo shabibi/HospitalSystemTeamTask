@@ -68,7 +68,19 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
-       
+        public string GetUserName(int uid)
+        {
+            try
+            {
+                var user = GetUserById(uid);
+
+                return user.UserName;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
         public bool IsValidRole(string roleName)
         {
             var validRoles = new List<string> { "Patient", "Admin", "Doctor" };

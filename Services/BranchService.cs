@@ -74,7 +74,10 @@ namespace HospitalSystemTeamTask.Services
             };
         }
 
-
+        public string GetBranchName (int branchId)
+        {
+            return _branchRepository.GetBranchName(branchId);
+        }
         public void UpdateBranch(string branchName, UpdateBranchDTO updatedBranchDto)
         {
             // Retrieve the existing branch

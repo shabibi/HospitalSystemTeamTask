@@ -175,6 +175,11 @@ namespace HospitalSystemTeamTask.Services
             // Persist changes
             _clinicRepo.UpdateClinic(clinic);
         }
+
+        public string GetClinicName(int cid)
+        {
+            return _clinicRepo.GetClinicName(cid);
+        }
     }
 
 }

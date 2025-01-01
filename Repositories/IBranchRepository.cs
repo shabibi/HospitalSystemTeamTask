@@ -9,5 +9,6 @@ namespace HospitalSystemTeamTask.Repositories
         Branch GetBranchByBranchName(string branchName);
         void UpdateBranch(Branch branch);
         Branch GetBranchById(int id);
+        string GetBranchName(int branchId);
     }
 }

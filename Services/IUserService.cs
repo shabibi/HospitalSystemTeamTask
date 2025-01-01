@@ -11,7 +11,7 @@ namespace HospitalSystemTeamTask.Services
         
         void DeactivateUser(int uid);
 
-       
+        string GetUserName(int userId);
         User GetUserById(int uid);
         User GetUserByName(string userName);
 

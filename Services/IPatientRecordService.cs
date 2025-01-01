@@ -5,7 +5,7 @@ namespace HospitalSystemTeamTask.Services
 {
     public interface IPatientRecordService
     {
-        IEnumerable<PatientRecord> GetAllRecords();
+        IEnumerable<PatientRecordOutput> GetAllRecords();
         PatientRecord GetRecordById(int id);
         void CreateRecord(PatientRecordInputDTO record, int doctorId);
         void UpdateRecord(PatientRecord record);
