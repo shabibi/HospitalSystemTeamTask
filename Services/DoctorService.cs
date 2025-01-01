@@ -176,6 +176,41 @@ namespace HospitalSystemTeamTask.Services
             return doctorDtos;
         }
 
+        public void UpdateDoctorDetails(int UID, int DID, DoctorUpdateDTO input)
+        {
+            if (input == null)
+            {
+                throw new ArgumentException("Doctor update details are required.");
+            }
+
+            // Get the user associated with the doctor
+            var existingUser = _UserService.GetUserById(UID);
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("Doctor user not found.");
+            }
+
+            // Update user details
+            existingUser.Password = input.Password;
+            existingUser.Phone = input.Phone;
+            _UserService.UpdateUser(existingUser);
+
+            // Get doctor entity
+            var existingDoctor = _DoctorRepo.GetDoctorById(DID);
+            if (existingDoctor == null)
+            {
+                throw new KeyNotFoundException("Doctor entity not found.");
+            }
+
+            // Update doctor details
+            existingDoctor.CurrentBrunch = input.CurrentBrunch;
+            existingDoctor.Level = input.Level;
+            existingDoctor.Degree = input.Degree;
+            existingDoctor.DepId = input.DepId;
+            existingDoctor.WorkingYear = input.WorkingYear;
+
+            _DoctorRepo.UpdateDoctor(existingDoctor);
+        }
 
 
     }

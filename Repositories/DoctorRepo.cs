@@ -135,6 +135,22 @@ namespace HospitalSystemTeamTask.Repositories
         }
 
 
+        public void UpdateDoctor(Doctor doctor)
+        {
+            try
+            {
+                _context.Doctors.Update(doctor);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+
+
+        }
+
+
 
 
 

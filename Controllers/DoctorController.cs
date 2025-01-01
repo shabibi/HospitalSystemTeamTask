@@ -159,7 +159,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [HttpGet("by-department")]
+        [HttpGet("GetDoctorsByDepartmentName")]
         public ActionResult<IEnumerable<DoctorOutPutDTO>> GetDoctorsByDepartmentName([FromQuery] string departmentName)
         {
             if (string.IsNullOrWhiteSpace(departmentName))
@@ -185,6 +185,39 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
 
+
+        }
+        //[Authorize(Roles = "admin,doctor")]
+        [HttpPut("UpdateDoctorDetails/{UID}/{DID}")]
+        public IActionResult UpdateDoctorDetails(int UID, int DID, [FromBody] DoctorUpdateDTO input)
+        {
+            try
+            {
+                if (input == null)
+                {
+                    return BadRequest("Updated doctor details are required.");
+                }
+
+                if (UID <= 0 || DID <= 0)
+                {
+                    return BadRequest("Invalid UID or DID.");
+                }
+
+                _doctorServicee.UpdateDoctorDetails(UID, DID, input);
+                return Ok("Doctor details updated successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
 
         }
     }

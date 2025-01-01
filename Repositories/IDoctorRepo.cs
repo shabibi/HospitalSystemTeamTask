@@ -13,6 +13,7 @@ namespace HospitalSystemTeamTask.Repositories
         void AddDoctor(Doctor doctor);
         IEnumerable<Doctor> GetDoctorByBranchName(string branchName);
         IEnumerable<Doctor> GetDoctorsByDepartmentName(string departmentName);
+        void UpdateDoctor(Doctor doctor);
 
     }
 }
