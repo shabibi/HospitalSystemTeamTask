@@ -28,17 +28,19 @@ namespace HospitalSystemTeamTask.Repositories
         }
 
         //Get Patients by id
-        public Patient GetPatientsById(int PID)
-        {
-            try
-            {
-                return _context.Patients.FirstOrDefault(u => u.PID == PID);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Database error: {ex.Message}");
-            }
-        }
+       public Patient GetPatientsById(int PID)
+{
+    try
+    {
+        return _context.Patients.Include(p => p.User).FirstOrDefault(p => p.PID == PID)
+            ?? throw new KeyNotFoundException($"Patient with ID {PID} not found.");
+    }
+    catch (Exception ex)
+    {
+        throw new InvalidOperationException($"Database error: {ex.Message}");
+    }
+}
+
 
 
         public void UpdatePatient(Patient patient)
@@ -73,5 +75,21 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
+        public Patient GetPatientByName(string PatientName)
+        {
+            try
+            {
+                return _context.Patients
+                    .Include(p => p.User) 
+                    .FirstOrDefault(p => p.User.UserName == PatientName); 
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
+
     }
+
 }
+

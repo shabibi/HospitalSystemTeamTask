@@ -26,19 +26,76 @@ namespace HospitalSystemTeamTask.Services
             return _PatientRepo.GetAllPatients();
         }
 
-        public Patient GetPatientById(int Pid)
+        public Patient GetPatientById(int PID)
         {
-            var patient = _PatientRepo.GetPatientsById(Pid);
+            var patient = _PatientRepo.GetPatientsById(PID);
+
             if (patient == null)
-                throw new KeyNotFoundException($"Patient with ID {Pid} not found.");
+            {
+                throw new KeyNotFoundException($"Patient with ID {PID} not found.");
+            }
+
             return patient;
         }
+
+
+        public PatienoutputDTO GetPatientData(string? userName, int? Pid)
+        {
+            Patient patient = null;
+
+            // Validate that at least one parameter is provided
+            if (string.IsNullOrWhiteSpace(userName) && !Pid.HasValue)
+            {
+                throw new ArgumentException("Either username or patient ID must be provided.");
+            }
+
+            // Retrieve user based on username
+            if (!string.IsNullOrEmpty(userName))
+            {
+                patient = GetPatientByName(userName);
+            }
+
+            // Retrieve user based on PID if username is not provided or no match was found
+            if (patient == null && Pid.HasValue)
+            {
+                patient = GetPatientById(Pid.Value);
+            }
+
+            // Validate if the patient exists
+            if (patient == null)
+            {
+                throw new KeyNotFoundException("Patient not found.");
+            }
+
+            // Prepare the output DTO
+            var outputData = new PatienoutputDTO
+            {
+                PID = patient.PID,
+                UserName = patient.User.UserName.ToLower(),
+                Email = patient.User.Email,
+                Phone = patient.User.Phone,
+                Role = patient.User.Role,
+                IsActive = patient.User.IsActive
+            };
+
+            return outputData;
+        }
+
+
+        public Patient GetPatientByName(string PatientName)
+        {
+            var patient = _PatientRepo.GetPatientByName(PatientName.ToLower());
+            if (patient == null)
+                throw new KeyNotFoundException($"User with Name {PatientName} not found.");
+            return patient;
+        }
+
 
         public void UpdatePatientDetails( int UID, PatientUpdate patientInput)
         {
 
 
-            var pass = "Pass1234";
+            
             var hashedPasswor = HashingPassword.Hshing(patientInput.Password);
             //get patient data from user table
             var existingUser = _userService.GetUserById(UID);
@@ -74,11 +131,11 @@ namespace HospitalSystemTeamTask.Services
             {
                 throw new ArgumentException("Patient or User information is missing.");
             }
-            var pass = "Pass1234";
+           
            var hashedPasswor = HashingPassword.Hshing(patientInput.Password);
           
             var user = new User { 
-                UserName = patientInput.UserName, 
+                UserName = patientInput.UserName.ToLower(), 
                 Password = hashedPasswor,
                 Email = patientInput.Email, 
                 Role = "patient" ,

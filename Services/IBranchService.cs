@@ -11,10 +11,11 @@ namespace HospitalSystemTeamTask.Services
         IEnumerable<Branch> GetAllBranches();
 
         Branch GetBranchDetailsByBranchName(string branchName);
-        void UpdateBranch(string branchName, UpdateBranchDTO updatedBranchDto);
-        void SetBranchStatus(string branchName, bool isActive);
+        void UpdateBranch(int branchId, UpdateBranchDTO updatedBranchDto);
+        void SetBranchStatus(int branchId, bool isActive);
         BranchDTO GetBranchById(int id);
         string GetBranchName(int branchId);
+        BranchDTO GetBranchDetails(string? branchName, int? branchId);
     }
 
     

@@ -9,5 +9,8 @@ namespace HospitalSystemTeamTask.Services
         Patient GetPatientById(int Pid);
         void UpdatePatientDetails(int UID, PatientUpdate patientInput);
         void AddPatient(PatientInputDTO patientInput);
+        Patient GetPatientByName(string PatientName);
+        PatienoutputDTO GetPatientData(string? userName, int? Pid);
+
     }
 }

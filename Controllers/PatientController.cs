@@ -6,6 +6,7 @@ using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -26,34 +27,6 @@ namespace HospitalSystemTeamTask.Controllers
         {
             _PatientService = patientService;
             _configuration = configuration;
-        }
-
-
-
-        //admin
-        [HttpGet("GetPatientById/{PID}")]
-        public IActionResult GetPatientById(int PID)
-        {
-            try
-            {
-                // Extract the token from the request and retrieve the user's role
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
-                {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
-                }
-                var patient = _PatientService.GetPatientById(PID);
-                return Ok(patient);
-
-            }
-            catch (Exception ex)
-            {
-                // Return a generic error response
-                return StatusCode(500, $"This ID not a patient!. {(ex.Message)}");
-            }
         }
 
         [NonAction]
@@ -90,18 +63,17 @@ namespace HospitalSystemTeamTask.Controllers
         {
             try
             {
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
 
+                // Check if the user's role allows them to perform this action
+                if (string.IsNullOrEmpty(userRole) ||
+            !(userRole == "admin" || userRole == "superAdmin" || (userRole == "patient" && userId == UID)))
+                {
+                    return BadRequest("You are not authorized to perform this action.");
+                }
 
-
-                //// Extract the token from the request and retrieve the user's role
-                //string token = JwtHelper.ExtractToken(Request);
-                //var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-
-                //// Check if the user's role allows them to perform this action
-                //if (userRole == null || (userRole != "patient"))
-                //{
-                //    return BadRequest(new { message = "You are not authorized to perform this action." });
-                //}
                 if (input == null)
                 {
                     return BadRequest("Patient details are required.");
@@ -115,7 +87,9 @@ namespace HospitalSystemTeamTask.Controllers
                 _PatientService.UpdatePatientDetails(UID, input);
 
                 return Ok("Patient details updated successfully.");
+
             }
+
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
@@ -127,13 +101,23 @@ namespace HospitalSystemTeamTask.Controllers
 
 
         }
-        // [Authorize(Roles = "Patient")]
-        [AllowAnonymous]
+        
+        //addmin
         [HttpPost("AddPatient")]
         public IActionResult AddPatient( PatientInputDTO input)
         {
             try
             {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+
                 if (input == null)
                 {
                     return BadRequest("Patient details are required.");
@@ -155,6 +139,38 @@ namespace HospitalSystemTeamTask.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetPatientData")]
+        public IActionResult GetPatientData( string? userName, int? uid)
+        {
+            try
+            {
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
+
+                // Check if the user's role allows them to perform this action
+                if (string.IsNullOrEmpty(userRole) ||
+            !(userRole == "admin" || userRole == "superAdmin" || (userRole == "patient" && userId == uid)))
+                {
+                    return BadRequest("You are not authorized to perform this action.");
+                }
+                var patientData = _PatientService.GetPatientData(userName, uid);
+                return Ok(patientData);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 

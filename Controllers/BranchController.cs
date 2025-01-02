@@ -42,16 +42,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while adding the new Branch: {ex.Message}");
             }
         }
-        [HttpGet("{id}")]
-        public ActionResult<BranchDTO> GetBranchById(int id)
-        {
-            var branchDto = _branchService.GetBranchById(id);
-            if (branchDto == null)
-            {
-                return NotFound();
-            }
-            return Ok(branchDto);
-        }
+        
 
         [HttpGet]
         public ActionResult<IEnumerable<BranchDTO>> GetAllBranches()
@@ -73,23 +64,28 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [HttpGet("details/{branchName}")]
-        public IActionResult GetBranchDetails(string branchName)
+        [HttpGet("branch")]
+        public IActionResult GetBranchDetails([FromQuery] string? branchName, [FromQuery] int? branchId)
         {
             try
             {
-                var branch = _branchService.GetBranchDetailsByBranchName(branchName);
+                var branch = _branchService.GetBranchDetails(branchName, branchId);
                 return Ok(branch);
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
             }
         }
+
 
 
         [HttpGet("GetDepartmentsByBranch")]
@@ -112,8 +108,8 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
         [Authorize]
-        [HttpPatch("{branchName}")]
-        public IActionResult UpdateBranch(string branchName, [FromBody] UpdateBranchDTO updatedBranchDto)
+        [HttpPatch("{branchId}")]
+        public IActionResult UpdateBranch(int branchId, [FromBody] UpdateBranchDTO updatedBranchDto)
         {
             try
             {
@@ -128,8 +124,8 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Call the service to update the branch
-                _branchService.UpdateBranch(branchName, updatedBranchDto);
-                return Ok(new { message = $"Branch '{branchName}' updated successfully." });
+                _branchService.UpdateBranch(branchId, updatedBranchDto);
+                return Ok(new { message = $"Branch with ID ' {branchId}' updated successfully." });
             }
             catch (KeyNotFoundException ex)
             {
@@ -145,8 +141,8 @@ namespace HospitalSystemTeamTask.Controllers
 
 
         [Authorize]
-        [HttpPatch("{branchName}/status")]
-        public IActionResult SetBranchStatus(string branchName, [FromQuery] bool isActive)
+        [HttpPatch("{branchId}/status")]
+        public IActionResult SetBranchStatus(int branchId, [FromQuery] bool isActive)
         {
             try
             {
@@ -161,8 +157,8 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Call the service to set the status
-                _branchService.SetBranchStatus(branchName, isActive);
-                return Ok(new { message = $"Branch '{branchName}' status updated to {(isActive ? "Active" : "Inactive")}." });
+                _branchService.SetBranchStatus(branchId, isActive);
+                return Ok(new { message = $"Branch with ID '{branchId}' status updated to {(isActive ? "Active" : "Inactive")}." });
             }
             catch (KeyNotFoundException ex)
             {

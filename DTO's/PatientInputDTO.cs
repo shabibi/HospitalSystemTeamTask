@@ -13,10 +13,11 @@ namespace HospitalSystemTeamTask.DTO_s
         public string Email { get; set; }
 
         [Required]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$",
-        ErrorMessage = "Password must be at least 8 characters long, contain at least one uppercase letter," +
-            " one lowercase letter, one digit")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+       ErrorMessage = "Password must be at least 8 characters long, contain at least one uppercase letter, " +
+                      "one lowercase letter, one digit, and one special character.")]
         public string Password { get; set; }
+
 
         [Required]
         [Range (0, 120 , ErrorMessage ="Age must be grater than 0 ")]
