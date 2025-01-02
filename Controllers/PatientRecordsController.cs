@@ -122,35 +122,27 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-        [HttpGet("by-doctor/{doctorId}")]
+        [HttpGet("GetRecordsByDoctorId/{doctorId}")]
         public IActionResult GetByDoctorId(int doctorId)
         {
             try
             {
-                // Retrieve patient records by doctor ID
-                //var records = _service.GetRecordsByDoctorId(doctorId)
-                    //.Select(record => new PatientRecordDto
-                    //{
-                    //    PatientRecordID = record.RID,
-                    //    PID = record.PID,
-                    //    PatientName = record.Patient?.User?.UserName,
-                    //    BID = record.BID,
-                    //    BranchName = record.Branch?.BranchName,
-                    //    DID = record.DID,
-                    //    DoctorName = record.Doctor?.User?.UserName,
-                    //    VisitDate = record.VisitDate,
-                    //    VisitTime = record.VisitTime,
-                    //    Inspection = record.Inspection,
-                    //    Treatment = record.Treatment,
-                    //    Cost = record.Cost
-                    //});
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-                //if (!records.Any())
-                //{
-                //    return NotFound(new { message = "No patient records found for the specified doctor." });
-                //}
-
-                return Ok();
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "supperAdmin" && userRole != "doctor"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+                //Retrieve patient records by doctor ID
+                var records = _service.GetRecordsByDoctorId(doctorId);
+                
+                return Ok(records);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {

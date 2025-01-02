@@ -1,6 +1,7 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
+using System.Numerics;
 
 namespace HospitalSystemTeamTask.Services
 {
@@ -87,11 +88,42 @@ namespace HospitalSystemTeamTask.Services
             _repository.Add(newRecord);
         }
 
-        public IEnumerable<PatientRecord> GetRecordsByDoctorId(int doctorId)
+        public IEnumerable<PatientRecordOutput> GetRecordsByDoctorId(int doctorId)
         {
-            return _repository.GetAll()
+            // Fetch the doctor details and validate
+            var doctor = _doctorService.GetDoctorById(doctorId);
+            if (doctor == null || !doctor.CID.HasValue)
+                throw new InvalidOperationException($"Doctor with ID {doctorId} not found or missing clinic information.");
+
+            // Filter records in the repository query
+            var records = _repository.GetAll()
                 .Where(record => record.DID == doctorId)
                 .ToList();
+
+            if (!records.Any())
+                throw new InvalidOperationException($"No records found for Doctor ID {doctorId}.");
+
+            var output = new List<PatientRecordOutput>();
+          
+            foreach (var record in records)
+            {
+                output.Add(new PatientRecordOutput
+                {
+                    RecordId = record.RID,
+                    PatientId = record.PID,
+                    PatientName = _userService.GetUserName(record.PID),
+                    BranchName = _branchService.GetBranchName(record.BID),
+                    DoctorName = _userService.GetUserName(doctorId),
+                    ClinicName = _clinicService.GetClinicName(doctor.CID.Value),
+                    VisitDate = record.VisitDate,
+                    VisitTime = record.VisitTime,
+                    Inspection = record.Inspection,
+                    Treatment = record.Treatment,
+                    Price = record.Cost,
+                });
+            }
+            return output;
+
         }
 
         public IEnumerable<PatientRecord> GetRecordsByBranchId(int branchId)

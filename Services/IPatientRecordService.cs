@@ -10,7 +10,7 @@ namespace HospitalSystemTeamTask.Services
         void CreateRecord(PatientRecordInputDTO record, int doctorId);
         void UpdateRecord(PatientRecord record);
         void DeleteRecord(PatientRecord record);
-        IEnumerable<PatientRecord> GetRecordsByDoctorId(int doctorId);
+        IEnumerable<PatientRecordOutput> GetRecordsByDoctorId(int doctorId);
         IEnumerable<PatientRecord> GetRecordsByBranchId(int branchId);
 
     }
