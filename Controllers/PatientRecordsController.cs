@@ -129,44 +129,31 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-      
-        //[HttpPatch("{id}")]
-        //public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
 
-        //    try
-        //    {
-        //        // Check if the record exists
-        //        var existingRecord = _service.GetRecordById(id);
-        //        if (existingRecord == null)
-        //        {
-        //            return NotFound(new { message = "Patient record not found." });
-        //        }
+        [HttpPatch("UpdateRecord")]
+        public IActionResult UpdateRecord(int RecordID, string? treatment, string? inspection)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //        // Update the existing entity with the new data
-        //        existingRecord.PID = dto.PID;
-        //        existingRecord.BID = dto.BID;
-        //        existingRecord.DID = dto.DID;
-        //        existingRecord.VisitDate = dto.VisitDate;
-        //        existingRecord.VisitTime = dto.VisitTime;
-        //        existingRecord.Inspection = dto.Inspection;
-        //        existingRecord.Treatment = dto.Treatment;
-        //        existingRecord.Cost = dto.Cost;
+            try
+            {
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                int userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
 
-        //        // Call the service to update the record
-        //        _service.UpdateRecord(existingRecord);
+                
+               _service.UpdateRecord(RecordID,treatment,inspection,userId);
 
-        //        return Ok(new { message = "Patient record updated successfully!" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { message = "An error occurred while updating the patient record.", details = ex.Message });
-        //    }
-        //}
+                return Ok(new { message = "Patient record updated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the patient record.", details = ex.Message });
+            }
+        }
 
         //[HttpDelete("{id}")]
         //public IActionResult DeleteRecord(int id)
