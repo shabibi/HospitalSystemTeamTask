@@ -9,15 +9,18 @@ namespace HospitalSystemTeamTask.Services
     public class ClinicService : IClinicService
     {
         private readonly IClinicRepocs _clinicRepo;
-        private readonly IBranchService _branchService;
-        private readonly IDepartmentService _departmentService;
         private readonly IDoctorService _doctorService;
-        public ClinicService(IClinicRepocs clinicRepo, IBranchService branchService, IDepartmentService departmentService, IDoctorService doctorService)
+
+        private readonly IBranchDepartmentService _branchDepartmentService;
+
+
+
+        public ClinicService(IClinicRepocs clinicRepo,  IDoctorService doctorService, IBranchDepartmentService branchDepartmentService)
         {
             _clinicRepo = clinicRepo;
-            _branchService = branchService;
-            _departmentService = departmentService;
+   
             _doctorService = doctorService;
+            _branchDepartmentService = branchDepartmentService;
         }
         public IEnumerable<Clinic> GetAllClinic()
         {
@@ -32,17 +35,40 @@ namespace HospitalSystemTeamTask.Services
                 throw new ArgumentException("Clinic details are required.");
             }
 
-            TimeSpan totalDuration = input.EndTime - input.StartTime;
+            // Validate capacity
             if (input.Capacity <= 0)
             {
                 throw new ArgumentException("Capacity must be greater than 0.");
             }
 
+            // Calculate slot time
+            TimeSpan totalDuration = input.EndTime - input.StartTime;
             int slotTime = (int)(totalDuration.TotalMinutes / input.Capacity);
 
+            // Check if the doctor exists
+            var doctor = _doctorService.GetDoctorById(input.AssignDoctor);
+            if (doctor == null)
+            {
+                throw new KeyNotFoundException($"Doctor with ID {input.AssignDoctor} not found.");
+            }
+
+            // Check if the doctor is already assigned to a clinic
+            if (doctor.CID != null)
+            {
+                throw new InvalidOperationException($"Doctor with ID {input.AssignDoctor} is already assigned to Clinic ID {doctor.CID}.");
+            }
+
+            // Validate the branch and department combination using BranchDepartmentService
+            var branchDepartment = _branchDepartmentService.GetBranchDep(input.DepID,input.BID);
+            if (branchDepartment == null)
+            {
+                throw new ArgumentException($"The specified branch (ID: {input.BID}) and department (ID: {input.DepID}) combination does not exist.");
+            }
+
+            // Create and add the clinic
             var clinic = new Clinic
             {
-                ClincName = input.ClincName,
+                ClincName = input.ClincName.ToLower(),
                 Capacity = input.Capacity,
                 StartTime = input.StartTime,
                 EndTime = input.EndTime,
@@ -53,8 +79,21 @@ namespace HospitalSystemTeamTask.Services
                 BID = input.BID,
                 AssignDoctor = input.AssignDoctor
             };
+
             _clinicRepo.AddClinic(clinic);
+
+            branchDepartment.DepartmentCapacity += input.Capacity;
+
+            // Update capacity in the BranchDepartment table
+            _branchDepartmentService.UpdateBranchDepartment(branchDepartment);
+            // Assign clinic ID to the doctor
+            doctor.CID = clinic.CID;
+            _doctorService.UpdateDoctor(doctor);
+
+
         }
+
+
 
 
         public Clinic GetClinicById(int clinicId)
@@ -89,7 +128,7 @@ namespace HospitalSystemTeamTask.Services
         //}
         public Clinic GetClinicByName(string clinicName)
         {
-            var clinic = _clinicRepo.GetClinicByName(clinicName);
+            var clinic = _clinicRepo.GetClinicByName(clinicName.ToLower());
             if (clinic == null)
                 throw new KeyNotFoundException($"clinic with name {clinicName} not found.");
             return clinic;
@@ -102,7 +141,7 @@ namespace HospitalSystemTeamTask.Services
                 throw new ArgumentException("Branch name is required.");
             }
 
-            var clinics = _clinicRepo.GetClinicsByBranchName(branchName);
+            var clinics = _clinicRepo.GetClinicsByBranchName(branchName.ToLower());
             if (!clinics.Any())
             {
                 throw new KeyNotFoundException($"No clinics found for branch: {branchName}");

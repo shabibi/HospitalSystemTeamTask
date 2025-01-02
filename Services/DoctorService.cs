@@ -13,7 +13,7 @@ namespace HospitalSystemTeamTask.Services
         private readonly IUserService _UserService;
 
 
-        public DoctorService(IDoctorRepo DoctorRepo , IUserService userService)
+        public DoctorService(IDoctorRepo DoctorRepo, IUserService userService)
         {
             _DoctorRepo = DoctorRepo;
             _UserService = userService;
@@ -81,9 +81,9 @@ namespace HospitalSystemTeamTask.Services
             {
                 UID = doctor.DID,
                 CurrentBrunch = doctor.CurrentBrunch,
-                Level= doctor.Level,
-                Degree= doctor.Degree,
-                WorkingYear= doctor.WorkingYear,
+                Level = doctor.Level,
+                Degree = doctor.Degree,
+                WorkingYear = doctor.WorkingYear,
                 JoiningDate = doctor.JoiningDate // Get the current date
 
             };
@@ -121,7 +121,7 @@ namespace HospitalSystemTeamTask.Services
                 CID = input.CID,
             };
 
-       
+
 
             // Save the doctor
             _DoctorRepo.AddDoctor(doctor);
@@ -217,10 +217,19 @@ namespace HospitalSystemTeamTask.Services
             _DoctorRepo.UpdateDoctor(existingDoctor);
         }
 
+        public void UpdateDoctor(Doctor doctor)
+        {
+
+            var existingDoctor = _DoctorRepo.GetDoctorById(doctor.DID);
+            if (existingDoctor == null)
+                throw new KeyNotFoundException($"Product with ID {doctor.DID} not found.");
+
+            _DoctorRepo.UpdateDoctor(doctor);
+
+        }
+
 
     }
-
-
 }
 
 
