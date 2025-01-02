@@ -71,7 +71,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = $"No branches found for the department '{departmentName}'.", error = ex.Message });
             }
             catch (Exception ex)
             {
