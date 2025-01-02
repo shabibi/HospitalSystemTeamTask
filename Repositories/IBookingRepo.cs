@@ -8,5 +8,6 @@ namespace HospitalSystemTeamTask.Repositories
         void AddBooking(Booking booking);
         void UpdateBooking(Booking booking);
         Booking GetBookingById(int bookingId);
+        IEnumerable<Booking> GetBookingsByClinicAndDate(int clinicId, DateTime date);
     }
 }

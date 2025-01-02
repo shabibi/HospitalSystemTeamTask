@@ -14,7 +14,7 @@ namespace HospitalSystemTeamTask.Models
 
 
         [ForeignKey("Patient")]
-        public int PID  { get; set; }
+        public int? PID  { get; set; }
         public Patient Patient { get; set; }
 
         [Required]
@@ -28,7 +28,7 @@ namespace HospitalSystemTeamTask.Models
 
         public DateTime Date {  get; set; }
 
-        public DateTime BookingDate  { get; set; }
+        public DateTime? BookingDate  { get; set; }
 
     }
 }

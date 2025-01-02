@@ -55,7 +55,15 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
+        public IEnumerable<Booking> GetBookingsByClinicAndDate(int clinicId, DateTime date)
+        {
+            return _context.Bookings
+                .Where(b => b.CID == clinicId && b.Date.Date == date.Date)
+                .ToList();
+        }
 
 
-    } }
+
+    }
+}
        
