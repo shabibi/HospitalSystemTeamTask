@@ -9,6 +9,7 @@ namespace HospitalSystemTeamTask.Repositories
         public Patient GetPatientsById(int Pid);
         void UpdatePatient(Patient patient);
         void AddPatient(Patient patient);
+        Patient GetPatientByName(string PatientName);
 
 
     }

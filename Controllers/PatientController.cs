@@ -30,31 +30,31 @@ namespace HospitalSystemTeamTask.Controllers
 
 
 
-        //admin
-        [HttpGet("GetPatientById/{PID}")]
-        public IActionResult GetPatientById(int PID)
-        {
-            try
-            {
-                // Extract the token from the request and retrieve the user's role
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+      
+        //[HttpGet("GetPatientById/{PID}")]
+        //public IActionResult GetPatientById(int PID)
+        //{
+        //    try
+        //    {
+        //        // Extract the token from the request and retrieve the user's role
+        //        string token = JwtHelper.ExtractToken(Request);
+        //        var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
-                {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
-                }
-                var patient = _PatientService.GetPatientById(PID);
-                return Ok(patient);
+        //        // Check if the user's role allows them to perform this action
+        //        if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+        //        {
+        //            return BadRequest(new { message = "You are not authorized to perform this action." });
+        //        }
+        //        var patient = _PatientService.GetPatientById(PID);
+        //        return Ok(patient);
 
-            }
-            catch (Exception ex)
-            {
-                // Return a generic error response
-                return StatusCode(500, $"This ID not a patient!. {(ex.Message)}");
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Return a generic error response
+        //        return StatusCode(500, $"This ID not a patient!. {(ex.Message)}");
+        //    }
+        //}
 
         [NonAction]
         public string GenerateJwtToken(string PId, string username, string role)
@@ -155,6 +155,28 @@ namespace HospitalSystemTeamTask.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetPatientData")]
+        public IActionResult GetPatientData( string? userName, int? pid)
+        {
+            try
+            {
+                var patientData = _PatientService.GetPatientData(userName, pid);
+                return Ok(patientData);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
