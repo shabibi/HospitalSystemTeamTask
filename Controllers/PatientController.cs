@@ -93,15 +93,15 @@ namespace HospitalSystemTeamTask.Controllers
 
 
 
-                // Extract the token from the request and retrieve the user's role
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                //// Extract the token from the request and retrieve the user's role
+                //string token = JwtHelper.ExtractToken(Request);
+                //var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "patient"))
-                {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
-                }
+                //// Check if the user's role allows them to perform this action
+                //if (userRole == null || (userRole != "patient"))
+                //{
+                //    return BadRequest(new { message = "You are not authorized to perform this action." });
+                //}
                 if (input == null)
                 {
                     return BadRequest("Patient details are required.");

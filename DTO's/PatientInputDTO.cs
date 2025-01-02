@@ -25,7 +25,8 @@ namespace HospitalSystemTeamTask.DTO_s
         [RegularExpression("M|F", ErrorMessage = "Gender must be M or F.")]
         public string Gender { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Phone number is required.")]
+        [RegularExpression(@"^\d{8}$", ErrorMessage = "Phone number must be exactly 8 digits.")]
         public string Phone {  get; set; }
     }
 }
