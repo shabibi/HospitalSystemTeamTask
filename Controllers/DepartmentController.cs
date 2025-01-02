@@ -45,7 +45,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("GetAllDepartments")]
         public IActionResult GetAllDepartments()
         {
             try
@@ -79,7 +79,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
         [Authorize]
-        [HttpPatch("{id}")]
+        [HttpPatch("UpdateDepartment/{id}")]
         public IActionResult UpdateDepartment(int id, [FromBody] DepartmentDTO departmentDto)
         {
             try

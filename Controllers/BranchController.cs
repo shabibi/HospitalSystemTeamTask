@@ -127,7 +127,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
         [Authorize]
-        [HttpPatch("{branchId}")]
+        [HttpPatch("UpdateDepartment/{branchId}")]
         public IActionResult UpdateBranch(int branchId, [FromBody] UpdateBranchDTO updatedBranchDto)
         {
             try
