@@ -94,27 +94,31 @@ namespace HospitalSystemTeamTask.Controllers
 
 
 
-        [HttpGet]
+        [HttpGet("GetAllRecords")]
         public IActionResult GetAll()
         {
-            //var records = _service.GetAllRecords()
-            //    .Select(record => new PatientRecordDto
-            //    {
-            //        PatientRecordID = record.RID,
-            //        PID = record.PID,
-            //        PatientName = record.Patient?.User?.UserName, 
-            //        BID = record.BID,
-            //        BranchName = record.Branch?.BranchName, 
-            //        DID = record.DID,
-            //        DoctorName = record.Doctor?.User?.UserName, 
-            //        VisitDate = record.VisitDate,
-            //        VisitTime = record.VisitTime,
-            //        Inspection = record.Inspection,
-            //        Treatment = record.Treatment,
-            //        Cost = record.Cost
-            //    });
+            try
+            {
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-            return Ok();
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "supperAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+                return Ok(_service.GetAllRecords());
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while retrieving products. {(ex.Message)}");
+
+            }
         }
 
 

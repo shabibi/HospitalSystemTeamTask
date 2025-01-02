@@ -99,7 +99,19 @@ namespace HospitalSystemTeamTask.Repositories
             _context.SaveChanges();
         }
 
+        public string GetClinicName(int cid)
+        {
+            try
+            {
+                var clinc = GetClinicById(cid);
 
+                return clinc.ClincName;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
 
     }
 }

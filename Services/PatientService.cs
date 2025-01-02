@@ -36,6 +36,10 @@ namespace HospitalSystemTeamTask.Services
 
         public void UpdatePatientDetails( int UID, PatientUpdate patientInput)
         {
+
+
+            var pass = "Pass1234";
+            var hashedPasswor = HashingPassword.Hshing(patientInput.Password);
             //get patient data from user table
             var existingUser = _userService.GetUserById(UID);
 
@@ -46,6 +50,18 @@ namespace HospitalSystemTeamTask.Services
             if (existingUser == null)
             {
                 throw new KeyNotFoundException("Patient not found.");
+            }
+
+            // Validate and update the user's name and phone number
+            if (!string.IsNullOrEmpty(patientInput.Phone) &&
+                int.TryParse(patientInput.Phone, out int parsedPhone) &&
+                patientInput.Phone.Length == 8)
+            {
+                existingUser.Phone = parsedPhone.ToString(); // Update phone as a string after validation
+            }
+            else
+            {
+                throw new ArgumentException("Invalid phone number. It must be exactly 8 numeric digits.");
             }
 
             _userService.UpdateUser(existingUser);

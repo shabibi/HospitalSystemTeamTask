@@ -11,11 +11,13 @@ namespace HospitalSystemTeamTask.Services
         private readonly IClinicRepocs _clinicRepo;
         private readonly IBranchService _branchService;
         private readonly IDepartmentService _departmentService;
-        public ClinicService(IClinicRepocs clinicRepo, IBranchService branchService, IDepartmentService departmentService)
+        private readonly IDoctorService _doctorService;
+        public ClinicService(IClinicRepocs clinicRepo, IBranchService branchService, IDepartmentService departmentService, IDoctorService doctorService)
         {
             _clinicRepo = clinicRepo;
             _branchService = branchService;
-           _departmentService = departmentService;
+            _departmentService = departmentService;
+            _doctorService = doctorService;
         }
         public IEnumerable<Clinic> GetAllClinic()
         {
@@ -53,6 +55,7 @@ namespace HospitalSystemTeamTask.Services
             };
             _clinicRepo.AddClinic(clinic);
         }
+
 
         public Clinic GetClinicById(int clinicId)
         {
@@ -146,6 +149,7 @@ namespace HospitalSystemTeamTask.Services
             existingClinic.DepID = input.DepID;
             existingClinic.BID = input.BID;
             existingClinic.AssignDoctor = input.AssignDoctor;
+            
 
             // Persist changes
             _clinicRepo.UpdateClinic(existingClinic);
@@ -170,6 +174,11 @@ namespace HospitalSystemTeamTask.Services
 
             // Persist changes
             _clinicRepo.UpdateClinic(clinic);
+        }
+
+        public string GetClinicName(int cid)
+        {
+            return _clinicRepo.GetClinicName(cid);
         }
     }
 
