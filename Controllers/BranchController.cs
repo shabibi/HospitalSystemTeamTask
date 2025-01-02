@@ -108,8 +108,8 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
         [Authorize]
-        [HttpPatch("{branchName}")]
-        public IActionResult UpdateBranch(string branchName, [FromBody] UpdateBranchDTO updatedBranchDto)
+        [HttpPatch("{branchId}")]
+        public IActionResult UpdateBranch(int branchId, [FromBody] UpdateBranchDTO updatedBranchDto)
         {
             try
             {
@@ -124,8 +124,8 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Call the service to update the branch
-                _branchService.UpdateBranch(branchName, updatedBranchDto);
-                return Ok(new { message = $"Branch '{branchName}' updated successfully." });
+                _branchService.UpdateBranch(branchId, updatedBranchDto);
+                return Ok(new { message = $"Branch with ID ' {branchId}' updated successfully." });
             }
             catch (KeyNotFoundException ex)
             {
@@ -141,8 +141,8 @@ namespace HospitalSystemTeamTask.Controllers
 
 
         [Authorize]
-        [HttpPatch("{branchName}/status")]
-        public IActionResult SetBranchStatus(string branchName, [FromQuery] bool isActive)
+        [HttpPatch("{branchId}/status")]
+        public IActionResult SetBranchStatus(int branchId, [FromQuery] bool isActive)
         {
             try
             {
@@ -157,8 +157,8 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Call the service to set the status
-                _branchService.SetBranchStatus(branchName, isActive);
-                return Ok(new { message = $"Branch '{branchName}' status updated to {(isActive ? "Active" : "Inactive")}." });
+                _branchService.SetBranchStatus(branchId, isActive);
+                return Ok(new { message = $"Branch with ID '{branchId}' status updated to {(isActive ? "Active" : "Inactive")}." });
             }
             catch (KeyNotFoundException ex)
             {
