@@ -193,44 +193,44 @@ namespace HospitalSystemTeamTask.Controllers
 
         }
 
-        //[Authorize]
-        //[HttpPost("AddDepartmentToBranch")]
-        //public IActionResult AddDepartmentToBranch (BranchDepDTO branchDepartment)
-        //{
-        //    try
-        //    {
-        //        if (branchDepartment == null)
-        //            return BadRequest("data is required.");
+        [Authorize]
+        [HttpPost("AddDepartmentToBranch")]
+        public IActionResult AddDepartmentToBranch(BranchDepDTO branchDepartment)
+        {
+            try
+            {
+                if (branchDepartment == null)
+                    return BadRequest("data is required.");
 
-        //        string token = JwtHelper.ExtractToken(Request);
-        //        var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-        //        // Check if the user's role allows them to perform this action
-        //        if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
-        //        {
-        //            return BadRequest(new { message = "You are not authorized to perform this action." });
-        //        }
-        //        _branchDepartmentService.AddDepartmentToBranch(branchDepartment);
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+                _branchDepartmentService.AddDepartmentToBranch(branchDepartment);
 
-        //        return Ok("Department added to Branch successfully");
+                return Ok("Department added to Branch successfully");
 
-        //    }
-        //    catch (ArgumentNullException ex)
-        //    {
-        //        // Handle specific exceptions, e.g., null input
-        //        return BadRequest(ex.Message);
-        //    }
-        //    catch (ArgumentException ex)
-        //    {
-        //        // Handle validation-related exceptions
-        //        return BadRequest(ex.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Return a generic error response
-        //        return StatusCode(500, $"An error occurred while adding the Department to Branch: {ex.Message}");
-        //    }
-        //}
+            }
+            catch (ArgumentNullException ex)
+            {
+                // Handle specific exceptions, e.g., null input
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                // Handle validation-related exceptions
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while adding the Department to Branch: {ex.Message}");
+            }
+        }
 
     }
 }

@@ -34,7 +34,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        
+        //admin
         [HttpPost("AddClinic")]
         public IActionResult AddClinic(ClinicInput input)
         {
@@ -46,7 +46,7 @@ namespace HospitalSystemTeamTask.Controllers
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
                 // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
+                if (userRole == null || (userRole != "admin" ))
                 {
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }

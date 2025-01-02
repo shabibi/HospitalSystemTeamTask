@@ -57,5 +57,36 @@ namespace HospitalSystemTeamTask.Repositories
             }
 
         }
+        public BranchDepartment GetBranchDep (int departmentId, int branchId)
+        {
+            try
+            {
+                return _context.branchDepartments
+                   .FirstOrDefault(bd => bd.BID == branchId && bd.DepID == departmentId);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+
+        }
+        
+
+        public void UpdateBranchDepartment(BranchDepartment branchDepartment)
+        {
+            try
+            {
+                // Validate that the branch-department combination exists
+                var existingBranchDepartment = GetBranchDep(branchDepartment.BID, branchDepartment.DepID);
+
+                if (existingBranchDepartment != null) 
+                  _context.Update(existingBranchDepartment);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
     }
 }
