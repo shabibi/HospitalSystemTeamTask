@@ -42,16 +42,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while adding the new Branch: {ex.Message}");
             }
         }
-        [HttpGet("{id}")]
-        public ActionResult<BranchDTO> GetBranchById(int id)
-        {
-            var branchDto = _branchService.GetBranchById(id);
-            if (branchDto == null)
-            {
-                return NotFound();
-            }
-            return Ok(branchDto);
-        }
+        
 
         [HttpGet]
         public ActionResult<IEnumerable<BranchDTO>> GetAllBranches()
@@ -73,23 +64,28 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [HttpGet("details/{branchName}")]
-        public IActionResult GetBranchDetails(string branchName)
+        [HttpGet("branch")]
+        public IActionResult GetBranchDetails([FromQuery] string? branchName, [FromQuery] int? branchId)
         {
             try
             {
-                var branch = _branchService.GetBranchDetailsByBranchName(branchName);
+                var branch = _branchService.GetBranchDetails(branchName, branchId);
                 return Ok(branch);
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
             }
         }
+
 
 
         [HttpGet("GetDepartmentsByBranch")]

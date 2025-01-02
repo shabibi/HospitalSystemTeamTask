@@ -15,6 +15,7 @@ namespace HospitalSystemTeamTask.Services
         void SetBranchStatus(string branchName, bool isActive);
         BranchDTO GetBranchById(int id);
         string GetBranchName(int branchId);
+        BranchDTO GetBranchDetails(string? branchName, int? branchId);
     }
 
     
