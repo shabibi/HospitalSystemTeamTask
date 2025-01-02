@@ -28,7 +28,7 @@ namespace HospitalSystemTeamTask.Services
 
             // Validate if the branch exists and is active
             var branchs = _branchService.GetAllBranches();
-            if (!branchs.Any(d => d.BID == department.BID || d.BranchStatus))
+            if (!branchs.Any(d => d.BID == department.BID || d.IsActive))
                 throw new Exception("The specified branch does not exist.");
 
             var newBranchDep = new BranchDepartment
@@ -45,7 +45,7 @@ namespace HospitalSystemTeamTask.Services
         public IEnumerable<DepartmentDTO>GetDepartmentsByBranch(string BranchName)
         {
             var branch = _branchService.GetBranchDetailsByBranchName(BranchName);
-            if (branch == null || !branch.BranchStatus)
+            if (branch == null || !branch.IsActive)
                 throw new Exception($"{BranchName} Not Found");
 
            var departments = _branchDepartmentRepo.GetDepartmentsByBranch(branch.BID);
@@ -61,25 +61,15 @@ namespace HospitalSystemTeamTask.Services
             return result;
         }
 
-        public IEnumerable<BranchDTO> GetBranchsByDepartment(string DepartmentName)
+        public IEnumerable<Branch> GetBranchsByDepartment(string DepartmentName)
         {
             var department = _departmentService.GetDepartmentByName(DepartmentName);
             if (department == null || !department.IsActive)
                 throw new Exception($"{DepartmentName} Not Found");
 
-            var branchs = _branchDepartmentRepo.GetBranchByDepartments(department.DepID);
-            List<BranchDTO> result = new List<BranchDTO>();
-            foreach (var branch in branchs)
-            {
-                result.Add(new BranchDTO
-                {
-                    BID = branch.BID,
-                    BranchName = branch.BranchName,
-                    Location = branch.Location,
-                    BranchStatus = branch.IsActive
-                });
-            }
-            return result;
+            return _branchDepartmentRepo.GetBranchByDepartments(department.DepID);
+       
+             
         }
     }
 }
