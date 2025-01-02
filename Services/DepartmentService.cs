@@ -29,7 +29,7 @@ namespace HospitalSystemTeamTask.Services
         {
             var department = new Department
             {
-                DepartmentName = departmentDto.DepartmentName,
+                DepartmentName = departmentDto.DepartmentName.ToLower(),
                 Description = departmentDto.Description,
                 IsActive = true // Default new departments to active
             };
