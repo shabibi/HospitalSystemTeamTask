@@ -40,8 +40,17 @@ namespace HospitalSystemTeamTask.Repositories
 
         public void DeleteRecord(PatientRecord record)
         {
-            _context.PatientRecords.Remove(record);
-            _context.SaveChanges();
+            try
+            {
+
+                _context.PatientRecords.Remove(record);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+
         }
 
     }
