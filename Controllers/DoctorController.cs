@@ -119,7 +119,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
         [HttpPost("AddDoctor")]
-        public IActionResult AddDoctor([FromBody] DoctorOutPutDTO input)
+        public IActionResult AddDoctor( DoctorOutPutDTO input)
         {
             try
             {

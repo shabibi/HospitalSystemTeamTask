@@ -28,7 +28,7 @@ namespace HospitalSystemTeamTask.Migrations
                 column: "CID",
                 principalTable: "Clinics",
                 principalColumn: "CID",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.NoAction);
         }
 
         /// <inheritdoc />
