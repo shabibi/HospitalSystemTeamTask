@@ -15,47 +15,31 @@ namespace HospitalSystemTeamTask.Services
 
         public void AddBranch(BranchDTO branchDto)
         {
+
             var branch = new Branch
             {
-                BranchName = branchDto.BranchName,
-                Location = branchDto.Location,
+                BranchName = branchDto.BranchName.ToLower(),
+                Location = branchDto.Location.ToLower(),
                 IsActive = true // Default new branches to active
             };
             _branchRepository.AddBranch(branch);
         }
 
-        public IEnumerable<BranchDTO> GetAllBranches()
+        public IEnumerable<Branch> GetAllBranches()
         {
             try
             {
                 // Get all branches from the repository
-                var branches = _branchRepository.GetAllBranches();
-                List<BranchDTO> branchDTOs = new List<BranchDTO>();
-
-                foreach (var branch in branches)
-                {
-                    // Map the branch to BranchDTO and add it to the list
-                    branchDTOs.Add(new BranchDTO
-                    {
-                        BranchName = branch.BranchName,
-                        Location = branch.Location,
-                        BID = branch.BID,
-                        BranchStatus = branch.IsActive
-                  
-                    });
-                }
-
-                return branchDTOs;
+                return _branchRepository.GetAllBranches();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while fetching branches: {ex.Message}");
                 throw new ApplicationException("An error occurred while fetching branches.", ex);
             }
         }
 
 
-        public BranchDTO GetBranchDetailsByBranchName(string branchName)
+        public Branch GetBranchDetailsByBranchName(string branchName)
         {
             var branch = _branchRepository.GetBranchByBranchName(branchName);
 
@@ -65,12 +49,12 @@ namespace HospitalSystemTeamTask.Services
             }
 
             // Return BranchDTO instead of the Branch model
-            return new BranchDTO
+            return new Branch
             {
                 BranchName = branch.BranchName,
                 Location = branch.Location,
                 BID= branch.BID,
-                BranchStatus = branch.IsActive
+                IsActive = branch.IsActive
             };
         }
 
@@ -130,9 +114,9 @@ namespace HospitalSystemTeamTask.Services
             // Map Branch to BranchDTO
             return new BranchDTO
             {
-                BID = branch.BID,
                 BranchName = branch.BranchName,
-                Location = branch.Location
+                Location = branch.Location,
+                BranchStatus = branch.IsActive
             };
         }
 

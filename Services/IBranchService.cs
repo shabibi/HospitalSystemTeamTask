@@ -8,9 +8,9 @@ namespace HospitalSystemTeamTask.Services
     public interface IBranchService
     {
         void AddBranch(BranchDTO branchDto);
-        IEnumerable<BranchDTO> GetAllBranches();
+        IEnumerable<Branch> GetAllBranches();
 
-        BranchDTO GetBranchDetailsByBranchName(string branchName);
+        Branch GetBranchDetailsByBranchName(string branchName);
         void UpdateBranch(string branchName, UpdateBranchDTO updatedBranchDto);
         void SetBranchStatus(string branchName, bool isActive);
         BranchDTO GetBranchById(int id);
