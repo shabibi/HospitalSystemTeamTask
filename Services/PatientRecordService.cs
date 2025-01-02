@@ -153,9 +153,14 @@ namespace HospitalSystemTeamTask.Services
             _repository.UpdateRecord(record);
         }
 
-        public void DeleteRecord(PatientRecord record)
+        public void DeleteRecord(int rid)
         {
-            _repository.DeleteRecord(record);
+            var reecord = _repository.GetById(rid);
+
+            if(reecord == null)
+                throw new KeyNotFoundException("Record not found");
+
+            _repository.DeleteRecord(reecord);
         }
     }
 }

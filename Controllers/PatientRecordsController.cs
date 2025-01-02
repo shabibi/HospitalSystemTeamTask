@@ -155,28 +155,30 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        //[HttpDelete("{id}")]
-        //public IActionResult DeleteRecord(int id)
-        //{
-        //    try
-        //    {
-        //        // Get the record to delete
-        //        var recordToDelete = _service.GetRecordById(id);
-        //        if (recordToDelete == null)
-        //        {
-        //            return NotFound(new { message = "Patient record not found." });
-        //        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteRecord(int id)
+        {
+            try
+            {
+                if(id <= 0)
+                    return BadRequest("Invalied input.");
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-        //        // Call the service to delete the record
-        //        _service.DeleteRecord(recordToDelete);
+                // Check if the user's role allows them to perform this action
+                if (userRole == null ||  userRole != "superAdmin")
+                    return BadRequest("You are not authorized to perform this action.");
 
-        //        return Ok(new { message = "Patient record deleted successfully!" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Return a generic error message
-        //        return StatusCode(500, new { message = "An error occurred while deleting the patient record.", details = ex.Message });
-        //    }
-        //}
+                _service.DeleteRecord(id);
+                // Call the service to delete the record
+
+                return Ok(new { message = "Patient record deleted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error message
+                return StatusCode(500, new { message = "An error occurred while deleting the patient record.", details = ex.Message });
+            }
+        }
     }
 }
