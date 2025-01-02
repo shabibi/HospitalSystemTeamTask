@@ -4,6 +4,7 @@ using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HospitalSystemTeamTask.Controllers
 {
@@ -67,24 +68,42 @@ namespace HospitalSystemTeamTask.Controllers
         [HttpGet("branch")]
         public IActionResult GetBranchDetails([FromQuery] string? branchName, [FromQuery] int? branchId)
         {
+            // Validate input: only one parameter should be provided
+            if (!string.IsNullOrEmpty(branchName) && branchId.HasValue)
+            {
+                return BadRequest(new { message = "Only one parameter (branchName or branchId) can be provided at a time." });
+            }
+
             try
             {
+                // Call the service to get branch details
                 var branch = _branchService.GetBranchDetails(branchName, branchId);
+
+                // Check if the branch is found
+                if (branch == null)
+                {
+                    return NotFound(new { message = "Branch not found." });
+                }
+
                 return Ok(branch);
             }
             catch (KeyNotFoundException ex)
             {
+                // Return 404 if no branch is found
                 return NotFound(new { message = ex.Message });
             }
             catch (ArgumentException ex)
             {
+                // Return 400 for invalid input
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                // Return 500 for any unexpected errors
                 return StatusCode(500, new { message = "An error occurred while retrieving the branch details.", error = ex.Message });
             }
         }
+
 
 
 
