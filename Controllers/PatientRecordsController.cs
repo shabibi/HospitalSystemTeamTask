@@ -52,48 +52,6 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            try
-            {
-                // Get the patient record by ID
-                var record = _service.GetRecordById(id);
-
-                if (record == null)
-                {
-                    return NotFound(new { message = "Patient record not found." });
-                }
-
-                // Map PatientRecord to PatientRecordDto
-                //var recordDto = new PatientRecordDto
-                //{
-                //    PatientRecordID = record.RID,
-                //    PID = record.PID,
-                //    PatientName = record.Patient?.User?.UserName,
-                //    BID = record.BID,
-                //    BranchName = record.Branch?.BranchName,
-                //    DID = record.DID,
-                //    DoctorName = record.Doctor?.User?.UserName,
-                //    VisitDate = record.VisitDate,
-                //    VisitTime = record.VisitTime,
-                //    Inspection = record.Inspection,
-                //    Treatment = record.Treatment,
-                //    Cost = record.Cost
-                //};
-
-                // Return the record if found
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                // Return a generic error message if something goes wrong
-                return StatusCode(500, new { message = "An error occurred while retrieving the patient record.", details = ex.Message });
-            }
-        }
-
-
-
         [HttpGet("GetAllRecords")]
         public IActionResult GetAll()
         {
@@ -122,22 +80,42 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-        [HttpGet("GetRecordsByDoctorId/{doctorId}")]
-        public IActionResult GetByDoctorId(int doctorId)
+        [HttpGet("GetRecords")]
+        public IActionResult GetRecords(int? RecordId, int? patientId, int? doctorId, int? branchId)
         {
             try
             {
+                // Ensure only one parameter is provided
+                int providedParametersCount = new[] { RecordId, patientId, doctorId, branchId }.Count(p => p.HasValue);
+                if (providedParametersCount > 1)
+                {
+                    throw new ArgumentException("Only one parameter can be provided at a time.");
+                }
+                // Extract JWT token and claims
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                int userId =int.Parse( JwtHelper.GetClaimValue(token, "sub"));
 
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "supperAdmin" && userRole != "doctor"))
+                // Validate patient access based on user role
+                if (userRole.Equals("patient", StringComparison.OrdinalIgnoreCase) && patientId.HasValue && userId != patientId)
                 {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                    return Forbid("You are not authorized to access other patients' records." );
                 }
+                // Validate doctor access based on user role
+                if (userRole.Equals("Doctor", StringComparison.OrdinalIgnoreCase) && doctorId.HasValue && userId != doctorId)
+                {
+                    return Forbid("You are not authorized to access other doctors' records." );
+                }
+
                 //Retrieve patient records by doctor ID
-                var records = _service.GetRecordsByDoctorId(doctorId);
-                
+                var records = _service.GetRecords(RecordId, patientId,  doctorId, branchId);
+
+                // Check if no records were found
+                if (records == null || !records.Any())
+                {
+                    return NotFound(new { message = "No records found matching the specified criteria." });
+                }
+
                 return Ok(records);
             }
             catch (ArgumentException ex)
@@ -151,102 +129,67 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-        [HttpGet("by-branch/{branchId}")]
-        public IActionResult GetByBranchId(int branchId)
-        {
-            try
-            {
-                // Retrieve patient records by branch ID
-                //var records = _service.GetRecordsByBranchId(branchId)
-                    //.Select(record => new PatientRecordDto
-                    //{
-                    //    PatientRecordID = record.RID,
-                    //    PID = record.PID,
-                    //    PatientName = record.Patient?.User?.UserName,
-                    //    BID = record.BID,
-                    //    BranchName = record.Branch?.BranchName,
-                    //    DID = record.DID,
-                    //    DoctorName = record.Doctor?.User?.UserName,
-                    //    VisitDate = record.VisitDate,
-                    //    VisitTime = record.VisitTime,
-                    //    Inspection = record.Inspection,
-                    //    Treatment = record.Treatment,
-                    //    Cost = record.Cost
-                    //});
+      
+        //[HttpPatch("{id}")]
+        //public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-                //if (!records.Any())
-                //{
-                //    return NotFound(new { message = "No patient records found for the specified branch." });
-                //}
+        //    try
+        //    {
+        //        // Check if the record exists
+        //        var existingRecord = _service.GetRecordById(id);
+        //        if (existingRecord == null)
+        //        {
+        //            return NotFound(new { message = "Patient record not found." });
+        //        }
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while retrieving patient records.", details = ex.Message });
-            }
-        }
+        //        // Update the existing entity with the new data
+        //        existingRecord.PID = dto.PID;
+        //        existingRecord.BID = dto.BID;
+        //        existingRecord.DID = dto.DID;
+        //        existingRecord.VisitDate = dto.VisitDate;
+        //        existingRecord.VisitTime = dto.VisitTime;
+        //        existingRecord.Inspection = dto.Inspection;
+        //        existingRecord.Treatment = dto.Treatment;
+        //        existingRecord.Cost = dto.Cost;
 
-        [HttpPatch("{id}")]
-        public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //        // Call the service to update the record
+        //        _service.UpdateRecord(existingRecord);
 
-            try
-            {
-                // Check if the record exists
-                var existingRecord = _service.GetRecordById(id);
-                if (existingRecord == null)
-                {
-                    return NotFound(new { message = "Patient record not found." });
-                }
+        //        return Ok(new { message = "Patient record updated successfully!" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { message = "An error occurred while updating the patient record.", details = ex.Message });
+        //    }
+        //}
 
-                // Update the existing entity with the new data
-                existingRecord.PID = dto.PID;
-                existingRecord.BID = dto.BID;
-                existingRecord.DID = dto.DID;
-                existingRecord.VisitDate = dto.VisitDate;
-                existingRecord.VisitTime = dto.VisitTime;
-                existingRecord.Inspection = dto.Inspection;
-                existingRecord.Treatment = dto.Treatment;
-                existingRecord.Cost = dto.Cost;
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteRecord(int id)
+        //{
+        //    try
+        //    {
+        //        // Get the record to delete
+        //        var recordToDelete = _service.GetRecordById(id);
+        //        if (recordToDelete == null)
+        //        {
+        //            return NotFound(new { message = "Patient record not found." });
+        //        }
 
-                // Call the service to update the record
-                _service.UpdateRecord(existingRecord);
+        //        // Call the service to delete the record
+        //        _service.DeleteRecord(recordToDelete);
 
-                return Ok(new { message = "Patient record updated successfully!" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while updating the patient record.", details = ex.Message });
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult DeleteRecord(int id)
-        {
-            try
-            {
-                // Get the record to delete
-                var recordToDelete = _service.GetRecordById(id);
-                if (recordToDelete == null)
-                {
-                    return NotFound(new { message = "Patient record not found." });
-                }
-
-                // Call the service to delete the record
-                _service.DeleteRecord(recordToDelete);
-
-                return Ok(new { message = "Patient record deleted successfully!" });
-            }
-            catch (Exception ex)
-            {
-                // Return a generic error message
-                return StatusCode(500, new { message = "An error occurred while deleting the patient record.", details = ex.Message });
-            }
-        }
+        //        return Ok(new { message = "Patient record deleted successfully!" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Return a generic error message
+        //        return StatusCode(500, new { message = "An error occurred while deleting the patient record.", details = ex.Message });
+        //    }
+        //}
     }
 }

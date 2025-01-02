@@ -52,11 +52,6 @@ namespace HospitalSystemTeamTask.Services
             return output;
         }
 
-        public PatientRecord GetRecordById(int id)
-        {
-            return _repository.GetById(id);
-        }
-
         public void CreateRecord(PatientRecordInputDTO record, int doctorId)
         {
             var doctor = _doctorService.GetDoctorById(doctorId);
@@ -88,32 +83,39 @@ namespace HospitalSystemTeamTask.Services
             _repository.Add(newRecord);
         }
 
-        public IEnumerable<PatientRecordOutput> GetRecordsByDoctorId(int doctorId)
+        //Get records depends on given parameter
+        public IEnumerable<PatientRecordOutput> GetRecords(int ? RecordId, int? patientId, int? doctorId, int? branchId)
         {
-            // Fetch the doctor details and validate
-            var doctor = _doctorService.GetDoctorById(doctorId);
-            if (doctor == null || !doctor.CID.HasValue)
-                throw new InvalidOperationException($"Doctor with ID {doctorId} not found or missing clinic information.");
+            if (!patientId.HasValue && !doctorId.HasValue && !branchId.HasValue && !RecordId.HasValue)
+                throw new ArgumentException("At least one filter parameter (PatientId, DoctorId, or BranchId) must be provided.");
 
-            // Filter records in the repository query
-            var records = _repository.GetAll()
-                .Where(record => record.DID == doctorId)
-                .ToList();
+            // Filter records based on provided parameters
+            var filteredRecords = _repository.GetAll().Where(record =>
+                (!patientId.HasValue || record.PID == patientId.Value) &&
+                (!doctorId.HasValue || record.DID == doctorId.Value) &&
+                (!branchId.HasValue || record.BID == branchId.Value)&&
+                (!RecordId.HasValue || record.RID == RecordId.Value)
+            ).ToList();
 
-            if (!records.Any())
-                throw new InvalidOperationException($"No records found for Doctor ID {doctorId}.");
+            if (!filteredRecords.Any())
+                throw new InvalidOperationException("No records found matching the specified criteria.");
 
-            var output = new List<PatientRecordOutput>();
           
-            foreach (var record in records)
+            // Generate output with additional details
+            List<PatientRecordOutput> output = new List<PatientRecordOutput>();
+            Doctor doctor = null;
+
+
+            foreach (var record in filteredRecords)
             {
+                doctor = _doctorService.GetDoctorById(record.DID);
                 output.Add(new PatientRecordOutput
                 {
                     RecordId = record.RID,
                     PatientId = record.PID,
                     PatientName = _userService.GetUserName(record.PID),
+                    DoctorName = _userService.GetUserName(record.DID),
                     BranchName = _branchService.GetBranchName(record.BID),
-                    DoctorName = _userService.GetUserName(doctorId),
                     ClinicName = _clinicService.GetClinicName(doctor.CID.Value),
                     VisitDate = record.VisitDate,
                     VisitTime = record.VisitTime,
@@ -121,18 +123,10 @@ namespace HospitalSystemTeamTask.Services
                     Treatment = record.Treatment,
                     Price = record.Cost,
                 });
+
             }
             return output;
-
         }
-
-        public IEnumerable<PatientRecord> GetRecordsByBranchId(int branchId)
-        {
-            return _repository.GetAll()
-                .Where(record => record.BID == branchId)
-                .ToList();
-        }
-
         public void UpdateRecord(PatientRecord record)
         {
             _repository.UpdateRecord(record);
