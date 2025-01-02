@@ -1,6 +1,7 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
+using Microsoft.IdentityModel.Tokens;
 using System.Numerics;
 
 namespace HospitalSystemTeamTask.Services
@@ -127,8 +128,28 @@ namespace HospitalSystemTeamTask.Services
             }
             return output;
         }
-        public void UpdateRecord(PatientRecord record)
+
+        public void UpdateRecord(int rid, string? treatment, string? inspection, int doctorId)
         {
+            // Retrieve the record from the repository using the provided ID.
+            var record = _repository.GetById(rid);
+
+            // If the record doesn't exist, throw an exception to indicate the record wasn't found.
+            if (record == null)
+                throw new KeyNotFoundException("Record not found");
+
+            if (record.DID != doctorId)
+                throw new UnauthorizedAccessException("You are not authorized to edit this record.");
+
+            // If the 'treatment' parameter is not null or empty, update the 'Treatment' property of the record.
+            if (!string.IsNullOrEmpty(treatment))
+                record.Treatment = treatment;
+
+            // If the 'inspection' parameter is not null or empty, update the 'Inspection' property of the record.
+            if (!string.IsNullOrEmpty(inspection))
+                record.Inspection = inspection;
+
+            // Save the updated record back to the repository.
             _repository.UpdateRecord(record);
         }
 
