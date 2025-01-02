@@ -75,3 +75,65 @@ ClinicName = "Unknown Clinic"
 GetClinicsByDepartmentID:
 DepId = -1
 
+
+
+branch_service_test_cases:
+
+1. Test AddBranch (Successful case)
+   - Input: BranchDTO { BranchName = "Test Branch", Location = "Test Location" }
+   - Expected Output: "Branch added successfully"
+
+
+2. Test GetAllBranches (Successful case)
+   - Input: None
+   - Expected Output: List of all branches
+
+
+3. Test GetBranchDetailsByBranchName (Branch found)
+   - Input: branchName = "Test Branch"
+   - Expected Output: BranchDTO { BranchName = "Test Branch", Location = "Test Location", BranchStatus = true }
+
+
+4. Test GetBranchDetailsByBranchName (Branch not found)
+   - Input: branchName = "Nonexistent Branch"
+   - Expected Output: KeyNotFoundException with message "Branch with name 'Nonexistent Branch' not found."
+
+
+5. Test UpdateBranch (Successful update)
+   - Input: branchId = 1, UpdateBranchDTO { BranchName = "Updated Branch", Location = "Updated Location" }
+   - Expected Output: "Branch with ID '1' updated successfully."
+
+
+6. Test UpdateBranch (Branch not found)
+   - Input: branchId = 999, UpdateBranchDTO { BranchName = "Updated Branch", Location = "Updated Location" }
+   - Expected Output: KeyNotFoundException with message "Branch with ID '999' not found."
+
+
+7. Test SetBranchStatus (Set active status)
+   - Input: branchId = 1, isActive = true
+   - Expected Output: "Branch with ID '1' status updated to Active."
+
+
+8. Test SetBranchStatus (Branch not found)
+   - Input: branchId = 999, isActive = false
+   - Expected Output: KeyNotFoundException with message "Branch with ID '999' not found."
+
+
+9. Test GetBranchDetails (Get by branchId)
+   - Input: branchId = 1
+   - Expected Output: BranchDTO { BranchName = "Test Branch", Location = "Test Location", BranchStatus = true }
+
+
+10. Test GetBranchDetails (Branch not found by branchId)
+    - Input: branchId = 999
+    - Expected Output: KeyNotFoundException with message "Branch not found."
+
+
+11. Test GetBranchName (Successful case)
+    - Input: branchId = 1
+    - Expected Output: "Test Branch"
+
+
+12. Test GetBranchName (Branch not found)
+    - Input: branchId = 999
+    - Expected Output: InvalidOperationException with message "Database error: Branch not found."
