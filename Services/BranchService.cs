@@ -17,8 +17,8 @@ namespace HospitalSystemTeamTask.Services
         {
             var branch = new Branch
             {
-                BranchName = branchDto.BranchName,
-                Location = branchDto.Location,
+                BranchName = branchDto.BranchName.ToLower(),
+                Location = branchDto.Location.ToLower(),
                 IsActive = true // Default new branches to active
             };
             _branchRepository.AddBranch(branch);
