@@ -120,5 +120,36 @@ namespace HospitalSystemTeamTask.Services
             };
         }
 
+        public BranchDTO GetBranchDetails(string? branchName, int? branchId)
+        {
+            Branch branch = null;
+
+            // Validate that at least one parameter is provided
+            if (string.IsNullOrWhiteSpace(branchName) && !branchId.HasValue)
+                throw new ArgumentException("Either branch name or branch ID must be provided.");
+
+            // Retrieve branch based on branch name
+            if (!string.IsNullOrEmpty(branchName))
+                branch = _branchRepository.GetBranchByBranchName(branchName);
+
+            // Retrieve branch based on branch ID
+            if (branchId.HasValue)
+                branch = _branchRepository.GetBranchById(branchId.Value);
+
+            if (branch == null)
+                throw new KeyNotFoundException("Branch not found.");
+
+            // Map to BranchDTO
+            var branchDTO = new BranchDTO
+            {
+                BranchName = branch.BranchName,
+                Location = branch.Location,
+                BranchStatus = branch.IsActive
+            };
+
+            return branchDTO;
+        }
+
+
     }
 }
