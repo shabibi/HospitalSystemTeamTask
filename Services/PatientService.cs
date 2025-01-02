@@ -71,7 +71,7 @@ namespace HospitalSystemTeamTask.Services
             var outputData = new PatienoutputDTO
             {
                 PID = patient.PID,
-                UserName = patient.User.UserName,
+                UserName = patient.User.UserName.ToLower(),
                 Email = patient.User.Email,
                 Phone = patient.User.Phone,
                 Role = patient.User.Role,
@@ -84,16 +84,11 @@ namespace HospitalSystemTeamTask.Services
 
         public Patient GetPatientByName(string PatientName)
         {
-            var patient = _PatientRepo.GetPatientByName(PatientName);
+            var patient = _PatientRepo.GetPatientByName(PatientName.ToLower());
             if (patient == null)
                 throw new KeyNotFoundException($"User with Name {PatientName} not found.");
             return patient;
         }
-
-
-
-
-
 
 
         public void UpdatePatientDetails( int UID, PatientUpdate patientInput)
