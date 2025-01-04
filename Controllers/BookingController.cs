@@ -156,7 +156,6 @@ namespace HospitalSystemTeamTask.Controllers
                 // Extract the token from the request and validate it
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-                int userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
 
                 if (string.IsNullOrEmpty(token))
                 {
@@ -184,5 +183,56 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
         }
+
+        [HttpPatch("cancelAppointment")]
+        public IActionResult CancelAppointment([FromBody] BookingInputDTO bookingInputDTO)
+        {
+            try
+            {
+                // Extract the token from the request
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                int userId = int.Parse(JwtHelper.GetClaimValue(token, "sub")); // Assuming "sub" holds the user's ID
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Token is missing or invalid." });
+                }
+
+                // Retrieve the appointment to validate permissions
+                var appointment = _bookingService
+                    .GetBookingsByClinicAndDate(bookingInputDTO.CID, bookingInputDTO.Date)
+                    .FirstOrDefault(b => b.StartTime == bookingInputDTO.StartTime);
+
+                if (appointment == null)
+                {
+                    return NotFound(new { message = "Appointment not found for the provided details." });
+                }
+
+                // Authorization checks
+                if (userRole == "patient" && appointment.PID != userId)
+                {
+                    return Unauthorized(new { message = "You are not authorized to cancel this appointment." });
+                }
+                if(userRole != "admin" && userRole != "superAdmin" && userRole != "doctor" && appointment.PID != userId)
+                {
+                    return Unauthorized(new { message = "You do not have sufficient permissions to cancel this appointment." });
+                }
+
+                // Call the service to cancel the appointment
+                _bookingService.CancelAppointment(bookingInputDTO);
+
+                return Ok(new { message = "Appointment successfully canceled." });
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
+
+
     }
+
+
 }

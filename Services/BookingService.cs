@@ -4,6 +4,7 @@ using HospitalSystemTeamTask.Repositories;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -254,6 +255,33 @@ namespace HospitalSystemTeamTask.Services
             });
 
             return bookingOutput;
+        }
+
+        public void CancelAppointment(BookingInputDTO bookingInputDTO)
+        {
+            // Retrieve the appointment based on clinic, date, and start time
+            var appointment = _bookingRepo
+                .GetBookingsByClinicAndDate(bookingInputDTO.CID, bookingInputDTO.Date)
+                .FirstOrDefault(b => b.StartTime == bookingInputDTO.StartTime);
+
+            // Check if the appointment exists and is currently booked
+            if (appointment == null)
+                throw new Exception("No appointment found for the provided details.");
+
+            if (!appointment.Staus)
+                throw new Exception("The appointment is not currently booked and cannot be canceled.");
+
+            // Update the appointment to mark it as canceled
+            appointment.Staus = false;
+            appointment.BookingDate = null;
+            appointment.PID = null;
+
+            // Persist the updated appointment in the repository
+            _bookingRepo.UpdateBooking(appointment);
+        }
+        public IEnumerable<Booking> GetBookingsByClinicAndDate(int clinicId, DateTime date)
+        {
+           return _bookingRepo.GetBookingsByClinicAndDate(clinicId, date);
         }
         public void UpdateBookingDetails(int BookingID, BookingInputDTO input)
         {
