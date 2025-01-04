@@ -1,6 +1,7 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,23 +24,35 @@ namespace HospitalSystemTeamTask.Services
             return _bookingRepo.GetAllBooking();
         }
 
-        public void ScheduledAppointments(int cid , DateTime appointmentDate)
+        public IEnumerable<Booking> ScheduledAppointments(int cid, DateTime appointmentDate)
         {
+            // Validate that the appointment date is not in the past
+            if (appointmentDate < DateTime.Today)
+                throw new InvalidOperationException("Cannot schedule appointments for a past date.");
+
             // Retrieve the clinic from the service
             var clinic = _clinicService.GetClinicById(cid);
 
             // Validate clinic existence and activity status
             if (clinic == null || !clinic.IsActive)
-                throw new ArgumentException("Invalid Clinic ID or the clinic is not active.");
+                throw new InvalidOperationException("Invalid Clinic ID or the clinic is not active.");
 
             // Calculate total available minutes for scheduling
             var totalMinutes = (clinic.EndTime - clinic.StartTime).TotalMinutes;
 
             // Ensure the clinic has valid operating hours
             if (totalMinutes <= 0)
-                throw new ArgumentException("Clinic operating hours are invalid.");
+                throw new InvalidOperationException("Clinic operating hours are invalid.");
+
+            // Retrieve existing bookings for the specified date
+            var existingBookings = _bookingRepo.GetBookingsByClinicAndDate(cid, appointmentDate).ToList();
+
+            // Ensure there are no existing schedules for this clinic on the same day
+            if (existingBookings.Any())
+                throw new InvalidOperationException("Clinic is already scheduled for this date.");
 
             // Generate appointment slots
+            var appointmentSlots = new List<Booking>();
             for (int i = 0; i < totalMinutes; i += clinic.SlotDuration)
             {
                 var startTime = clinic.StartTime.Add(TimeSpan.FromMinutes(i));
@@ -52,36 +65,45 @@ namespace HospitalSystemTeamTask.Services
                     StartTime = startTime,
                     EndTime = endTime,
                     Date = appointmentDate,
-                    BookingDate = DateTime.Now, // Default to current date/time
-                    Staus = false, // Default status: not booked
-                    PID = null // No patient assigned initially
+                    BookingDate = null, // Default to null for unbooked slots
+                    Staus = false,     // Slot is initially unbooked
+                    PID = null          // No patient assigned
                 };
 
-                // Add the appointment to the repository
+                appointmentSlots.Add(appointment);
+            }
+
+            // Add all generated slots to the repository in a batch
+            foreach (var appointment in appointmentSlots)
+            {
                 _bookingRepo.AddBooking(appointment);
             }
+
+            // Return all generated slots
+            return appointmentSlots;
         }
     
-    //public void AddBooking(BookingInputDTO input, int patientId)
-    //    {
-    //        var bookedAppointments = _bookingRepo.GetBookingByClinicID(input.CID);
-    //        foreach(var booked in bookedAppointments)
-    //        {
-    //            if(booked.StartTime == input.)
-    //        }
-    //        var booking = new Booking
-    //        {
-    //            StartTime = input.StartTime,
-    //            EndTime = input.EndTime,
-          
-    //            Staus = input.Staus,
-    //            Date = input.Date,
-    //            CID = input.CID,
-    //            PID = input.PID,
-    //            BookingDate = input.BookingDate
-    //        };
-    //        _bookingRepo.AddBooking(booking);
-    //    }
+
+        //public void AddBooking(BookingInputDTO input, int patientId)
+        //    {
+        //        var bookedAppointments = _bookingRepo.GetBookingByClinicID(input.CID);
+        //        foreach(var booked in bookedAppointments)
+        //        {
+        //            if(booked.StartTime == input.)
+        //        }
+        //        var booking = new Booking
+        //        {
+        //            StartTime = input.StartTime,
+        //            EndTime = input.EndTime,
+
+        //            Staus = input.Staus,
+        //            Date = input.Date,
+        //            CID = input.CID,
+        //            PID = input.PID,
+        //            BookingDate = input.BookingDate
+        //        };
+        //        _bookingRepo.AddBooking(booking);
+        //    }
 
         public Booking GetBookingById(int bookingId)
         {

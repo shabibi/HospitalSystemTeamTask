@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Helper;
+using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -17,27 +18,35 @@ namespace HospitalSystemTeamTask.Controllers
         {
             _bookingService = bookingService;
         }
-        [HttpPost]
+       
+        [HttpPost("ScheduledAppointments")]
         public IActionResult ScheduledAppointments(int clinicId, DateTime date)
         {
             try
             {
-                //// Extract the token from the request and retrieve the user's role
-                //string token = JwtHelper.ExtractToken(Request);
-                //var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                // Extract the token from the request and validate it
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-                //// Check if the user's role allows them to perform this action
-                //if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
-                //{
-                //    return BadRequest(new { message = "You are not authorized to perform this action." });
-                //}
-                _bookingService.ScheduledAppointments(clinicId, date);
-                return Ok("Scheduled Appointments successfully");
+                // Validate user role
+                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
+                }
+
+                // Call the service to retrieve scheduled appointments
+                var appointments = _bookingService.ScheduledAppointments(clinicId, date);
+
+                // Return the result
+                return Ok(new
+                {
+                    message = "Scheduled appointments retrieved successfully."
+                });
             }
             catch (Exception ex)
             {
-                // Return a generic error response
-                return StatusCode(500, $"An error occurred while adding the new Branch: {ex.Message}");
+                // Return a 500 response with a generic error message
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
         }
     }

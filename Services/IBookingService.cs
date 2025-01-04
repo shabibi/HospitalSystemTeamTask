@@ -8,6 +8,6 @@ namespace HospitalSystemTeamTask.Services
         IEnumerable<Booking> GetAllBooking();
         //void AddBooking(BookingInputDTO input);
         Booking GetBookingById(int bookingId);
-        void ScheduledAppointments(int cid, DateTime appointmentDate);
+        IEnumerable<Booking> ScheduledAppointments(int cid, DateTime appointmentDate);
     }
 }
