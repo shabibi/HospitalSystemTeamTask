@@ -82,28 +82,52 @@ namespace HospitalSystemTeamTask.Services
             // Return all generated slots
             return appointmentSlots;
         }
-    
 
-        //public void AddBooking(BookingInputDTO input, int patientId)
-        //    {
-        //        var bookedAppointments = _bookingRepo.GetBookingByClinicID(input.CID);
-        //        foreach(var booked in bookedAppointments)
-        //        {
-        //            if(booked.StartTime == input.)
-        //        }
-        //        var booking = new Booking
-        //        {
-        //            StartTime = input.StartTime,
-        //            EndTime = input.EndTime,
 
-        //            Staus = input.Staus,
-        //            Date = input.Date,
-        //            CID = input.CID,
-        //            PID = input.PID,
-        //            BookingDate = input.BookingDate
-        //        };
-        //        _bookingRepo.AddBooking(booking);
-        //    }
+        public void BookAppointment(BookingInputDTO input, int patientId)
+        {
+            // Fetch appointments for the clinic and date
+            var bookedAppointments = _bookingRepo.GetBookingsByClinicAndDate(input.CID, input.Date);
+
+            // Check if the patient already has a booking at the same clinic or time
+            var patientBookings = _bookingRepo.GetBookingsByPatientId(patientId);
+
+            foreach (var booking in patientBookings)
+            {
+                if ((booking.Date == input.Date && booking.StartTime == input.StartTime) || booking.CID == input.CID)
+                {
+                    throw new InvalidOperationException("You already have an appointment at this time or at this clinic.");
+                }
+            }
+
+            // Check for time conflicts
+            var conflictingAppointment = bookedAppointments
+                .FirstOrDefault(b => b.StartTime == input.StartTime && b.Staus);
+
+            if (conflictingAppointment != null)
+            {
+                throw new InvalidOperationException("The selected time slot is already booked.");
+            }
+
+            // Find an available appointment slot
+            var availableAppointment = bookedAppointments
+                .FirstOrDefault(b => b.StartTime == input.StartTime && !b.Staus);
+
+            if (availableAppointment == null)
+            {
+                throw new InvalidOperationException("No available slot for the given time.");
+            }
+
+            // Book the appointment
+            availableAppointment.Staus = true;
+            availableAppointment.PID = patientId;
+            availableAppointment.BookingDate = DateTime.Now;
+
+            // Update the booking in the repository
+            _bookingRepo.UpdateBooking(availableAppointment);
+        }
+
+
 
         public Booking GetBookingById(int bookingId)
         {

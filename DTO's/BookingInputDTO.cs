@@ -8,8 +8,6 @@ namespace HospitalSystemTeamTask.DTO_s
         public int CID { get; set; }
         [Required]
         public TimeSpan StartTime { get; set; }
-        [Required]
-        public TimeSpan EndTime { get; set; }
       
         [Required]
         public DateTime Date { get; set; }

@@ -49,5 +49,30 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
         }
+
+        [HttpPost("BookAppointment")]
+        public IActionResult BookAppointment(BookingInputDTO bookingInput)
+        {
+            try
+            {
+                // Extract the token from the request and retrieve the user's role
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
+
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || userRole != "patient")
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+                _bookingService.BookAppointment(bookingInput, userId);
+                return Ok(" Appointment booked successfully");
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while booking appointment : {ex.Message}");
+            }
+        }
     }
 }

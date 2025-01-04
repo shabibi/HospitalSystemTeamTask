@@ -2,6 +2,7 @@
 using HospitalSystemTeamTask;
 using HospitalSystemTeamTask.Repositories;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace HospitalSystemTeamTask.Repositories
 {
     public class BookingRepo : IBookingRepo
@@ -62,6 +63,19 @@ namespace HospitalSystemTeamTask.Repositories
                 .ToList();
         }
 
+        public IEnumerable<Booking> GetBookingsByPatientId(int PatientId)
+        {
+            try
+            {
+                return _context.Bookings
+                .Where(b => b.PID == PatientId)
+                .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Database error: {ex.Message}");
+            }
+        }
 
 
     }
