@@ -10,5 +10,6 @@ namespace HospitalSystemTeamTask.Services
         IEnumerable<Booking> ScheduledAppointments(int cid, DateTime appointmentDate);
        void BookAppointment(BookingInputDTO input, int patientId);
         IEnumerable<BookingInputDTO> GetAvailableAppointmentsBy(int? clinicId, int? departmentId);
+        IEnumerable<BookingOutputDTO> GetBookedAppointments(int? patientId, int? clinicId, int? departmentId, DateTime? date);
     }
 }

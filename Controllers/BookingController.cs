@@ -136,5 +136,53 @@ namespace HospitalSystemTeamTask.Controllers
             }
 
         }
+
+        [HttpGet("bookedAppointments")]
+        public IActionResult GetBookedAppointments(
+        [FromQuery] int? patientId,
+        [FromQuery] int? clinicId,
+        [FromQuery] int? departmentId,
+        [FromQuery] DateTime? date)
+        {
+            try
+            {
+                // Ensure only one parameter is provided
+                int providedParametersCount = new List<object> { patientId, clinicId, departmentId, date }.Count(p => p != null);
+                if (providedParametersCount > 1)
+                {
+                    throw new ArgumentException("Only one parameter can be provided at a time.");
+                }
+
+                // Extract the token from the request and validate it
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                int userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Token is missing or invalid." });
+                }
+                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
+                {
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
+                }
+                
+                // Call the service method to get booked appointments based on the provided parameters
+                var bookedAppointments = _bookingService.GetBookedAppointments(patientId, clinicId, departmentId, date);
+
+                // Return the result as an OkResponse with the booked appointments
+                return Ok(bookedAppointments);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle errors such as no appointments found and return a BadRequest with the error message
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
     }
 }
