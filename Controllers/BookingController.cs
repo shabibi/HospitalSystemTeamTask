@@ -104,5 +104,37 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An error occurred while fetching bookings.", Details = ex.Message });
             }
         }
+
+        [HttpGet("availableAppointments")]
+        public IActionResult GetAvailableAppointmentsBy([FromQuery] int? clinicId, [FromQuery] int? departmentId)
+        {
+            try
+            {
+                // Validate that only one parameter (clinicId or departmentId) is provided
+                if (clinicId.HasValue && departmentId.HasValue)
+                    throw new ArgumentException("Only one parameter can be provided at a time.");
+
+                // Validate that at least one parameter is provided
+                if (!clinicId.HasValue && !departmentId.HasValue)
+                    throw new ArgumentException("At least one parameter must be provided.");
+
+                // Call the service method to get available appointments
+                var availableAppointments = _bookingService.GetAvailableAppointmentsBy(clinicId, departmentId);
+
+                // Return the result as an OkResponse with the available appointments
+                return Ok(availableAppointments);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle no available bookings error and return a BadRequest response with the error message
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors and return a BadRequest response with the error message
+                return BadRequest(new { message = ex.Message });
+            }
+
+        }
     }
 }

@@ -153,7 +153,39 @@ namespace HospitalSystemTeamTask.Services
         }
 
 
+        public IEnumerable<BookingInputDTO> GetAvailableAppointmentsBy( int? clinicId, int? departmentId)
+        {
+            // Retrieve all bookings from the repository
+            var bookings = _bookingRepo.GetAllBooking();
 
+            // Filter available bookings only
+            var availableBookings = bookings.Where(b => !b.Staus);
+
+            if (clinicId.HasValue)
+            {
+                availableBookings = availableBookings.Where(b => b.CID == clinicId.Value);
+            }
+
+            if (departmentId.HasValue)
+            {
+                // Assuming you have a way to filter by department, like a clinic-department mapping
+                availableBookings = availableBookings.Where(b => _clinicService.GetClinicById(b.CID)?.DepID == departmentId.Value);
+            }
+
+            // Check if no available bookings were found
+            if (!availableBookings.Any())
+                throw new InvalidOperationException("No available appointments found for the given criteria.");
+
+            // Map the filtered bookings to BookingOutputDTO
+            var bookingOutput = availableBookings.Select(b => new BookingInputDTO
+            {
+                CID = b.CID,
+                Date = b.Date,
+                StartTime = b.StartTime
+            });
+
+            return bookingOutput;
+        }
         public Booking GetBookingById(int bookingId)
         {
             // Validate input
