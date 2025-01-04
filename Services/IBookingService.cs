@@ -5,8 +5,7 @@ namespace HospitalSystemTeamTask.Services
 {
     public interface IBookingService
     {
-        IEnumerable<Booking> GetAllBooking();
-        //void AddBooking(BookingInputDTO input);
+        IEnumerable<BookingOutputDTO> GetAllBooking(int pageNumber, int pageSize);
         Booking GetBookingById(int bookingId);
         IEnumerable<Booking> ScheduledAppointments(int cid, DateTime appointmentDate);
        void BookAppointment(BookingInputDTO input, int patientId);

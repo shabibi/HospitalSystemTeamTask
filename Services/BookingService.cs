@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HospitalSystemTeamTask.Services
 {
@@ -19,9 +20,33 @@ namespace HospitalSystemTeamTask.Services
             _bookingRepo = bookingRepo;
             _clinicService = clinicService;
         }
-        public IEnumerable<Booking> GetAllBooking()
+        public IEnumerable<BookingOutputDTO> GetAllBooking(int pageNumber, int pageSize)
         {
-            return _bookingRepo.GetAllBooking();
+            // Validate pagination parameters
+            if (pageNumber <= 0 || pageSize <= 0)
+                throw new ArgumentException("Page number and page size must be greater than zero.");
+
+            // Get all bookings from the repository
+            var appointments = _bookingRepo.GetAllBooking();
+
+            // Map each booking to a BookingOutputDTO
+            var bookingList = appointments.Select(appointment => new BookingOutputDTO
+            {
+                CID = appointment.CID,
+                Date = appointment.Date,
+                StartTime = appointment.StartTime,
+                Staus = appointment.Staus,
+                PID = appointment.PID,
+                BookingDate = appointment.BookingDate
+            });
+
+            // Apply pagination using Skip and Take
+            var pagedBookings = bookingList
+                .Skip((pageNumber - 1) * pageSize) // Skip records for previous pages
+                .Take(pageSize)                   // Take records for the current page
+                .ToList();
+
+            return pagedBookings;
         }
 
         public IEnumerable<Booking> ScheduledAppointments(int cid, DateTime appointmentDate)

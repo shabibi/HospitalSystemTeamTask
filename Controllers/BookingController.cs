@@ -74,5 +74,35 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while booking appointment : {ex.Message}");
             }
         }
+        /// <summary>
+        /// Get all bookings.
+        /// </summary>
+        /// <returns>A list of all bookings.</returns>
+        [HttpGet("all")]
+        public ActionResult<IEnumerable<BookingOutputDTO>> GetAllBookings([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                // Extract the token from the request and validate it
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Validate user role
+                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
+                }
+
+                // get all bookings
+                var bookings = _bookingService.GetAllBooking(pageNumber,pageSize);
+
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                // Return 500 Internal Server Error with the error message
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An error occurred while fetching bookings.", Details = ex.Message });
+            }
+        }
     }
 }
