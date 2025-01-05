@@ -210,12 +210,17 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Authorization checks
-                if (userRole == "patient" && appointment.PID != userId)
+                if (userRole == "patient")
                 {
-                    return Unauthorized(new { message = "You are not authorized to cancel this appointment." });
+                    // Ensure the patient can only cancel their own appointment
+                    if (appointment.PID != userId)
+                    {
+                        return Unauthorized(new { message = "You are not authorized to cancel this appointment." });
+                    }
                 }
-                if(userRole != "admin" && userRole != "superAdmin" && userRole != "doctor" && appointment.PID != userId)
+                else if (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor")
                 {
+                    // Restrict cancellation for non-admin/non-doctor roles
                     return Unauthorized(new { message = "You do not have sufficient permissions to cancel this appointment." });
                 }
 
