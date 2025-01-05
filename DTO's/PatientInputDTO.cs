@@ -23,7 +23,7 @@ namespace HospitalSystemTeamTask.DTO_s
         [Range (0, 120 , ErrorMessage ="Age must be grater than 0 ")]
         public int Age { get; set; }
         [Required]
-        [RegularExpression("M|F", ErrorMessage = "Gender must be M or F.")]
+        [RegularExpression("^(M|m|F|f)$", ErrorMessage = "Gender must be 'M' or 'F'.")]
         public string Gender { get; set; }
 
         [Required(ErrorMessage = "Phone number is required.")]
