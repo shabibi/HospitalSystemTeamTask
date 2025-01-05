@@ -151,13 +151,19 @@ namespace HospitalSystemTeamTask.Controllers
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
                 var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
 
-                // Check if the user's role allows them to perform this action
-                if (string.IsNullOrEmpty(userRole) ||
-            !(userRole == "admin" || userRole == "superAdmin" || (userRole == "patient" && userId == uid)))
+                if (string.IsNullOrEmpty(userRole))
                 {
-                    return BadRequest("You are not authorized to perform this action.");
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
                 }
+
                 var patientData = _PatientService.GetPatientData(userName, uid);
+                // Check if the user's role allows them to perform this action
+                if ( userRole == "patient" && userId != patientData.PID)
+                {
+                    return Unauthorized(new { message = "You are not authorized to view another patient's data." });
+                }
+               
+                
                 return Ok(patientData);
             }
             catch (ArgumentException ex)
