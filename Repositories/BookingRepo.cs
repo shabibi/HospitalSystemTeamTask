@@ -77,6 +77,12 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
+        public void DeleteBooking(int bookingId)
+        {
+            var booking = GetBookingById(bookingId);
+            _context.Bookings.Remove(booking);
+            _context.SaveChanges();
+        }
 
     }
 }

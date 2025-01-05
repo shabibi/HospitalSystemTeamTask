@@ -275,6 +275,40 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
         }
+
+        [HttpDelete("deleteAppointment")]
+        public IActionResult DeleteAppointment([FromBody] BookingInputDTO bookingInputDTO)
+        {
+            try
+            {
+                // Extract the patient ID from the token
+                string token = JwtHelper.ExtractToken(Request);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Token is missing or invalid." });
+                }
+
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                // Validate user role
+                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
+                }
+
+                // Call the service to delete the appointment
+                _bookingService.DeleteAppointments(bookingInputDTO);
+
+                return Ok(new { message = "Appointment successfully deleted." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
     }
 
 

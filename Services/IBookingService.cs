@@ -15,5 +15,6 @@ namespace HospitalSystemTeamTask.Services
         void CancelAppointment(BookingInputDTO bookingInputDTO);
         IEnumerable<Booking> GetBookingsByClinicAndDate(int clinicId, DateTime date);
         void UpdateBookedAppointment(BookingInputDTO previousAppointment, BookingInputDTO newAppointment, int patientId);
+        void DeleteAppointments(BookingInputDTO bookingInputDTO);
     }
 }

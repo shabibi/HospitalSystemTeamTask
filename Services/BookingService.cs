@@ -328,7 +328,23 @@ namespace HospitalSystemTeamTask.Services
             _bookingRepo.UpdateBooking(newAppointmentSlot);
         }
 
+        public void DeleteAppointments(BookingInputDTO bookingInputDTO)
+        {
+            // Retrieve the appointment based on clinic, date, and start time
+            var appointment = _bookingRepo
+                .GetBookingsByClinicAndDate(bookingInputDTO.CID, bookingInputDTO.Date)
+                .FirstOrDefault(b => b.StartTime == bookingInputDTO.StartTime);
 
+            // Check if the appointment exists and is currently booked
+            if (appointment == null)
+                throw new Exception("No appointment found for the provided details.");
+
+            if (appointment.Staus)
+                throw new Exception("The appointment is currently booked and cannot be deleted.");
+
+            _bookingRepo.DeleteBooking(appointment.BookingID);
+
+        }
 
     }
 }

@@ -10,5 +10,6 @@ namespace HospitalSystemTeamTask.Repositories
         Booking GetBookingById(int bookingId);
         IEnumerable<Booking> GetBookingsByClinicAndDate(int clinicId, DateTime date);
         IEnumerable<Booking> GetBookingsByPatientId(int PatientId);
+        void DeleteBooking(int bookingId);
     }
 }
