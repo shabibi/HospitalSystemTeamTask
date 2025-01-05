@@ -19,27 +19,32 @@ namespace HospitalSystemTeamTask.Services
 
         public void AddDepartmentToBranch(BranchDepDTO department)
         {
+            // Get all departments
             var departments = _departmentService.GetAllDepartments();
 
             // Validate if the department exists and is active
-            if (!departments.Any(d => d.DepId == department.DID || d.DepartmentStatus))
+            var departmentExists = departments.Any(d => d.DepId == department.DID && d.DepartmentStatus);
+            if (!departmentExists)
+                throw new Exception("The specified department does not exist or is not active.");
 
-                throw new Exception("The specified department does not exist.");
+            // Get all branches
+            var branches = _branchService.GetAllBranches();
 
             // Validate if the branch exists and is active
-            var branchs = _branchService.GetAllBranches();
-            if (!branchs.Any(d => d.BID == department.BID || d.IsActive))
-                throw new Exception("The specified branch does not exist.");
+            var branchExists = branches.Any(b => b.BID == department.BID && b.IsActive);
+            if (!branchExists)
+                throw new Exception("The specified branch does not exist or is not active.");
 
+            // Create a new BranchDepartment object to associate the department with the branch
             var newBranchDep = new BranchDepartment
             {
                 DepID = department.DID,
                 BID = department.BID,
-                DepartmentCapacity = department.Capacity
+                DepartmentCapacity = 0 //calculated after asigning clinic 
             };
+
             // Add the department to the branch
             _branchDepartmentRepo.AddDepartmentToBranch(newBranchDep);
-
         }
 
         public IEnumerable<DepDTO>GetDepartmentsByBranch(string BranchName)
