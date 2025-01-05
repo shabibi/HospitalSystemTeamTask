@@ -50,24 +50,50 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [Authorize(Roles = "superAdmin")]
+
         [HttpPost("RegisterNewStaff")]
-        public IActionResult RegisterNewStaff(UserInputDTO InputUser)
+        public async Task<IActionResult> RegisterNewStaff(UserInputDTO InputUser)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
             try
             {
+                // Extract the token from the request
+                string token = JwtHelper.ExtractToken(Request);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Token is missing or invalid." });
+                }
+
+                // Get the user's role from the token
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+
+                // Check if the user's role allows them to perform this action
+                if (string.IsNullOrEmpty(userRole) || ( userRole != "superAdmin"))
+                {
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
+                }
+
                 if (InputUser == null)
                     return BadRequest("User data is required");
 
                 // Normalize role by trimming spaces and comparing case-insensitively
                 var normalizedRole = InputUser.Role?.Trim();
 
-                // Add the user
-                _userService.AddStaff(InputUser);
+                // Optional: You could also add validation here to ensure the role is valid
+                if (string.IsNullOrEmpty(normalizedRole))
+                {
+                    return BadRequest("Role is required.");
+                }
+
+                // Set the normalized role back into the InputUser if needed
+                InputUser.Role = normalizedRole;
+
+                // Add the user (async call)
+                await _userService.AddStaff(InputUser);
 
                 return Ok("New staff registered successfully.");
             }
@@ -77,6 +103,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while adding new staff. {ex.Message}");
             }
         }
+
 
         [AllowAnonymous]
         [HttpGet("Login")]

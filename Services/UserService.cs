@@ -70,20 +70,29 @@ namespace HospitalSystemTeamTask.Services
             }
                    
         }
-         
-        
+
+
         //Add hospital stuff (admin or doctor ) 
-        public void AddStaff(UserInputDTO InputUser)
+        public async Task AddStaff(UserInputDTO InputUser)
         {
             if (InputUser.Role.ToLower() != "doctor" && InputUser.Role.ToLower() != "admin")
-                throw new ArgumentException("Invalid role. Only 'doctor and admin' role is allowed.", nameof(InputUser.Role));
+                throw new ArgumentException("Invalid role. Only 'doctor' and 'admin' roles are allowed.", nameof(InputUser.Role));
 
-            String defaultPassword = "Staff1234";
+            const string defaultPassword = "Staff1234";
 
             Random random = new Random();
-            int randomNumber = random.Next(1000, 9999);
-            string generatedEmail = $"{InputUser.UserName}{randomNumber}@gmail.com";
+            int randomNumber;
+            string generatedEmail;
+
+            // Ensure unique email generation
+            do
+            {
+                randomNumber = random.Next(1000, 9999);
+                generatedEmail = $"{InputUser.UserName}{randomNumber}@gmail.com";
+            } while (_userRepo.EmailExists(generatedEmail));
+
             string hashedPassword = HashingPassword.Hshing(defaultPassword);
+
             var newStaff = new User
             {
                 UserName = InputUser.UserName,
@@ -95,13 +104,16 @@ namespace HospitalSystemTeamTask.Services
             };
 
             // Email subject and body
-            string subject = "Hospital System ";
-            string body = $"Dear {InputUser.UserName},\n\nYour  account has been created successfully for Hospital System.\n\nEmail: {generatedEmail}\nYour default password is: " +
-           $"{defaultPassword}\nPlease change your password after logging in.\n\nBest Regards,\nYour Super Admin";
+            string subject = "Hospital System";
+            string body = $"Dear {InputUser.UserName},\n\nYour account has been created successfully for Hospital System.\n\n" +
+                          $"Email: {generatedEmail}\nYour default password is: {defaultPassword}\n" +
+                          $"Please change your password after logging in.\n\nBest Regards,\nYour Super Admin";
 
-            _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+            // Send email asynchronously
+            await _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+
+            // Add user to the database
             _userRepo.AddUser(newStaff);
-
         }
 
         // Deactivate user

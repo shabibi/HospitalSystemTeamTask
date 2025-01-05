@@ -20,7 +20,7 @@ namespace HospitalSystemTeamTask.Services
         void UpdatePassword(int uid, string currentPassword, string newPassword);
         void AddSuperAdmin(UserInputDTO InputUser);
         bool EmailExists(string email);
-        void AddStaff(UserInputDTO InputUser);
+        Task AddStaff(UserInputDTO InputUser);
         UserOutputDTO GetUserData(string? userName, int? uid);
         IEnumerable<UserOutputDTO> GetUserByRole(string roleName);
     }
