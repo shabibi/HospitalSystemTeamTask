@@ -8,13 +8,15 @@ AddPatient:
     "Gender": "M"
 }
 
+-email is misied:
 {
     "UserName": "JohnDoe",
     "Password": "Secure123!",
     "Phone": "1234567890",
     "Age": 30,
-    "Gender": "Male"
+    "Gender": "M"
 }
+  "Gender": "Male" insted of M
 {
     "UserName": "JohnDoe",
     "Password": "Secure123!",
@@ -26,7 +28,7 @@ AddPatient:
 
 UpdatePatientDetails:
 
-UID = 0
+ * erorr os : UID = 0
 {
     "Phone": "9876543210",
     "Password": "NewPassword123!"
@@ -34,11 +36,11 @@ UID = 0
 
 
 GetPatientById:
-PID = 0
+ * erorr is PID = 0
 
 
 AddClinic:
-Missing Required Fields (ClinicName)
+* Missing Required Fields (ClinicName)
 {
   "depID": 2,
   "assignDoctor": 10,
@@ -51,7 +53,7 @@ Missing Required Fields (ClinicName)
   "isActive": true
 }
 
-Invalid Capacity:
+Invalid Capacity * erorr is -11:
 
 {
   "depID": 2,
@@ -67,13 +69,27 @@ Invalid Capacity:
 
 GetClinicByID:
 
-CID = 0
+* erorr is CID = 0
 
 GetClinicByName:
 ClinicName = "Unknown Clinic"
 
 GetClinicsByDepartmentID:
-DepId = -1
+* erorr is DepId = -1
+
+
+ 1- Invalid Doctor ID:
+
+ DoctorOutPutDTO { UID = -1, CurrentBrunch = "A", DepId = 1, Level = 2, Degree = "MD", WorkingYear = 5, CID = 10 }
+
+  2- User Not Found:
+  { UID = 999, CurrentBrunch = "A", DepId = 1, Level = 2, Degree = "MD", WorkingYear = 5, CID = 10 }
+
+  3- Department Not Found:
+  departmentName = "Nonexistent Department"
+
+
+
 
 
 
