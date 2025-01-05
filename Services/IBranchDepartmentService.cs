@@ -8,7 +8,8 @@ namespace HospitalSystemTeamTask.Services
         void AddDepartmentToBranch(BranchDepDTO department);
         IEnumerable<DepartmentDTO> GetDepartmentsByBranch(string BranchName);
         IEnumerable<Branch> GetBranchsByDepartment(string DepartmentName);
-
+        void UpdateBranchDepartment(BranchDepartment branchDepartment);
+        BranchDepartment GetBranchDep(int departmentId, int branchId);
 
     }
 }

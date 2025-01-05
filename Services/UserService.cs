@@ -220,14 +220,36 @@ namespace HospitalSystemTeamTask.Services
             }
             return (output);    
         }
-        public void UpdatePassword(int uid, string newPassword)
+        public void UpdatePassword(int uid, string currentPassword, string newPassword)
         {
             var user = _userRepo.GetUserById(uid);
             if (user == null)
                 throw new KeyNotFoundException($"User with ID {uid} not found.");
 
-            _userRepo.UpdatePassword(uid, newPassword);
+            // Validate the current password
+            string hashedCurrentPassword = HashingPassword.Hshing(currentPassword);
+            if (user.Password != hashedCurrentPassword)
+                throw new ArgumentException("Current password is incorrect.");
+
+            // Validate new password strength
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
+                throw new ArgumentException("New password must be at least 8 characters long.");
+
+            if (!newPassword.Any(char.IsUpper) ||
+                !newPassword.Any(char.IsLower) ||
+                !newPassword.Any(char.IsDigit) ||
+                !newPassword.Any(ch => !char.IsLetterOrDigit(ch)))
+            {
+                throw new ArgumentException("New password must include uppercase, lowercase, a digit, and a special character.");
+            }
+
+            // Hash the new password
+            string hashedNewPassword = HashingPassword.Hshing(newPassword);
+
+            // Update the password in the repository
+            _userRepo.UpdatePassword(uid, hashedNewPassword);
         }
+
 
         public bool EmailExists(string email)
         {

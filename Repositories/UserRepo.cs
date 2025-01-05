@@ -1,4 +1,5 @@
-﻿using HospitalSystemTeamTask.Models;
+﻿using HospitalSystemTeamTask.Helper;
+using HospitalSystemTeamTask.Models;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -100,27 +101,27 @@ namespace HospitalSystemTeamTask.Repositories
             }
         }
 
-        public void UpdatePassword(int uid, string newPassword)
+        public void UpdatePassword(int uid, string hashedNewPassword)
         {
-            try
-            {
-                var user = GetUserById(uid);
-                if (user != null)
-                {
-                    user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
-                    _context.Users.Update(user);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    throw new KeyNotFoundException("User not found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Database error: {ex.Message}");
-            }
+            var user = GetUserById(uid);
+            if (user == null)
+                throw new KeyNotFoundException($"User with ID {uid} not found.");
+
+            user.Password = hashedNewPassword;
+            _context.SaveChanges(); // Update the database with the new password
         }
+
+
+        public bool ValidateCurrentPassword(int uid, string currentPassword)
+        {
+            var user = GetUserById(uid);
+            if (user == null)
+                throw new KeyNotFoundException($"User with ID {uid} not found.");
+
+            string hashedCurrentPassword = HashingPassword.Hshing(currentPassword);
+            return user.Password == hashedCurrentPassword;
+        }
+
         public IEnumerable<User> GetUserByRole(string roleName)
         {
             try

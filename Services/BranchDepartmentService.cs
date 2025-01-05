@@ -71,5 +71,13 @@ namespace HospitalSystemTeamTask.Services
        
              
         }
+        public void UpdateBranchDepartment(BranchDepartment branchDepartment)
+        {
+            _branchDepartmentRepo.UpdateBranchDepartment(branchDepartment);
+        }
+        public BranchDepartment GetBranchDep(int departmentId, int branchId)
+        {
+           return _branchDepartmentRepo.GetBranchDep(departmentId, branchId);
+        }
     }
 }

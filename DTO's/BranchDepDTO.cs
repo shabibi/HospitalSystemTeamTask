@@ -4,6 +4,6 @@
     {
         public int BID { get; set; }
         public int DID { get; set; }
-        public int Capacity { get; set; }
+        public int Capacity { get; set; } 
     }
 }

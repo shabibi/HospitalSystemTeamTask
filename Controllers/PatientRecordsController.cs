@@ -129,67 +129,56 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
 
-      
-        //[HttpPatch("{id}")]
-        //public IActionResult UpdateRecord(int id, [FromBody] UpdatePatientRecordDto dto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
 
-        //    try
-        //    {
-        //        // Check if the record exists
-        //        var existingRecord = _service.GetRecordById(id);
-        //        if (existingRecord == null)
-        //        {
-        //            return NotFound(new { message = "Patient record not found." });
-        //        }
+        [HttpPatch("UpdateRecord")]
+        public IActionResult UpdateRecord(int RecordID, string? treatment, string? inspection)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //        // Update the existing entity with the new data
-        //        existingRecord.PID = dto.PID;
-        //        existingRecord.BID = dto.BID;
-        //        existingRecord.DID = dto.DID;
-        //        existingRecord.VisitDate = dto.VisitDate;
-        //        existingRecord.VisitTime = dto.VisitTime;
-        //        existingRecord.Inspection = dto.Inspection;
-        //        existingRecord.Treatment = dto.Treatment;
-        //        existingRecord.Cost = dto.Cost;
+            try
+            {
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                int userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
 
-        //        // Call the service to update the record
-        //        _service.UpdateRecord(existingRecord);
+                
+               _service.UpdateRecord(RecordID,treatment,inspection,userId);
 
-        //        return Ok(new { message = "Patient record updated successfully!" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { message = "An error occurred while updating the patient record.", details = ex.Message });
-        //    }
-        //}
+                return Ok(new { message = "Patient record updated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the patient record.", details = ex.Message });
+            }
+        }
 
-        //[HttpDelete("{id}")]
-        //public IActionResult DeleteRecord(int id)
-        //{
-        //    try
-        //    {
-        //        // Get the record to delete
-        //        var recordToDelete = _service.GetRecordById(id);
-        //        if (recordToDelete == null)
-        //        {
-        //            return NotFound(new { message = "Patient record not found." });
-        //        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteRecord(int id)
+        {
+            try
+            {
+                if(id <= 0)
+                    return BadRequest("Invalied input.");
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-        //        // Call the service to delete the record
-        //        _service.DeleteRecord(recordToDelete);
+                // Check if the user's role allows them to perform this action
+                if (userRole == null ||  userRole != "superAdmin")
+                    return BadRequest("You are not authorized to perform this action.");
 
-        //        return Ok(new { message = "Patient record deleted successfully!" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Return a generic error message
-        //        return StatusCode(500, new { message = "An error occurred while deleting the patient record.", details = ex.Message });
-        //    }
-        //}
+                _service.DeleteRecord(id);
+                // Call the service to delete the record
+
+                return Ok(new { message = "Patient record deleted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                // Return a generic error message
+                return StatusCode(500, new { message = "An error occurred while deleting the patient record.", details = ex.Message });
+            }
+        }
     }
 }

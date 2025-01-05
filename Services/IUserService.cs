@@ -17,7 +17,7 @@ namespace HospitalSystemTeamTask.Services
 
         void UpdateUser(User user);
         string AuthenticateUser(string email, string password);
-        void UpdatePassword(int uid, string newPassword);
+        void UpdatePassword(int uid, string currentPassword, string newPassword);
         void AddSuperAdmin(UserInputDTO InputUser);
         bool EmailExists(string email);
         void AddStaff(UserInputDTO InputUser);
