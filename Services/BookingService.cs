@@ -1,4 +1,5 @@
 ﻿using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -16,10 +17,15 @@ namespace HospitalSystemTeamTask.Services
     {
         private readonly IBookingRepo _bookingRepo;
         private readonly IClinicService _clinicService;
-        public BookingService(IBookingRepo bookingRepo, IClinicService clinicService)
+        private readonly IUserService _userService;
+        private readonly ISendEmail _email;
+
+        public BookingService(IBookingRepo bookingRepo, IClinicService clinicService,ISendEmail email,IUserService userService)
         {
             _bookingRepo = bookingRepo;
             _clinicService = clinicService;
+            _userService = userService;
+            _email = email;
         }
         public IEnumerable<BookingOutputDTO> GetAllBooking(int pageNumber, int pageSize)
         {
@@ -112,45 +118,73 @@ namespace HospitalSystemTeamTask.Services
 
         public void BookAppointment(BookingInputDTO input, int patientId)
         {
-            // Fetch appointments for the clinic and date
-            var bookedAppointments = _bookingRepo.GetBookingsByClinicAndDate(input.CID, input.Date);
-
-            // Check if the patient already has a booking at the same clinic or time
-            var patientBookings = _bookingRepo.GetBookingsByPatientId(patientId);
-
-            foreach (var booking in patientBookings)
+            try
             {
-                if ((booking.Date == input.Date && booking.StartTime == input.StartTime) || booking.CID == input.CID)
+                // Fetch appointments for the clinic and date
+                var bookedAppointments = _bookingRepo.GetBookingsByClinicAndDate(input.CID, input.Date);
+
+                // Check if the patient already has a booking at the same clinic or time
+                var patientBookings = _bookingRepo.GetBookingsByPatientId(patientId);
+
+                foreach (var booking in patientBookings)
                 {
-                    throw new InvalidOperationException("You already have an appointment at this time or at this clinic.");
+                    if ((booking.Date == input.Date && booking.StartTime == input.StartTime) || booking.CID == input.CID)
+                    {
+                        throw new InvalidOperationException("You already have an appointment at this time or at this clinic.");
+                    }
                 }
+
+                // Check for time conflicts
+                var conflictingAppointment = bookedAppointments
+                    .FirstOrDefault(b => b.StartTime == input.StartTime && b.Staus);
+
+                if (conflictingAppointment != null)
+                {
+                    throw new InvalidOperationException("The selected time slot is already booked.");
+                }
+
+                // Find an available appointment slot
+                var availableAppointment = bookedAppointments
+                    .FirstOrDefault(b => b.StartTime == input.StartTime && !b.Staus);
+
+                if (availableAppointment == null)
+                {
+                    throw new InvalidOperationException("No available slot for the given time.");
+                }
+
+                // Book the appointment
+                availableAppointment.Staus = true;
+                availableAppointment.PID = patientId;
+                availableAppointment.BookingDate = DateTime.Now;
+
+                // Update the booking in the repository
+                _bookingRepo.UpdateBooking(availableAppointment);
+
+                // Email subject and body
+                var patientName = _userService.GetUserName(patientId);
+                var bookedDate = $"{availableAppointment.Date:MMMM dd, yyyy}";
+                string subject = "Hospital System Booking Confirmation";
+                string body = $"Dear {patientName},\n\n" +
+                              $"Your appointment has been successfully booked with our hospital system.\n\n" +
+                              $"Booking Details:\n" +
+                              $"- Clinic: {_clinicService.GetClinicName(input.CID)}\n" +
+                              $"- Date: {bookedDate}\n" +
+                              $"- Time: {availableAppointment.StartTime}\n\n" +
+                              "Please be on time for your appointment. If you need to reschedule, kindly contact us.\n\n" +
+                              "Best regards,\n" +
+                              "Your Hospital System Team";
+
+                // Send the email notification
+                _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
             }
-
-            // Check for time conflicts
-            var conflictingAppointment = bookedAppointments
-                .FirstOrDefault(b => b.StartTime == input.StartTime && b.Staus);
-
-            if (conflictingAppointment != null)
+            catch (FormatException ex)
             {
-                throw new InvalidOperationException("The selected time slot is already booked.");
+                throw new InvalidOperationException("An error occurred while processing your request. Please check the input format.", ex);
             }
-
-            // Find an available appointment slot
-            var availableAppointment = bookedAppointments
-                .FirstOrDefault(b => b.StartTime == input.StartTime && !b.Staus);
-
-            if (availableAppointment == null)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("No available slot for the given time.");
+                throw new Exception("An error occurred while booking the appointment.", ex);
             }
-
-            // Book the appointment
-            availableAppointment.Staus = true;
-            availableAppointment.PID = patientId;
-            availableAppointment.BookingDate = DateTime.Now;
-
-            // Update the booking in the repository
-            _bookingRepo.UpdateBooking(availableAppointment);
         }
 
 
@@ -257,28 +291,67 @@ namespace HospitalSystemTeamTask.Services
             return bookingOutput;
         }
 
-        public void CancelAppointment(BookingInputDTO bookingInputDTO)
+        public void CancelAppointment(BookingInputDTO bookingInputDTO, int patientId)
         {
-            // Retrieve the appointment based on clinic, date, and start time
-            var appointment = _bookingRepo
-                .GetBookingsByClinicAndDate(bookingInputDTO.CID, bookingInputDTO.Date)
-                .FirstOrDefault(b => b.StartTime == bookingInputDTO.StartTime);
+            try
+            {
+                // Retrieve the appointment based on clinic, date, and start time
+                var appointment = _bookingRepo
+                    .GetBookingsByClinicAndDate(bookingInputDTO.CID, bookingInputDTO.Date)
+                    .FirstOrDefault(b => b.StartTime == bookingInputDTO.StartTime);
 
-            // Check if the appointment exists and is currently booked
-            if (appointment == null)
-                throw new Exception("No appointment found for the provided details.");
+                // Check if the appointment exists
+                if (appointment == null)
+                {
+                    throw new Exception("No appointment found for the provided details.");
+                }
 
-            if (!appointment.Staus)
-                throw new Exception("The appointment is not currently booked and cannot be canceled.");
+                // Check if the appointment is already canceled or not booked
+                if (!appointment.Staus)
+                {
+                    throw new Exception("The appointment is not currently booked and cannot be canceled.");
+                }
 
-            // Update the appointment to mark it as canceled
-            appointment.Staus = false;
-            appointment.BookingDate = null;
-            appointment.PID = null;
+                // Only allow cancellation by the patient or admin
+                if (appointment.PID != patientId )
+                {
+                    throw new UnauthorizedAccessException("You are not authorized to cancel this appointment.");
+                }
 
-            // Persist the updated appointment in the repository
-            _bookingRepo.UpdateBooking(appointment);
+                // Update the appointment to mark it as canceled
+                appointment.Staus = false;
+                appointment.BookingDate = null;
+                appointment.PID = null;
+
+                // Persist the updated appointment in the repository
+                _bookingRepo.UpdateBooking(appointment);
+
+                // Get patient's name and email
+                var patientName = _userService.GetUserName(patientId); // Ensure this function fetches the email
+
+                // Email subject and body
+                string subject = "Hospital System Appointment Cancellation Confirmation";
+                string body = $"Dear {patientName},\n\n" +
+                              $"We regret to inform you that your appointment with our hospital system has been successfully canceled.\n\n" +
+                              $"Booking Details:\n" +
+                              $"- Clinic: {_clinicService.GetClinicName(appointment.CID)}\n" +
+                              $"- Date: {appointment.Date:MMMM dd, yyyy}\n" +
+                              $"- Time: {appointment.StartTime}\n\n" +
+                              "If this cancellation was made in error or if you would like to reschedule, please contact us as soon as possible.\n\n" +
+                              "We apologize for any inconvenience caused.\n\n" +
+                              "Best regards,\n" +
+                              "Your Hospital System Team";
+
+                // Send the email notification
+                _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors that might occur during the process
+                throw new InvalidOperationException("An error occurred while canceling the appointment.", ex);
+            }
         }
+    
         public IEnumerable<Booking> GetBookingsByClinicAndDate(int clinicId, DateTime date)
         {
            return _bookingRepo.GetBookingsByClinicAndDate(clinicId, date);
@@ -326,6 +399,27 @@ namespace HospitalSystemTeamTask.Services
             newAppointmentSlot.BookingDate = DateTime.Today;
 
             _bookingRepo.UpdateBooking(newAppointmentSlot);
+
+            // Get patient's name and email
+            var patientName = _userService.GetUserName(patientId); // Ensure this function fetches the email
+
+            string subject = "Hospital System Appointment Update Confirmation";
+            string body = $"Dear {patientName},\n\n" +
+                          $"We would like to inform you that your appointment with our hospital system has been successfully updated.\n\n" +
+                          $"Previous Appointment Details:\n" +
+                          $"- Clinic: {_clinicService.GetClinicName(previousAppointment.CID)}\n" +
+                          $"- Date: {previousBookedAppointment.Date:MMMM dd, yyyy}\n" +
+                          $"- Time: {previousBookedAppointment.StartTime}\n\n" +
+                          $"New Appointment Details:\n" +
+                          $"- Clinic: {_clinicService.GetClinicName(newAppointmentSlot.CID)}\n" +
+                          $"- Date: {newAppointmentSlot.Date:MMMM dd, yyyy}\n" +
+                          $"- Time: {newAppointmentSlot.StartTime}\n\n" +
+                          "If you did not request this change or if you would like to reschedule your appointment, please contact us immediately.\n\n" +
+                          "We apologize for any inconvenience this may have caused and are here to assist you with any questions or concerns.\n\n" +
+                          "Best regards,\n" +
+                          "Your Hospital System Team";
+            // Send the email notification
+            _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
         }
 
         public void DeleteAppointments(BookingInputDTO bookingInputDTO)
