@@ -12,7 +12,7 @@ namespace HospitalSystemTeamTask.Services
        void BookAppointment(BookingInputDTO input, int patientId);
         IEnumerable<BookingInputDTO> GetAvailableAppointmentsBy(int? clinicId, int? departmentId);
         IEnumerable<BookingOutputDTO> GetBookedAppointments(int? patientId, int? clinicId, int? departmentId, DateTime? date);
-        void CancelAppointment(BookingInputDTO bookingInputDTO);
+        void CancelAppointment(BookingInputDTO bookingInputDTO, int patientId);
         IEnumerable<Booking> GetBookingsByClinicAndDate(int clinicId, DateTime date);
         void UpdateBookedAppointment(BookingInputDTO previousAppointment, BookingInputDTO newAppointment, int patientId);
         void DeleteAppointments(BookingInputDTO bookingInputDTO);

@@ -225,7 +225,7 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Call the service to cancel the appointment
-                _bookingService.CancelAppointment(bookingInputDTO);
+                _bookingService.CancelAppointment(bookingInputDTO, appointment.PID.Value);
 
                 return Ok(new { message = "Appointment successfully canceled." });
             }
