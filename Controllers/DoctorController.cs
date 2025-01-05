@@ -24,30 +24,6 @@ namespace HospitalSystemTeamTask.Controllers
             _doctorServicee = doctorService;
             _configuration = configuration;
         }
-        [HttpGet("GetDoctorById/{DoctorID}")]
-        public IActionResult GetUserById(int DoctorID)
-        {
-            try
-            {
-                // Extract the token from the request and retrieve the user's role
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
-                {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
-                }
-                var doctor = _doctorServicee.GetDoctorById(DoctorID);
-                return Ok(doctor);
-
-            }
-            catch (Exception ex)
-            {
-                // Return a generic error response
-                return StatusCode(500, $"This person not a doctor!!. {(ex.Message)}");
-            }
-        }
 
         //[HttpGet("GetDoctorByEmail")]
         //public IActionResult GetDoctorByEmail(string email)
