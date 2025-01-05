@@ -50,7 +50,7 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = "superAdmin")]
         [HttpPost("RegisterNewStaff")]
         public IActionResult RegisterNewStaff(UserInputDTO InputUser)
         {
