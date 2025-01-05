@@ -5,6 +5,7 @@ using HospitalSystemTeamTask.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -24,19 +25,18 @@ namespace HospitalSystemTeamTask.Controllers
             _doctorServicee = doctorService;
             _configuration = configuration;
         }
+
+
         [HttpGet("GetDoctorById/{DoctorID}")]
-        public IActionResult GetUserById(int DoctorID)
+        public IActionResult GetDoctorById(int DoctorID)
         {
             try
             {
-                // Extract the token from the request and retrieve the user's role
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
+                
+               
+                if (DoctorID <= 0)
                 {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                    return BadRequest("Valid Doctor ID (DID) is required.");
                 }
                 var doctor = _doctorServicee.GetDoctorById(DoctorID);
                 return Ok(doctor);
@@ -207,18 +207,32 @@ namespace HospitalSystemTeamTask.Controllers
         }
         //[Authorize(Roles = "admin,doctor")]
         [HttpPut("UpdateDoctorDetails/{UID}/{DID}")]
-        public IActionResult UpdateDoctorDetails(int UID, int DID,  DoctorUpdateDTO input)
+        public IActionResult UpdateDoctorDetails(int UID, int DID, DoctorUpdateDTO input)
         {
             try
             {
-                // Extract the token from the request and retrieve the user's role
+                // Extract token and claims
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                var loggedInUserId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
 
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
+                // Validate the user's role
+                if (string.IsNullOrEmpty(userRole) ||
+                    (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
                 {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                    return BadRequest("You are not authorized to perform this action.");
+                }
+
+                // Check if the user is a doctor and not authorized to update another doctor's details
+                if (userRole == "doctor" && loggedInUserId != UID)
+                {
+                    return BadRequest("You are not authorized to update details of another doctor.");
+                }
+
+                // Validate the input
+                if (UID <= 0 || DID <= 0)
+                {
+                    return BadRequest("Invalid UID or DID.");
                 }
 
                 if (input == null)
@@ -226,27 +240,23 @@ namespace HospitalSystemTeamTask.Controllers
                     return BadRequest("Updated doctor details are required.");
                 }
 
-                if (UID <= 0 || DID <= 0)
-                {
-                    return BadRequest("Invalid UID or DID.");
-                }
-
+                // Perform the update
                 _doctorServicee.UpdateDoctorDetails(UID, DID, input);
+
                 return Ok("Doctor details updated successfully.");
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                // Return 404 if the doctor is not found
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while updating doctor details. {ex.Message}");
             }
-
         }
+
+
     }
 }

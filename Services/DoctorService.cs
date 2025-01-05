@@ -1,5 +1,6 @@
 ﻿
 using HospitalSystemTeamTask.DTO_s;
+using HospitalSystemTeamTask.Helper;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
 using System.Security.Cryptography;
@@ -195,7 +196,12 @@ namespace HospitalSystemTeamTask.Services
             }
 
             // Update user details
-            existingUser.Password = input.Password;
+            if (!string.IsNullOrWhiteSpace(input.Password))
+            {
+                // Hash the new password before saving it
+                string hashedPassword = HashingPassword.Hshing(input.Password);
+                existingUser.Password = hashedPassword;
+            }
             existingUser.Phone = input.Phone;
             _UserService.UpdateUser(existingUser);
 
@@ -216,6 +222,7 @@ namespace HospitalSystemTeamTask.Services
 
             _DoctorRepo.UpdateDoctor(existingDoctor);
         }
+
 
         public void UpdateDoctor(Doctor doctor)
         {
