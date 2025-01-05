@@ -77,66 +77,140 @@ DepId = -1
 
 
 
-branch_service_test_cases:
-
-1. Test AddBranch (Successful case)
-   - Input: BranchDTO { BranchName = "Test Branch", Location = "Test Location" }
-   - Expected Output: "Branch added successfully"
 
 
-2. Test GetAllBranches (Successful case)
-   - Input: None
-   - Expected Output: List of all branches
 
 
-3. Test GetBranchDetailsByBranchName (Branch found)
-   - Input: branchName = "Test Branch"
-   - Expected Output: BranchDTO { BranchName = "Test Branch", Location = "Test Location", BranchStatus = true }
+user_service_test_cases
+
+1. RegisterSuperAdmin
+Test Case 1.1: Valid input for super admin registration.
+Input: { "UserName": "adminUser", "Role": "superAdmin", "Phone": "1234567890" }
+Expected Output: 200 OK with message "Super Admin registered successfully."
+
+Test Case 1.2: Invalid role for super admin registration.
+Input: { "UserName": "adminUser", "Role": "doctor", "Phone": "1234567890" }
+Expected Output: 400 BadRequest with message "Invalid role. Only 'superAdmin' role is allowed."
+
+Test Case 1.3: An active super admin already exists.
+Input: { "UserName": "adminUser", "Role": "superAdmin", "Phone": "1234567890" }
+Expected Output: 500 Internal Server Error with message "Only one active super admin is allowed in the system."
+
+2. RegisterNewStaff
+Test Case 2.1: Valid staff registration.
+Input: { "UserName": "staffUser", "Role": "doctor", "Phone": "9876543210" }
+Expected Output: 200 OK with message "New staff registered successfully."
+
+Test Case 2.2: Invalid role for staff registration.
+Input: { "UserName": "staffUser", "Role": "patient", "Phone": "9876543210" }
+Expected Output: 400 BadRequest with message "Invalid role. Only 'doctor and admin' role is allowed."
+
+3. Login
+Test Case 3.1: Valid login credentials.
+Input: Email: "admin@domain.com", Password: "Super1234"
+Expected Output: 200 OK with a JWT token.
+
+Test Case 3.2: Invalid email.
+Input: Email: "invalid@domain.com", Password: "Super1234"
+Expected Output: 400 BadRequest with message "Invalid email"
+
+Test Case 3.3: Incorrect password.
+Input: Email: "admin@domain.com", Password: "WrongPassword"
+Expected Output: 400 BadRequest with message "Incorrect Password"
+
+Test Case 3.4: Inactive user account.
+Input: Email: "inactive@domain.com", Password: "Super1234"
+Expected Output: 400 BadRequest with message "This user account is inactive"
+
+4. DeactivateUser
+Test Case 4.1: Deactivate an active user.
+Input: UserId: "101"
+Expected Output: 200 OK with message "User deactivated successfully."
+
+Test Case 4.2: User already inactive.
+Input: UserId: "102" (Inactive user)
+Expected Output: 400 BadRequest with message "User already not active."
+
+5. GetUser
+Test Case 5.1: Get user data by ID.
+Input: UserID: "101"
+Expected Output: 200 OK with user data.
+
+Test Case 5.2: Get user data by name.
+Input: UserName: "doctorUser"
+Expected Output: 200 OK with user data.
+
+Test Case 5.3: User not found by ID or name.
+Input: UserID: "9999", UserName: "nonExistentUser"
+Expected Output: 404 NotFound with message "User not found."
+
+6. GetUsersByRole
+Test Case 6.1: Get users by role (admin).
+Input: Role: "admin"
+Expected Output: 200 OK with list of users.
+
+Test Case 6.2: Invalid role.
+Input: Role: "patient"
+Expected Output: 400 BadRequest with message "Invalid input"
+
+7. UpdatePassword
+Test Case 7.1: Valid password update.
+Input: { "UserId": 101, "NewPassword": "NewPass123" }
+Expected Output: 200 OK with message "Password updated successfully."
+
+Test Case 7.2: New password is empty.
+Input: { "UserId": 101, "NewPassword": "" }
+Expected Output: 400 BadRequest with message "New password is required."
+
+8. Authorization
+Test Case 8.1: Unauthorized user trying to perform admin tasks.
+Input: User with role "patient" tries to deactivate another user.
+Expected Output: 400 BadRequest with message "You are not authorized to perform this action."
+
+9. GetUserData (General Tests)
+Test Case 9.1: Get data for a patient, but only for themselves.
+Input: UserRole: "patient", UserID: "101", ViewingUserID: "101"
+Expected Output: 200 OK with patient data.
+
+Test Case 9.2: Patient tries to get data for another patient.
+Input: UserRole: "patient", UserID: "101", ViewingUserID: "102"
+Expected Output: 400 BadRequest with message "You are not authorized to get data of other patients."
 
 
-4. Test GetBranchDetailsByBranchName (Branch not found)
-   - Input: branchName = "Nonexistent Branch"
-   - Expected Output: KeyNotFoundException with message "Branch with name 'Nonexistent Branch' not found."
+Patient_service_test_cases
+1. Test UpdatePatientDetails (authorized admin role)
+   - Provide a valid token for an admin role, valid UID, and valid input for updating patient details.
+   - Expected Result: Successfully updates the patient details.
+
+2. Test UpdatePatientDetails (unauthorized role)
+   - Provide a non-admin token (e.g., a patient token) trying to update another patient's details.
+   - Expected Result: Returns a BadRequest indicating unauthorized access.
+
+3. Test AddPatient (authorized admin role)
+   - Provide valid admin role token and valid patient data to add a new patient.
+   - Expected Result: Successfully adds the patient.
+
+4. Test AddPatient (unauthorized role)
+   - Provide a non-admin token (e.g., a patient token) trying to add a new patient.
+   - Expected Result: Returns a BadRequest indicating unauthorized access.
+
+5. Test GetPatientData (authorized role with valid user data)
+   - Provide a valid token and valid patient UID or username.
+   - Expected Result: Returns the patient's data.
+
+6. Test GetPatientData (authorized role with invalid user data)
+   - Provide a valid token and an invalid or non-existent UID or username.
+   - Expected Result: Returns a NotFound error.
+
+7. Test GetPatientData (unauthorized access for a patient to access another patient's data)
+   - Provide a valid patient token and a different patient UID.
+   - Expected Result: Returns a BadRequest indicating unauthorized access.
+
+8. Test GenerateJwtToken
+   - Test if a valid JWT token is generated with correct claims for patient, username, and role.
+   - Expected Result: Generates a valid JWT token.
 
 
-5. Test UpdateBranch (Successful update)
-   - Input: branchId = 1, UpdateBranchDTO { BranchName = "Updated Branch", Location = "Updated Location" }
-   - Expected Output: "Branch with ID '1' updated successfully."
-
-
-6. Test UpdateBranch (Branch not found)
-   - Input: branchId = 999, UpdateBranchDTO { BranchName = "Updated Branch", Location = "Updated Location" }
-   - Expected Output: KeyNotFoundException with message "Branch with ID '999' not found."
-
-
-7. Test SetBranchStatus (Set active status)
-   - Input: branchId = 1, isActive = true
-   - Expected Output: "Branch with ID '1' status updated to Active."
-
-
-8. Test SetBranchStatus (Branch not found)
-   - Input: branchId = 999, isActive = false
-   - Expected Output: KeyNotFoundException with message "Branch with ID '999' not found."
-
-
-9. Test GetBranchDetails (Get by branchId)
-   - Input: branchId = 1
-   - Expected Output: BranchDTO { BranchName = "Test Branch", Location = "Test Location", BranchStatus = true }
-
-
-10. Test GetBranchDetails (Branch not found by branchId)
-    - Input: branchId = 999
-    - Expected Output: KeyNotFoundException with message "Branch not found."
-
-
-11. Test GetBranchName (Successful case)
-    - Input: branchId = 1
-    - Expected Output: "Test Branch"
-
-
-12. Test GetBranchName (Branch not found)
-    - Input: branchId = 999
-    - Expected Output: InvalidOperationException with message "Database error: Branch not found."
 
 
 
@@ -218,3 +292,387 @@ Test Steps:
 1. Call the SetDepartmentActiveStatus method with an invalid value for isActive.
 2. Assert that the method throws an error.
 Expected Result: An error is thrown due to invalid status.
+
+
+branch_service_test_cases:
+
+1. Test AddBranch (Successful case)
+   - Input: BranchDTO { BranchName = "Test Branch", Location = "Test Location" }
+   - Expected Output: "Branch added successfully"
+
+
+2. Test GetAllBranches (Successful case)
+   - Input: None
+   - Expected Output: List of all branches
+
+
+3. Test GetBranchDetailsByBranchName (Branch found)
+   - Input: branchName = "Test Branch"
+   - Expected Output: BranchDTO { BranchName = "Test Branch", Location = "Test Location", BranchStatus = true }
+
+
+4. Test GetBranchDetailsByBranchName (Branch not found)
+   - Input: branchName = "Nonexistent Branch"
+   - Expected Output: KeyNotFoundException with message "Branch with name 'Nonexistent Branch' not found."
+
+
+5. Test UpdateBranch (Successful update)
+   - Input: branchId = 1, UpdateBranchDTO { BranchName = "Updated Branch", Location = "Updated Location" }
+   - Expected Output: "Branch with ID '1' updated successfully."
+
+
+6. Test UpdateBranch (Branch not found)
+   - Input: branchId = 999, UpdateBranchDTO { BranchName = "Updated Branch", Location = "Updated Location" }
+   - Expected Output: KeyNotFoundException with message "Branch with ID '999' not found."
+
+
+7. Test SetBranchStatus (Set active status)
+   - Input: branchId = 1, isActive = true
+   - Expected Output: "Branch with ID '1' status updated to Active."
+
+
+8. Test SetBranchStatus (Branch not found)
+   - Input: branchId = 999, isActive = false
+   - Expected Output: KeyNotFoundException with message "Branch with ID '999' not found."
+
+
+9. Test GetBranchDetails (Get by branchId)
+   - Input: branchId = 1
+   - Expected Output: BranchDTO { BranchName = "Test Branch", Location = "Test Location", BranchStatus = true }
+
+
+10. Test GetBranchDetails (Branch not found by branchId)
+    - Input: branchId = 999
+    - Expected Output: KeyNotFoundException with message "Branch not found."
+
+
+11. Test GetBranchName (Successful case)
+    - Input: branchId = 1
+    - Expected Output: "Test Branch"
+
+
+12. Test GetBranchName (Branch not found)
+    - Input: branchId = 999
+    - Expected Output: InvalidOperationException with message "Database error: Branch not found."
+
+
+
+Patient Record
+
+
+
+
+Test Case 1: Create Patient Record - Valid Input
+- Test Description: Create a new patient record with valid input data.
+- Pre-conditions: 
+  - The doctor exists and is associated with a clinic.
+  - The input data is valid (i.e., Patient ID, Treatment, Inspection).
+- Expected Result:
+  - The patient record is successfully created.
+  - The response status should be 201 Created.
+  - The response message should be "Patient record added successfully!".
+- Post-conditions: The new patient record is stored in the repository.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 2: Create Patient Record - Doctor Not Found
+- Test Description: Try to create a patient record with a non-existent doctor ID.
+- Pre-conditions: The doctor ID provided in the JWT does not exist in the system.
+- Expected Result:
+  - An ArgumentException is thrown with the message "Doctor not found.".
+  - The response status should be 400 Bad Request.
+- Post-conditions: No record is created.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 3: Create Patient Record - Doctor Not Associated with Clinic
+- Test Description: Try to create a patient record where the doctor is not associated with a clinic.
+- Pre-conditions: The doctor exists but is not associated with any clinic.
+- Expected Result:
+  - An ArgumentException is thrown with the message "Doctor is not associated with a clinic.".
+  - The response status should be 400 Bad Request.
+- Post-conditions: No record is created.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 4: Create Patient Record - Invalid IDs
+- Test Description: Create a patient record with invalid IDs (e.g., zero or negative values).
+- Pre-conditions: The provided Patient ID, Doctor ID, or Branch ID is invalid (e.g., 0 or -1).
+- Expected Result:
+  - An ArgumentException is thrown with the message "Invalid IDs provided.".
+  - The response status should be 400 Bad Request.
+- Post-conditions: No record is created.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 5: Get All Records - Valid Request (Admin Role)
+- Test Description: Retrieve all patient records by an admin user.
+- Pre-conditions: The user has an "admin" or "supperAdmin" role.
+- Expected Result:
+  - A list of all patient records is returned.
+  - The response status should be 200 OK.
+  - Each record contains correct details (PatientName, DoctorName, BranchName, etc.).
+- Post-conditions: None.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 6: Get All Records - Invalid Role
+- Test Description: Try to retrieve all records with a non-admin user (e.g., doctor or patient).
+- Pre-conditions: The user does not have an "admin" or "supperAdmin" role.
+- Expected Result:
+  - A 400 Bad Request is returned with the message "You are not authorized to perform this action.".
+- Post-conditions: None.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 7: Get Records - Valid Filter (Patient ID)
+- Test Description: Retrieve patient records filtered by patientId.
+- Pre-conditions: The patient exists with the given patientId.
+- Expected Result:
+  - A list of patient records filtered by the patientId is returned.
+  - The response status should be 200 OK.
+- Post-conditions: None.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 8: Get Records - Invalid Filter (Multiple Parameters)
+- Test Description: Try to retrieve patient records with more than one filter parameter.
+- Pre-conditions: Multiple filter parameters are provided (e.g., RecordId, patientId, doctorId).
+- Expected Result:
+  - An ArgumentException is thrown with the message "Only one parameter can be provided at a time.".
+  - The response status should be 400 Bad Request.
+- Post-conditions: None.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 9: Get Records - No Matching Records Found
+- Test Case ID: TC_09
+- Test Description: Try to retrieve records that do not match any filter criteria.
+- Pre-conditions: No patient records match the given filter criteria.
+- Test Steps:
+  1. Call the GetRecords endpoint with a filter that does not match any records (e.g., non-existing doctorId or patientId).
+- Pass/Fail: [Pass/Fail]
+
+---
+
+Test Case 10: Update Patient Record
+- Test Description: Update an existing patient record.
+- Pre-conditions: The record exists in the system.
+- Expected Result:
+  - The record is updated successfully.
+  - No exceptions are thrown, and the record is persisted in the repository.
+- Pass/Fail: [Pass/Fail]
+
+---
+
+
+Docter_service_test_case
+1. Test Case: GetAllDoctors
+   - Method: GetAllDoctors
+   - Input: None
+   - Expected Output: List of all doctors
+
+2. Test Case: GetDoctorById_ValidId
+   - Method: GetDoctorById
+   - Input: uid = 1
+   - Expected Output: Doctor object with ID 1
+
+3. Test Case: GetDoctorById_InvalidId
+   - Method: GetDoctorById
+   - Input: uid = 999
+   - Expected Output: KeyNotFoundException with message "User  with ID 999 not found."
+
+4. Test Case: GetDoctorByEmail_ValidEmail
+   - Method: GetDoctorByEmail
+   - Input: email = "doctor@example.com"
+   - Expected Output: Doctor object associated with the email
+
+5. Test Case: GetDoctorByEmail_NullEmail
+   - Method: GetDoctorByEmail
+   - Input: email = null
+   - Expected Output: ArgumentException with message "Email cannot be null or empty."
+
+6. Test Case: EmailExists_ExistingEmail
+   - Method: EmailExists
+   - Input: email = "doctor@example.com"
+   - Expected Output: true
+
+7. Test Case: EmailExists_NonExistingEmail
+   - Method: EmailExists
+   - Input: email = "nonexistent@example.com"
+   - Expected Output: false
+
+8. Test Case: GetDoctorByName_ValidName
+   - Method: GetDoctorByName
+   - Input: docName = "Dr. Smith"
+   - Expected Output: Doctor object with name "Dr. Smith"
+
+9. Test Case: GetDoctorByName_NullName
+   - Method: GetDoctorByName
+   - Input: docName = null
+   - Expected Output: ArgumentException with message "Doctor name cannot be null or empty."
+
+10. Test Case: GetDoctorData_ValidParameters
+    - Method: GetDoctorData
+    - Input: docName = "Dr. Smith", Did = null
+    - Expected Output: DoctorOutPutDTO object for "Dr. Smith"
+
+11. Test Case: GetDoctorData_InvalidParameters
+    - Method: GetDoctorData
+    - Input: docName = null, Did = null
+    - Expected Output: ArgumentException with message "Either docName or doctor ID must be provided."
+
+12. Test Case: AddDoctor_ValidInput
+    - Method: AddDoctor
+    - Input: DoctorOutPutDTO with valid data
+    - Expected Output: Doctor added successfully (no exception thrown)
+
+13. Test Case: AddDoctor_NullInput
+    - Method: AddDoctor
+    - Input: null
+    - Expected Output: ArgumentException with message "Doctor information is missing."
+
+14. Test Case: GetDoctorsByBranchName_ValidBranch
+    - Method: GetDoctorsByBranchName
+    - Input: branchName = "Cardiology"
+    - Expected Output: List of DoctorOutPutDTO for doctors in "Cardiology"
+
+15. Test Case: GetDoctorsByBranchName_EmptyBranch
+    - Method: GetDoctorsByBranchName
+    - Input: branchName = ""
+    - Expected Output: ArgumentException with message "Branch name is required."
+
+16. Test Case: GetDoctorsByDepartmentName_ValidDepartment
+    - Method: GetDoctorsByDepartmentName
+    - Input: departmentName = "Pediatrics"
+    - Expected Output: List of DoctorOutPutDTO for doctors in "Pediatrics"
+
+17. Test Case: GetDoctorsByDepartmentName_EmptyDepartment
+    - Method: GetDoctorsByDepartmentName
+    - Input: departmentName = ""
+    - Expected Output: ArgumentException with message "Department name is required."
+
+18. Test Case: UpdateDoctorDetails_ValidInput
+    - Method: UpdateDoctorDetails
+    - Input: UID = 1, DID = 1, DoctorUpdateDTO with valid data
+    - Expected Output: Doctor details updated successfully (no exception thrown)
+
+19. Test Case: UpdateDoctorDetails_NullInput
+    - Method: UpdateDoctorDetails
+    - Input: UID = 1, DID = 1, input = null
+    - Expected Output: ArgumentException with message "Doctor update details are required."
+
+20. Test Case: UpdateDoctorDetails_InvalidUID
+    - Method: UpdateDoctorDetails
+    - Input: UID = -1, DID = 1, DoctorUpdateDTO with valid data
+    - Expected Output: BadRequest with message "Invalid UID or DID."
+
+1. Test Case: GetAllClinics
+   - Method: GetAllClinic
+   - Input: None
+   - Expected Output: List of all clinics
+
+2. Test Case: AddClinic_ValidInput
+   - Method: AddClinic
+   - Input: ClinicInput with valid data
+   - Expected Output: Clinic added successfully (no exception thrown)
+
+3. Test Case: AddClinic_NullInput
+   - Method: AddClinic
+   - Input: null
+   - Expected Output: ArgumentException with message "Clinic details are required."
+
+4. Test Case: AddClinic_InvalidCapacity
+   - Method: AddClinic
+   - Input: ClinicInput with Capacity <= 0
+   - Expected Output: ArgumentException with message "Capacity must be greater than 0."
+
+5. Test Case: GetClinicById_ValidId
+   - Method: GetClinicById
+   - Input: clinicId = 1
+   - Expected Output: Clinic object with ID 1
+
+6. Test Case: GetClinicById_InvalidId
+   - Method: GetClinicById
+   - Input: clinicId = -1
+   - Expected Output: ArgumentException with message "Invalid clinic ID. Clinic ID must be greater than 0."
+
+7. Test Case: GetClinicById_NonExistentId
+   - Method: GetClinicById
+   - Input: clinicId = 999
+   - Expected Output: KeyNotFoundException with message "Clinic with ID 999 not found."
+
+8. Test Case: GetPrice_ValidId
+   - Method: GetPrice
+   - Input: clinicId = 1
+   - Expected Output: Cost of the clinic with ID 1
+
+9. Test Case: GetClinicByName_ValidName
+   - Method: GetClinicByName
+   - Input: clinicName = "Health Clinic"
+   - Expected Output: Clinic object with name "Health Clinic"
+
+10. Test Case: GetClinicByName_NonExistentName
+    - Method: GetClinicByName
+    - Input: clinicName = "Nonexistent Clinic"
+    - Expected Output: KeyNotFoundException with message "clinic with name Nonexistent Clinic not found."
+
+11. Test Case: GetClinicsByBranchName_ValidBranch
+    - Method: GetClinicsByBranchName
+    - Input: branchName = "Downtown"
+    - Expected Output: List of clinics in the "Downtown" branch
+
+12. Test Case: GetClinicsByBranchName_EmptyBranch
+    - Method: GetClinicsByBranchName
+    - Input: branchName = ""
+    - Expected Output: ArgumentException with message "Branch name is required."
+
+13. Test Case: GetClinicsByBranchName_NonExistentBranch
+    - Method: GetClinicsByBranchName
+    - Input: branchName = "Nonexistent Branch"
+    - Expected Output: KeyNotFoundException with message "No clinics found for branch: Nonexistent Branch"
+
+14. Test Case: GetClinicsByDepartmentId_ValidId
+    - Method: GetClinicsByDepartmentId
+    - Input: departmentId = 1
+    - Expected Output: List of clinics for department ID 1
+
+15. Test Case: GetClinicsByDepartmentId_InvalidId
+    - Method: GetClinicsByDepartmentId
+    - Input: departmentId = -1
+    - Expected Output: ArgumentException with message "Department ID must be greater than 0."
+
+    clinic_service_test_case
+
+Test Case: GetClinicsByDepartmentId_NonExistentId
+    - Method: GetClinicsByDepartmentId
+    - Input: departmentId = 999
+    - Expected Output: KeyNotFoundException with message "No clinics found for Department ID: 999"
+
+Test Case: UpdateClinicDetails_ValidInput
+    - Method: UpdateClinicDetails
+    - Input: CID = 1, ClinicInput with valid data
+    - Expected Output: Clinic details updated successfully (no exception thrown)
+
+Test Case: UpdateClinicDetails_NullInput
+    - Method: UpdateClinicDetails
+    - Input: CID = 1, input = null
+    - Expected Output: BadRequest with message "Updated clinic details are required."
+
+Test Case: UpdateClinicDetails_InvalidCID
+    - Method: UpdateClinicDetails
+    - Input: CID = -1, ClinicInput with valid data
+    - Expected Output: BadRequest with message "Invalid Clinic ID."
+
+Test Case: SetClinicStatus_ValidId
+    - Method: SetClinicStatus
+    - Input: clinicId = 1, isActive = true
+    - Expected Output: Clinic status updated to Active (
