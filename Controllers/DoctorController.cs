@@ -182,15 +182,15 @@ namespace HospitalSystemTeamTask.Controllers
 
         }
         //[Authorize(Roles = "admin,doctor")]
-        [HttpPut("UpdateDoctorDetails/{DID}")]
-        public IActionResult UpdateDoctorDetails(int DID,  DoctorUpdateDTO input)
+        [HttpPut("UpdateDoctorDetails")]
+        public IActionResult UpdateDoctorDetails([FromBody] DoctorUpdateDTO input)
         {
             try
             {
-                // Extract the token from the request and retrieve the user's role
+                // Extract the token from the request
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub")); // Logged-in user ID
+                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub")); // Logged-in user's ID
 
                 // Check if the user's role allows them to perform this action
                 if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
@@ -198,25 +198,25 @@ namespace HospitalSystemTeamTask.Controllers
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }
 
-                // Ensure doctors can only update their own details
-                if (userRole == "doctor" && userId != DID)
+                // If the user is a doctor, ensure they can only update their own details
+                if (userRole == "doctor")
                 {
-                    return BadRequest(new { message = "Doctors can only update their own details." });
+                    input.DID= userId; // Ensure the doctor can only update their own details
                 }
 
                 // Validate the input
-                if (DID <= 0)
-                {
-                    return BadRequest(new { message = "Invalid Doctor ID (DID)." });
-                }
-
                 if (input == null)
                 {
                     return BadRequest(new { message = "Updated doctor details are required." });
                 }
 
-                // Call service layer to update doctor details
-                _doctorServicee.UpdateDoctorDetails(DID, input);
+                if (input.DID <= 0)
+                {
+                    return BadRequest(new { message = "Invalid Doctor ID." });
+                }
+
+                // Call the service layer to update doctor details
+                _doctorServicee.UpdateDoctorDetails(input.DID, input);
 
                 return Ok(new { message = "Doctor details updated successfully." });
             }
@@ -233,6 +233,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
         }
+
 
     }
 }
