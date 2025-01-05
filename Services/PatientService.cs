@@ -91,30 +91,24 @@ namespace HospitalSystemTeamTask.Services
         }
 
 
-        public void UpdatePatientDetails( int UID, PatientUpdate patientInput)
+        public void UpdatePatientDetails( int UID, string phoneNumber)
         {
            
             //get patient data from user table
             var existingUser = _userService.GetUserById(UID);
 
-            //update patient data (only accept to update user name and phone number)
-            existingUser.Password = patientInput.Password;
-            existingUser.Phone = patientInput.Phone;
+            //update patient data (only accept to update phone number)
+            existingUser.Phone = phoneNumber;
 
             if (existingUser == null)
             {
                 throw new KeyNotFoundException("Patient not found.");
             }
-            // Validate and hash the password if provided
-            if (!string.IsNullOrEmpty(patientInput.Password))
-            {
-                var hashedPassword = HashingPassword.Hshing(patientInput.Password);
-                existingUser.Password = hashedPassword; // Update with hashed password
-            }
+           
             // Validate and update the user's name and phone number
-            if (!string.IsNullOrEmpty(patientInput.Phone) &&
-                int.TryParse(patientInput.Phone, out int parsedPhone) &&
-                patientInput.Phone.Length == 8)
+            if (!string.IsNullOrEmpty(phoneNumber) &&
+                int.TryParse(phoneNumber, out int parsedPhone) &&
+                phoneNumber.Length == 8)
             {
                 existingUser.Phone = parsedPhone.ToString(); // Update phone as a string after validation
             }

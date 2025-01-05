@@ -58,8 +58,8 @@ namespace HospitalSystemTeamTask.Controllers
 
 
        
-        [HttpPut("UpdatePatientDetails")]
-        public IActionResult UpdatePatientDetails( int UID, PatientUpdate input)
+        [HttpPut("UpdatePatientphoneNumber")]
+        public IActionResult UpdatePatientDetails( int UID, string phoneNumber)
         {
             try
             {
@@ -74,9 +74,9 @@ namespace HospitalSystemTeamTask.Controllers
                     return BadRequest("You are not authorized to perform this action.");
                 }
 
-                if (input == null)
+                if ( phoneNumber == null)
                 {
-                    return BadRequest("Patient details are required.");
+                    return BadRequest("Patient phone Number are required.");
                 }
                 if (UID <= 0)
                 {
@@ -84,9 +84,9 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
 
-                _PatientService.UpdatePatientDetails(UID, input);
+                _PatientService.UpdatePatientDetails(UID,phoneNumber);
 
-                return Ok("Patient details updated successfully.");
+                return Ok("Patient phone Number updated successfully.");
 
             }
 

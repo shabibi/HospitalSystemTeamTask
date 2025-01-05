@@ -7,7 +7,7 @@ namespace HospitalSystemTeamTask.Services
     {
         IEnumerable<Patient> GetAllPatients();
         Patient GetPatientById(int Pid);
-        void UpdatePatientDetails(int UID, PatientUpdate patientInput);
+        void UpdatePatientDetails(int UID, string phoneNumber);
         void AddPatient(PatientInputDTO patientInput);
         Patient GetPatientByName(string PatientName);
         PatienoutputDTO GetPatientData(string? userName, int? Pid);
