@@ -80,7 +80,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
         [Authorize]
         [HttpPatch("UpdateDepartment/{id}")]
-        public IActionResult UpdateDepartment(int id, [FromBody] DepartmentDTO departmentDto)
+        public IActionResult UpdateDepartment(int id, [FromBody] DepDTO departmentDto)
         {
             if (!ModelState.IsValid)
             {

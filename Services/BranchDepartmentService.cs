@@ -42,20 +42,22 @@ namespace HospitalSystemTeamTask.Services
 
         }
 
-        public IEnumerable<DepartmentDTO>GetDepartmentsByBranch(string BranchName)
+        public IEnumerable<DepDTO>GetDepartmentsByBranch(string BranchName)
         {
             var branch = _branchService.GetBranchDetailsByBranchName(BranchName);
             if (branch == null || !branch.IsActive)
                 throw new Exception($"{BranchName} Not Found");
 
            var departments = _branchDepartmentRepo.GetDepartmentsByBranch(branch.BID);
-            List<DepartmentDTO> result = new List<DepartmentDTO>();
+            List<DepDTO> result = new List<DepDTO>();
             foreach (var department in departments)
             {
-                result.Add(new DepartmentDTO {
+                result.Add(new DepDTO
+                {
                     DepartmentName = department.DepartmentName,
                     DepartmentStatus = department.IsActive,
                     DepId = department.DepID 
+                    
                 });
             }
             return result;
