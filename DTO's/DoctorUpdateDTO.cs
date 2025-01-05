@@ -4,10 +4,10 @@ namespace HospitalSystemTeamTask.DTO_s
 {
     public class DoctorUpdateDTO
     {
+        public int DID { get; set; }
         [Required]
         public string Phone { get; set; }
-     
-
+  
         [Required]
         public int DepId { get; set; }
         [Required]
