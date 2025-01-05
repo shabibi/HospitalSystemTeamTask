@@ -156,18 +156,37 @@ namespace HospitalSystemTeamTask.Controllers
                 // Extract the token from the request and validate it
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                int loggedInUserId = int.Parse(JwtHelper.GetClaimValue(token, "sub")); // Assuming "sub" holds the user ID
 
                 if (string.IsNullOrEmpty(token))
                 {
                     return Unauthorized(new { message = "Token is missing or invalid." });
                 }
-                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
+
+                // Check if the user has sufficient authorization
+                if (string.IsNullOrEmpty(userRole))
                 {
                     return Unauthorized(new { message = "You are not authorized to perform this action." });
                 }
-                
+
                 // Call the service method to get booked appointments based on the provided parameters
                 var bookedAppointments = _bookingService.GetBookedAppointments(patientId, clinicId, departmentId, date);
+
+                // If the user is a patient, filter appointments to show only theirs
+                if (userRole == "patient" && bookedAppointments != null)
+                {  
+                    // Check if the provided patientId is the same as the logged-in patient
+                    if (patientId.HasValue && patientId.Value != loggedInUserId)
+                    {
+                        return Unauthorized(new { message = "You are not authorized to view another patient's appointments." });
+                    }
+
+                    // Filter appointments to only show the logged-in patient's appointments if no patientId is provided
+                    if (patientId == null)
+                    {
+                        bookedAppointments = bookedAppointments.Where(a => a.PID == loggedInUserId).ToList();
+                    }
+                }
 
                 // Return the result as an OkResponse with the booked appointments
                 return Ok(bookedAppointments);
