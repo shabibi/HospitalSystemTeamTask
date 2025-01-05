@@ -6,10 +6,7 @@ namespace HospitalSystemTeamTask.DTO_s
     {
         [Required]
         public string Phone { get; set; }
-        [Required]
-        [RegularExpression(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
-        ErrorMessage = "Password must be at least 8 characters long, including at least one uppercase letter, one lowercase letter, one number, and one special character.")]
-        public string Password { get; set; }
+     
 
         [Required]
         public int DepId { get; set; }
@@ -21,7 +18,7 @@ namespace HospitalSystemTeamTask.DTO_s
         public string Degree { get; set; }
         [Required]
         public int WorkingYear { get; set; }
-        public int CID { get; set; }
+       
 
 
     }

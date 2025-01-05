@@ -182,47 +182,57 @@ namespace HospitalSystemTeamTask.Controllers
 
         }
         //[Authorize(Roles = "admin,doctor")]
-        [HttpPut("UpdateDoctorDetails/{UID}/{DID}")]
-        public IActionResult UpdateDoctorDetails(int UID, int DID,  DoctorUpdateDTO input)
+        [HttpPut("UpdateDoctorDetails/{DID}")]
+        public IActionResult UpdateDoctorDetails(int DID,  DoctorUpdateDTO input)
         {
             try
             {
                 // Extract the token from the request and retrieve the user's role
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub")); // Logged-in user ID
 
                 // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
+                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin" && userRole != "doctor"))
                 {
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }
 
+                // Ensure doctors can only update their own details
+                if (userRole == "doctor" && userId != DID)
+                {
+                    return BadRequest(new { message = "Doctors can only update their own details." });
+                }
+
+                // Validate the input
+                if (DID <= 0)
+                {
+                    return BadRequest(new { message = "Invalid Doctor ID (DID)." });
+                }
+
                 if (input == null)
                 {
-                    return BadRequest("Updated doctor details are required.");
+                    return BadRequest(new { message = "Updated doctor details are required." });
                 }
 
-                if (UID <= 0 || DID <= 0)
-                {
-                    return BadRequest("Invalid UID or DID.");
-                }
+                // Call service layer to update doctor details
+                _doctorServicee.UpdateDoctorDetails(DID, input);
 
-                _doctorServicee.UpdateDoctorDetails(UID, DID, input);
-                return Ok("Doctor details updated successfully.");
+                return Ok(new { message = "Doctor details updated successfully." });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
-
         }
+
     }
 }

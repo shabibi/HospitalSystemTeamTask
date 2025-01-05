@@ -180,7 +180,7 @@ namespace HospitalSystemTeamTask.Services
             return doctorDtos;
         }
 
-        public void UpdateDoctorDetails(int UID, int DID, DoctorUpdateDTO input)
+        public void UpdateDoctorDetails( int DID, DoctorUpdateDTO input)
         {
             if (input == null)
             {
@@ -188,14 +188,14 @@ namespace HospitalSystemTeamTask.Services
             }
 
             // Get the user associated with the doctor
-            var existingUser = _UserService.GetUserById(UID);
+            var existingUser = _UserService.GetUserById(DID);
             if (existingUser == null)
             {
                 throw new KeyNotFoundException("Doctor user not found.");
             }
 
             // Update user details
-            existingUser.Password = input.Password;
+           
             existingUser.Phone = input.Phone;
             _UserService.UpdateUser(existingUser);
 
@@ -212,8 +212,7 @@ namespace HospitalSystemTeamTask.Services
             existingDoctor.Degree = input.Degree;
             existingDoctor.DepId = input.DepId;
             existingDoctor.WorkingYear = input.WorkingYear;
-            existingDoctor.CID = input.CID;
-
+          
             _DoctorRepo.UpdateDoctor(existingDoctor);
         }
 
