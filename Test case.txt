@@ -288,13 +288,6 @@ Test Steps:
 2. Assert that a KeyNotFoundException is thrown.
 Expected Result: KeyNotFoundException is thrown.
 
-Test Case 8: SetDepartmentActiveStatus - Invalid Status
-Description: Try setting an invalid status (not active or inactive).
-Test Steps:
-1. Call the SetDepartmentActiveStatus method with an invalid value for isActive.
-2. Assert that the method throws an error.
-Expected Result: An error is thrown due to invalid status.
-
 
 branch_service_test_cases:
 

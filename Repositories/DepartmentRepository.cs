@@ -54,11 +54,14 @@ namespace HospitalSystemTeamTask.Repositories
         public void SetDepartmentActiveStatus(int departmentId, bool isActive)
         {
             var department = _context.Departments.Find(departmentId);
-            if (department != null)
+            if (department == null)
             {
-                department.IsActive = isActive;
-                SaveChanges();
+                throw new KeyNotFoundException("Department not found.");
             }
+
+            department.IsActive = isActive;
+            SaveChanges();
         }
+
     }
 }
