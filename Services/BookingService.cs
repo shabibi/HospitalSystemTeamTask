@@ -283,24 +283,49 @@ namespace HospitalSystemTeamTask.Services
         {
            return _bookingRepo.GetBookingsByClinicAndDate(clinicId, date);
         }
-        public void UpdateBookingDetails(int BookingID, BookingInputDTO input)
+        public void UpdateBookedAppointment(BookingInputDTO previousAppointment, BookingInputDTO newAppointment, int patientId)
         {
-        //    var existingBooking = _bookingRepo.GetBookingById(BookingID);
+            // Retrieve the existing (previous) appointment
+            var previousBookedAppointment = _bookingRepo
+                .GetBookingsByClinicAndDate(previousAppointment.CID, previousAppointment.Date)
+                .FirstOrDefault(b => b.StartTime == previousAppointment.StartTime);
 
+            // Validate if the previous appointment exists and is booked
+            if (previousBookedAppointment == null)
+                throw new Exception("No appointment found for the provided details.");
 
+            if (!previousBookedAppointment.Staus)
+                throw new Exception("The appointment is not currently booked and cannot be updated.");
 
-        //    // Map updated properties
-        //    existingBooking.BookingDate = input.BookingDate;
-        //    existingBooking.CID = input.CID;
-        //    existingBooking.StartTime = input.StartTime;
-        //    existingBooking.EndTime = input.EndTime;
-        //    existingBooking.Staus = input.Staus;
-        //    existingBooking.PID = input.PID;
-        //    existingBooking.Date = input.Date;
-            
+            // Ensure the patient owns the appointment
+            if (previousBookedAppointment.PID != patientId)
+                throw new Exception("You cannot update an appointment booked by another patient.");
 
-        //    // Persist changes
-        //    _bookingRepo.UpdateBooking(existingBooking);
+            // Retrieve the new appointment slot
+            var newAppointmentSlot = _bookingRepo
+                .GetBookingsByClinicAndDate(newAppointment.CID, newAppointment.Date)
+                .FirstOrDefault(b => b.StartTime == newAppointment.StartTime);
+
+            // Validate if the new appointment slot exists and is available
+            if (newAppointmentSlot == null)
+                throw new Exception("No appointment found for the new provided details.");
+
+            if (newAppointmentSlot.Staus)
+                throw new Exception("The new appointment slot is already booked.");
+
+            // Update the previous appointment to be unbooked
+            previousBookedAppointment.PID = null;
+            previousBookedAppointment.BookingDate = null;
+            previousBookedAppointment.Staus = false;
+
+            _bookingRepo.UpdateBooking(previousBookedAppointment);
+
+            // Update the new appointment slot to be booked by the patient
+            newAppointmentSlot.Staus = true;
+            newAppointmentSlot.PID = patientId;
+            newAppointmentSlot.BookingDate = DateTime.Today;
+
+            _bookingRepo.UpdateBooking(newAppointmentSlot);
         }
 
 

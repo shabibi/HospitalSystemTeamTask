@@ -106,7 +106,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
         [HttpGet("availableAppointments")]
-        public IActionResult GetAvailableAppointmentsBy([FromQuery] int? clinicId, [FromQuery] int? departmentId)
+        public IActionResult GetAvailableAppointmentsBy([FromBody] int? clinicId, int? departmentId)
         {
             try
             {
@@ -236,8 +236,49 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
+        [HttpPatch("updateAppointment")]
+        public IActionResult UpdateAppointment([FromBody] UpdateBookingDTO updateAppointmentDTO)
+        {
+            try
+            {
+                // Extract the patient ID from the token
+                string token = JwtHelper.ExtractToken(Request);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Token is missing or invalid." });
+                }
 
+                int patientId = int.Parse(JwtHelper.GetClaimValue(token, "sub")); // Assuming "sub" holds the patient's ID
+
+                // Call the service to update the appointment
+                _bookingService.UpdateBookedAppointment(updateAppointmentDTO.PreviousAppointment, updateAppointmentDTO.NewAppointment, patientId);
+
+                return Ok(new { message = "Appointment successfully updated." });
+            }
+            catch (Exception ex)
+            {
+                // Handle different exceptions and provide meaningful feedback
+                if (ex.Message.Contains("No appointment found"))
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                if (ex.Message.Contains("cannot update for another patient"))
+                {
+                    return Unauthorized(new { message = ex.Message });
+                }
+                if (ex.Message.Contains("already booked") || ex.Message.Contains("not currently booked"))
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
+
+                // Handle unexpected errors
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
     }
 
 
 }
+
+
+
