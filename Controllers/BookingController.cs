@@ -106,7 +106,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
 
         [HttpGet("availableAppointments")]
-        public IActionResult GetAvailableAppointmentsBy([FromBody] int? clinicId, int? departmentId)
+        public IActionResult GetAvailableAppointmentsBy(int? clinicId, int? departmentId)
         {
             try
             {
