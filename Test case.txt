@@ -101,25 +101,25 @@ user_service_test_cases
 
 1. RegisterSuperAdmin
 Test Case 1.1: Valid input for super admin registration.
-Input: { "UserName": "adminUser", "Role": "superAdmin", "Phone": "1234567890" }
+Input: { "UserName": "ahmed", "Role": "superAdmin", "Phone": "1234567890" }
 Expected Output: 200 OK with message "Super Admin registered successfully."
 
 Test Case 1.2: Invalid role for super admin registration.
-Input: { "UserName": "adminUser", "Role": "doctor", "Phone": "1234567890" }
+Input: { "UserName": "ahmed", "Role": "doctor", "Phone": "1234567890" }
 Expected Output: 400 BadRequest with message "Invalid role. Only 'superAdmin' role is allowed."
 
 Test Case 1.3: An active super admin already exists.
-Input: { "UserName": "adminUser", "Role": "superAdmin", "Phone": "1234567890" }
+Input: { "UserName": "ahmed", "Role": "superAdmin", "Phone": "1234567890" }
 Expected Output: 500 Internal Server Error with message "Only one active super admin is allowed in the system."
 
 2. RegisterNewStaff
 Test Case 2.1: Valid staff registration.
-Input: { "UserName": "staffUser", "Role": "doctor", "Phone": "9876543210" }
+Input: { "UserName": "Tareq", "Role": "doctor", "Phone": "9876543210" }
 Expected Output: 200 OK with message "New staff registered successfully."
 
 Test Case 2.2: Invalid role for staff registration.
-Input: { "UserName": "staffUser", "Role": "patient", "Phone": "9876543210" }
-Expected Output: 400 BadRequest with message "Invalid role. Only 'doctor and admin' role is allowed."
+Input: { "UserName": "Tareq", "Role": "patient", "Phone": "9876543210" }
+Expected Output: 400 BadRequest with message "Invalid role. Only Role must be either 'admin' , 'superAdmin' or 'doctor role is allowed."
 
 3. Login
 Test Case 3.1: Valid login credentials.
@@ -134,9 +134,6 @@ Test Case 3.3: Incorrect password.
 Input: Email: "admin@domain.com", Password: "WrongPassword"
 Expected Output: 400 BadRequest with message "Incorrect Password"
 
-Test Case 3.4: Inactive user account.
-Input: Email: "inactive@domain.com", Password: "Super1234"
-Expected Output: 400 BadRequest with message "This user account is inactive"
 
 4. DeactivateUser
 Test Case 4.1: Deactivate an active user.
@@ -152,9 +149,7 @@ Test Case 5.1: Get user data by ID.
 Input: UserID: "101"
 Expected Output: 200 OK with user data.
 
-Test Case 5.2: Get user data by name.
-Input: UserName: "doctorUser"
-Expected Output: 200 OK with user data.
+
 
 Test Case 5.3: User not found by ID or name.
 Input: UserID: "9999", UserName: "nonExistentUser"
@@ -166,17 +161,50 @@ Input: Role: "admin"
 Expected Output: 200 OK with list of users.
 
 Test Case 6.2: Invalid role.
-Input: Role: "patient"
+Input: Role: "Invalidrole"
 Expected Output: 400 BadRequest with message "Invalid input"
 
-7. UpdatePassword
-Test Case 7.1: Valid password update.
-Input: { "UserId": 101, "NewPassword": "NewPass123" }
-Expected Output: 200 OK with message "Password updated successfully."
+Test Case 1: Valid Password Update
 
-Test Case 7.2: New password is empty.
-Input: { "UserId": 101, "NewPassword": "" }
-Expected Output: 400 BadRequest with message "New password is required."
+{
+    "uid": 1,
+    "currentPassword": "Super1234!",
+    "newPassword": "Hh12345@"
+}
+
+Test Case 2: User Not Found
+{
+    "uid": 999,
+    "currentPassword": "OldPassword123!",
+    "newPassword": "NewPassword123!"
+}
+Test Case 3: Current password is incorrect.
+{
+    "uid": 1,
+    "currentPassword": "WrongPassword123!",
+    "newPassword": "NewPassword123!"
+}
+
+Test Case 4:Password must be at least 8 characters long
+{
+    "uid": 1,
+    "currentPassword": "OldPassword123!",
+    "newPassword": "short"
+}
+
+Test Case 5: Weak New Password (No Uppercase Letter)
+{
+    "uid": 1,
+    "currentPassword": "OldPassword123!",
+    "newPassword": "newpassword123!"
+}
+Test Case 8: Weak New Password (No Special Character)
+{
+    "uid": 1,
+    "currentPassword": "OldPassword123!",
+    "newPassword": "NewPassword123"
+}
+
 
 8. Authorization
 Test Case 8.1: Unauthorized user trying to perform admin tasks.
@@ -470,10 +498,6 @@ Test Case 10: Update Patient Record
 
 
 Docter_service_test_case
-1. Test Case: GetAllDoctors
-   - Method: GetAllDoctors
-   - Input: None
-   - Expected Output: List of all doctors
 
 2. Test Case: GetDoctorById_ValidId
    - Method: GetDoctorById
@@ -485,25 +509,6 @@ Docter_service_test_case
    - Input: uid = 999
    - Expected Output: KeyNotFoundException with message "User  with ID 999 not found."
 
-4. Test Case: GetDoctorByEmail_ValidEmail
-   - Method: GetDoctorByEmail
-   - Input: email = "doctor@example.com"
-   - Expected Output: Doctor object associated with the email
-
-5. Test Case: GetDoctorByEmail_NullEmail
-   - Method: GetDoctorByEmail
-   - Input: email = null
-   - Expected Output: ArgumentException with message "Email cannot be null or empty."
-
-6. Test Case: EmailExists_ExistingEmail
-   - Method: EmailExists
-   - Input: email = "doctor@example.com"
-   - Expected Output: true
-
-7. Test Case: EmailExists_NonExistingEmail
-   - Method: EmailExists
-   - Input: email = "nonexistent@example.com"
-   - Expected Output: false
 
 8. Test Case: GetDoctorByName_ValidName
    - Method: GetDoctorByName
@@ -513,17 +518,9 @@ Docter_service_test_case
 9. Test Case: GetDoctorByName_NullName
    - Method: GetDoctorByName
    - Input: docName = null
-   - Expected Output: ArgumentException with message "Doctor name cannot be null or empty."
+   docID= null
+   - Expected Output: ArgumentException with message "Invalid input. Provide either UserID or UserName."
 
-10. Test Case: GetDoctorData_ValidParameters
-    - Method: GetDoctorData
-    - Input: docName = "Dr. Smith", Did = null
-    - Expected Output: DoctorOutPutDTO object for "Dr. Smith"
-
-11. Test Case: GetDoctorData_InvalidParameters
-    - Method: GetDoctorData
-    - Input: docName = null, Did = null
-    - Expected Output: ArgumentException with message "Either docName or doctor ID must be provided."
 
 12. Test Case: AddDoctor_ValidInput
     - Method: AddDoctor
@@ -537,8 +534,8 @@ Docter_service_test_case
 
 14. Test Case: GetDoctorsByBranchName_ValidBranch
     - Method: GetDoctorsByBranchName
-    - Input: branchName = "Cardiology"
-    - Expected Output: List of DoctorOutPutDTO for doctors in "Cardiology"
+    - Input: branchName = "Town Branch"
+    - Expected Output: List of DoctorOutPutDTO for doctors in "Town Branch"
 
 15. Test Case: GetDoctorsByBranchName_EmptyBranch
     - Method: GetDoctorsByBranchName
@@ -547,13 +544,13 @@ Docter_service_test_case
 
 16. Test Case: GetDoctorsByDepartmentName_ValidDepartment
     - Method: GetDoctorsByDepartmentName
-    - Input: departmentName = "Pediatrics"
-    - Expected Output: List of DoctorOutPutDTO for doctors in "Pediatrics"
+    - Input: departmentName = "General"
+    - Expected Output: List of DoctorOutPutDTO for doctors in "General"
 
 17. Test Case: GetDoctorsByDepartmentName_EmptyDepartment
     - Method: GetDoctorsByDepartmentName
     - Input: departmentName = ""
-    - Expected Output: ArgumentException with message "Department name is required."
+    - Expected Output: ArgumentException with message "The departmentName field is required.."
 
 18. Test Case: UpdateDoctorDetails_ValidInput
     - Method: UpdateDoctorDetails
@@ -563,12 +560,9 @@ Docter_service_test_case
 19. Test Case: UpdateDoctorDetails_NullInput
     - Method: UpdateDoctorDetails
     - Input: UID = 1, DID = 1, input = null
-    - Expected Output: ArgumentException with message "Doctor update details are required."
+    - Expected Output: ArgumentException with message "The input field is required."
 
-20. Test Case: UpdateDoctorDetails_InvalidUID
-    - Method: UpdateDoctorDetails
-    - Input: UID = -1, DID = 1, DoctorUpdateDTO with valid data
-    - Expected Output: BadRequest with message "Invalid UID or DID."
+
 
 1. Test Case: GetAllClinics
    - Method: GetAllClinic
@@ -583,7 +577,7 @@ Docter_service_test_case
 3. Test Case: AddClinic_NullInput
    - Method: AddClinic
    - Input: null
-   - Expected Output: ArgumentException with message "Clinic details are required."
+   - Expected Output: ArgumentException with message "The input field is required."
 
 4. Test Case: AddClinic_InvalidCapacity
    - Method: AddClinic
@@ -605,15 +599,11 @@ Docter_service_test_case
    - Input: clinicId = 999
    - Expected Output: KeyNotFoundException with message "Clinic with ID 999 not found."
 
-8. Test Case: GetPrice_ValidId
-   - Method: GetPrice
-   - Input: clinicId = 1
-   - Expected Output: Cost of the clinic with ID 1
 
 9. Test Case: GetClinicByName_ValidName
    - Method: GetClinicByName
-   - Input: clinicName = "Health Clinic"
-   - Expected Output: Clinic object with name "Health Clinic"
+   - Input: clinicName = "General"
+   - Expected Output: Clinic object with name "General"
 
 10. Test Case: GetClinicByName_NonExistentName
     - Method: GetClinicByName
@@ -622,13 +612,10 @@ Docter_service_test_case
 
 11. Test Case: GetClinicsByBranchName_ValidBranch
     - Method: GetClinicsByBranchName
-    - Input: branchName = "Downtown"
-    - Expected Output: List of clinics in the "Downtown" branch
+    - Input: branchName = "Town Branch"
+    - Expected Output: List of clinics in the "Town Branch" branch
 
-12. Test Case: GetClinicsByBranchName_EmptyBranch
-    - Method: GetClinicsByBranchName
-    - Input: branchName = ""
-    - Expected Output: ArgumentException with message "Branch name is required."
+
 
 13. Test Case: GetClinicsByBranchName_NonExistentBranch
     - Method: GetClinicsByBranchName
@@ -647,10 +634,6 @@ Docter_service_test_case
 
     clinic_service_test_case
 
-Test Case: GetClinicsByDepartmentId_NonExistentId
-    - Method: GetClinicsByDepartmentId
-    - Input: departmentId = 999
-    - Expected Output: KeyNotFoundException with message "No clinics found for Department ID: 999"
 
 Test Case: UpdateClinicDetails_ValidInput
     - Method: UpdateClinicDetails
@@ -660,7 +643,7 @@ Test Case: UpdateClinicDetails_ValidInput
 Test Case: UpdateClinicDetails_NullInput
     - Method: UpdateClinicDetails
     - Input: CID = 1, input = null
-    - Expected Output: BadRequest with message "Updated clinic details are required."
+    - Expected Output: BadRequest with message "The input field is required."
 
 Test Case: UpdateClinicDetails_InvalidCID
     - Method: UpdateClinicDetails
@@ -671,3 +654,130 @@ Test Case: SetClinicStatus_ValidId
     - Method: SetClinicStatus
     - Input: clinicId = 1, isActive = true
     - Expected Output: Clinic status updated to Active (
+
+
+
+
+
+
+
+
+    Booking_Service_test_case
+Test Case 1: ScheduledAppointments - Unauthorized Access
+Description: Test that an unauthorized user (non-admin or non-superAdmin) cannot access the ScheduledAppointments endpoint.
+Steps:
+1. Send a POST request to /api/Booking/ScheduledAppointments with invalid user role (e.g., "patient").
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 2: ScheduledAppointments - Successful Retrieval
+Description: Test that an authorized user (admin or superAdmin) can successfully retrieve scheduled appointments.
+Steps:
+1. Send a POST request to /api/Booking/ScheduledAppointments with valid user role ("admin" or "superAdmin").
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Scheduled appointments retrieved successfully."
+
+Test Case 3: BookAppointment - Unauthorized Access for Non-Patient
+Description: Test that a non-patient user cannot book an appointment.
+Steps:
+1. Send a POST request to /api/Booking/BookAppointment with user role other than "patient".
+2. Assert that the response status is 400 BadRequest.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 4: BookAppointment - Successful Booking
+Description: Test that a patient can successfully book an appointment.
+Steps:
+1. Send a POST request to /api/Booking/BookAppointment with valid user role ("patient") and a valid booking input.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment booked successfully."
+
+Test Case 5: GetAllBookings - Unauthorized Access
+Description: Test that an unauthorized user (non-admin or non-superAdmin) cannot access the GetAllBookings endpoint.
+Steps:
+1. Send a GET request to /api/Booking/all with invalid user role (e.g., "patient").
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 6: GetAllBookings - Successful Retrieval
+Description: Test that an authorized user (admin or superAdmin) can successfully retrieve all bookings.
+Steps:
+1. Send a GET request to /api/Booking/all with valid user role ("admin" or "superAdmin").
+2. Assert that the response status is 200 OK.
+3. Assert that the response contains the list of bookings.
+
+Test Case 7: GetAvailableAppointmentsBy - Invalid Parameters
+Description: Test that providing both clinicId and departmentId results in an error.
+Steps:
+1. Send a POST request to /api/Booking/availableAppointments with both clinicId and departmentId.
+2. Assert that the response status is 400 BadRequest.
+3. Assert that the response message is "Only one parameter can be provided at a time."
+
+Test Case 8: GetAvailableAppointmentsBy - Successful Retrieval
+Description: Test that providing a valid clinicId or departmentId returns available appointments.
+Steps:
+1. Send a POST request to /api/Booking/availableAppointments with a valid clinicId or departmentId.
+2. Assert that the response status is 200 OK.
+3. Assert that the response contains available appointments.
+
+Test Case 9: GetBookedAppointments - Unauthorized Access
+Description: Test that an unauthorized user cannot access another patient's appointments.
+Steps:
+1. Send a GET request to /api/Booking/bookedAppointments with a different patientId than the logged-in user.
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to view another patient's appointments."
+
+Test Case 10: GetBookedAppointments - Successful Retrieval for Patient
+Description: Test that a patient can only access their own booked appointments.
+Steps:
+1. Send a GET request to /api/Booking/bookedAppointments with valid user role ("patient") and the logged-in patientId.
+2. Assert that the response status is 200 OK.
+3. Assert that the response contains the logged-in patient's appointments.
+
+Test Case 11: CancelAppointment - Unauthorized Access
+Description: Test that a non-patient or non-authorized user cannot cancel an appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/cancelAppointment with user role other than "patient", "admin", "superAdmin", or "doctor".
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You do not have sufficient permissions to cancel this appointment."
+
+Test Case 12: CancelAppointment - Patient Cancelling Own Appointment
+Description: Test that a patient can successfully cancel their own appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/cancelAppointment with valid user role ("patient") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully canceled."
+
+Test Case 13: CancelAppointment - Admin Cancelling Appointment
+Description: Test that an admin can cancel any appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/cancelAppointment with valid user role ("admin") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully canceled."
+
+Test Case 14: UpdateAppointment - Unauthorized Access
+Description: Test that a non-patient cannot update an appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/updateAppointment with user role other than "patient".
+2. Assert that the response status is 400 BadRequest.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 15: UpdateAppointment - Successful Update
+Description: Test that a patient can successfully update their own appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/updateAppointment with valid user role ("patient") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully updated."
+
+Test Case 16: DeleteAppointment - Unauthorized Access
+Description: Test that a non-admin cannot delete an appointment.
+Steps:
+1. Send a DELETE request to /api/Booking/deleteAppointment with user role other than "admin" or "superAdmin".
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 17: DeleteAppointment - Successful Deletion
+Description: Test that an admin can successfully delete an appointment.
+Steps:
+1. Send a DELETE request to /api/Booking/deleteAppointment with valid user role ("admin") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully deleted."

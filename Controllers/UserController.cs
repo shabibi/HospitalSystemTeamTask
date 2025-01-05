@@ -148,44 +148,28 @@ namespace HospitalSystemTeamTask.Controllers
         {
             try
             {
-                // Extract the token from the request
                 string token = JwtHelper.ExtractToken(Request);
-                if (string.IsNullOrEmpty(token))
-                {
-                    return Unauthorized(new { message = "Token is missing or invalid." });
-                }
-
-                // Get the user's role from the token
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
                 // Check if the user's role allows them to perform this action
-                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin"))
-                {
-                    return Unauthorized(new { message = "You are not authorized to perform this action." });
-                }
+                if (userRole == null && userRole != "admin" && userRole != "superAdmin")
+                    return BadRequest("You are not authorized to perform this action.");
 
                 // Validate the user ID
-                if (userId <= 0)
-                {
-                    return BadRequest(new { message = "Invalid user ID provided." });
-                }
+                if (userId < 0)
+                    return BadRequest("Invalid input");
 
-                // Deactivate the user
                 _userService.DeactivateUser(userId);
                 return Ok(new { message = "User deactivated successfully." });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                // Handle cases where the user is not found
-                return NotFound(new { message = ex.Message });
+
             }
             catch (Exception ex)
             {
-                // Handle unexpected errors
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+                // Return a generic error response
+                return StatusCode(500, $"An error occurred while adding the product: {ex.Message}");
             }
         }
-
+        
         [HttpGet("GetUser")]
         public IActionResult GetUser(int? UserID, string ? UserName)
         {
