@@ -174,11 +174,16 @@ namespace HospitalSystemTeamTask.Services
             {
                 throw new ArgumentException("Capacity must be greater than 0.");
             }
+           
 
             int slotTime = (int)(totalDuration.TotalMinutes / input.Capacity);
 
             // Map updated properties
             existingClinic.ClincName = input.ClincName;
+            if (CID <= 0)
+            {
+                throw new ArgumentException("Invalid CID.");
+            }
             existingClinic.Capacity = input.Capacity;
             existingClinic.StartTime = input.StartTime;
             existingClinic.EndTime = input.EndTime;

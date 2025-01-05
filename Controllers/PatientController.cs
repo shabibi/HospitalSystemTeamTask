@@ -153,7 +153,7 @@ namespace HospitalSystemTeamTask.Controllers
 
                 // Check if the user's role allows them to perform this action
                 if (string.IsNullOrEmpty(userRole) ||
-            !(userRole == "admin" || userRole == "superAdmin" || (userRole == "patient" && userId == uid)))
+            !(userRole == "doctor" || userRole == "admin" || userRole == "superAdmin" || (userRole == "patient" && userId == uid)))
                 {
                     return BadRequest("You are not authorized to perform this action.");
                 }
