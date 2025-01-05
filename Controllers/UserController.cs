@@ -220,22 +220,31 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
 
-        [Authorize]
         [HttpPut("UpdatePassword")]
-        public IActionResult UpdatePassword(UpdatePasswordDTO passwordDto)
+        public IActionResult UpdatePassword(UpdatePasswordDTO updatePasswordDto)
         {
+            if (updatePasswordDto == null)
+                return BadRequest("Request body cannot be null.");
+
+            if (string.IsNullOrWhiteSpace(updatePasswordDto.CurrentPassword) || string.IsNullOrWhiteSpace(updatePasswordDto.NewPassword))
+                return BadRequest("Both current and new passwords are required.");
+
             try
             {
-                if (string.IsNullOrEmpty(passwordDto.NewPassword))
-                    return BadRequest("New password is required.");
-
-                _userService.UpdatePassword(passwordDto.UserId, passwordDto.NewPassword);
-
+                _userService.UpdatePassword(updatePasswordDto.UserId, updatePasswordDto.CurrentPassword, updatePasswordDto.NewPassword);
                 return Ok("Password updated successfully.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred while updating the password: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
