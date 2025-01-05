@@ -125,8 +125,10 @@ namespace HospitalSystemTeamTask.Controllers
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
                 // Check if the user's role allows them to perform this action
-                if (userRole == null && userRole != "admin" && userRole != "superAdmin")
-                    return BadRequest("You are not authorized to perform this action.");
+                if (string.IsNullOrEmpty(userRole) || (userRole != "admin" && userRole != "superAdmin"))
+                {
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
+                }
 
                 // Validate the user ID
                 if (userId < 0)
