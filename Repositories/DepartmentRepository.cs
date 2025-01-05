@@ -30,25 +30,38 @@ namespace HospitalSystemTeamTask.Repositories
         {
             _context.SaveChanges();
         }
-        public void UpdateDepartment(int departmentId, Department updatedDepartment)
+
+        public Department GetDepartmentById(int id)
         {
-            var existingDepartment = _context.Departments.Find(departmentId);
-            if (existingDepartment != null)
+            return _context.Departments.FirstOrDefault(d => d.DepID == id);
+        }
+
+        public void UpdateDepartment(int id, Department updatedDepartment)
+        {
+            var existingDepartment = _context.Departments.FirstOrDefault(d => d.DepID == id);
+            if (existingDepartment == null)
             {
-                existingDepartment.DepartmentName = updatedDepartment.DepartmentName;
-                existingDepartment.Description = updatedDepartment.Description;
-                SaveChanges();
+                throw new KeyNotFoundException("Department not found.");
             }
+
+            existingDepartment.DepartmentName = updatedDepartment.DepartmentName;
+            existingDepartment.Description = updatedDepartment.Description;
+            existingDepartment.IsActive = updatedDepartment.IsActive;
+
+            _context.SaveChanges();
         }
 
         public void SetDepartmentActiveStatus(int departmentId, bool isActive)
         {
             var department = _context.Departments.Find(departmentId);
-            if (department != null)
+            if (department == null)
             {
-                department.IsActive = isActive;
-                SaveChanges();
+                throw new KeyNotFoundException("Department not found.");
             }
+
+            department.IsActive = isActive;
+            SaveChanges();
         }
+
     }
 }

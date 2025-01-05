@@ -37,15 +37,16 @@ namespace HospitalSystemTeamTask.Services
             _departmentRepository.AddDepartment(department);
         }
 
-        public void UpdateDepartment(int departmentId, DepartmentDTO departmentDto)
+        public void UpdateDepartment(int id, DepartmentDTO departmentDto)
         {
             var updatedDepartment = new Department
             {
                 DepartmentName = departmentDto.DepartmentName,
-                Description = departmentDto.Description
+                Description = departmentDto.Description,
+                IsActive = departmentDto.DepartmentStatus
             };
 
-            _departmentRepository.UpdateDepartment(departmentId, updatedDepartment);
+            _departmentRepository.UpdateDepartment(id, updatedDepartment);
         }
 
         public void SetDepartmentActiveStatus(int departmentId, bool isActive)

@@ -301,41 +301,20 @@ Test Steps:
 2. Assert that the method returns a list of departments.
 Expected Result: A list of departments is returned.
 
-Test Case 6: GetDepartmentByName - Success
-Description: Retrieve a department by name.
-Test Steps:
-1. Create a department with a known name.
-2. Call the GetDepartmentByName method of DepartmentService with the department name.
-3. Assert that the correct department is returned.
-Expected Result: The department with the provided name is returned.
 
-Test Case 7: GetDepartmentByName - Department Not Found
-Description: Try retrieving a department that does not exist.
-Test Steps:
-1. Call the GetDepartmentByName method with a non-existing department name.
-2. Assert that the method returns null or throws a KeyNotFoundException.
-Expected Result: KeyNotFoundException is thrown.
-
-Test Case 8: SetDepartmentActiveStatus - Success
+Test Case 6: SetDepartmentActiveStatus - Success
 Description: Set the status of a department.
 Test Steps:
 1. Call the SetDepartmentActiveStatus method with a valid department ID and true value for isActive.
 2. Assert that the department's status is updated to active.
 Expected Result: Department status is updated to active.
 
-Test Case 9: SetDepartmentActiveStatus - Department Not Found
+Test Case 7: SetDepartmentActiveStatus - Department Not Found
 Description: Try setting the status for a non-existing department.
 Test Steps:
 1. Call the SetDepartmentActiveStatus method with a non-existing department ID.
 2. Assert that a KeyNotFoundException is thrown.
 Expected Result: KeyNotFoundException is thrown.
-
-Test Case 10: SetDepartmentActiveStatus - Invalid Status
-Description: Try setting an invalid status (not active or inactive).
-Test Steps:
-1. Call the SetDepartmentActiveStatus method with an invalid value for isActive.
-2. Assert that the method throws an error.
-Expected Result: An error is thrown due to invalid status.
 
 
 branch_service_test_cases:

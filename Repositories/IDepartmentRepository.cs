@@ -10,5 +10,6 @@ namespace HospitalSystemTeamTask.Repositories
         Department GetDepartmentByName(string departmentName);
         void UpdateDepartment(int departmentId, Department updatedDepartment);
         void SetDepartmentActiveStatus(int departmentId, bool isActive);
+        Department GetDepartmentById(int id);
     }
 }

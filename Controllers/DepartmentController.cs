@@ -82,13 +82,22 @@ namespace HospitalSystemTeamTask.Controllers
         [HttpPatch("UpdateDepartment/{id}")]
         public IActionResult UpdateDepartment(int id, [FromBody] DepartmentDTO departmentDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != departmentDto.DepId)
+            {
+                return BadRequest(new { message = "ID in the URL does not match ID in the body." });
+            }
+
             try
             {
-                // Extract the token from the request and retrieve the user's role
+                // Extract the token and validate the user's role
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-                // Check if the user's role allows them to perform this action
                 if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
                 {
                     return BadRequest(new { message = "You are not authorized to perform this action." });
@@ -96,11 +105,12 @@ namespace HospitalSystemTeamTask.Controllers
 
                 // Update the department
                 _departmentService.UpdateDepartment(id, departmentDto);
+
                 return Ok(new { message = "Department updated successfully." });
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = "Department not found." });
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -114,29 +124,31 @@ namespace HospitalSystemTeamTask.Controllers
         {
             try
             {
-                // Extract the token from the request and retrieve the user's role
+                // Extract token and user role
                 string token = JwtHelper.ExtractToken(Request);
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-                // Check if the user's role allows them to perform this action
+                // Check user role
                 if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
                 {
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }
 
+                // Call service to set department status
                 _departmentService.SetDepartmentActiveStatus(id, isActive);
                 var statusMessage = isActive ? "activated" : "deactivated";
                 return Ok(new { message = $"Department {statusMessage} successfully." });
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = "Department not found." });
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while updating the department status.", error = ex.Message });
             }
         }
+
 
 
     }
