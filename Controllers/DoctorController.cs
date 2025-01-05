@@ -25,47 +25,37 @@ namespace HospitalSystemTeamTask.Controllers
             _configuration = configuration;
         }
 
-        //[HttpGet("GetDoctorByEmail")]
-        //public IActionResult GetDoctorByEmail(string email)
-        //{
-        //    try
-        //    {
-        //        var doctor = _doctorServicee.GetDoctorByEmail(email);
-        //        if (doctor == null)
-        //        {
-        //            return NotFound("Doctor not found.");
-        //        }
+        [HttpPost("AddDoctor")]
+        public IActionResult AddDoctor(DoctorOutPutDTO input)
+        {
+            try
+            {
 
-        //        return Ok(doctor);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, ex.Message);
-        //    }
-        //}
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
-        //[HttpGet("GetDoctorByName")]
-        //public IActionResult GetDoctorByName(string docName)
-        //{
-        //    try
-        //    {
-        //        var doctor = _doctorServicee.GetDoctorByName(docName);
-        //        if (doctor == null)
-        //        {
-        //            return NotFound("Doctor not found.");
-        //        }
+                // Check if the user's role allows them to perform this action
+                if (userRole == null || (userRole != "admin" && userRole != "supperAdmin"))
+                {
+                    return BadRequest(new { message = "You are not authorized to perform this action." });
+                }
+                if (input == null || input.UID <= 0)
+                    return BadRequest("Invalid input. Doctor information and a valid ID are required.");
 
-        //        return Ok(doctor);
-        //    }
-        //    catch (ArgumentException ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "An error occurred while processing your request.");
-        //    }
-        //}
+                // Add doctor using the service
+                _doctorServicee.AddDoctor(input);
+
+                return Ok(new { message = "Doctor added successfully." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred while adding the doctor. {ex.Message}" });
+            }
+        }
 
         [HttpGet("GetDoctor")]
         public IActionResult GetDoctor(int? DocID, string? DocName)
@@ -103,38 +93,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, $"An error occurred while retrieving user. {(ex.Message)}");
             }
         }
-        [HttpPost("AddDoctor")]
-        public IActionResult AddDoctor( DoctorOutPutDTO input)
-        {
-            try
-            {
-
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "supperAdmin"))
-                {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
-                }
-                if (input == null || input.UID <= 0)
-                    return BadRequest("Invalid input. Doctor information and a valid ID are required.");
-
-                // Add doctor using the service
-                _doctorServicee.AddDoctor(input);
-
-                return Ok(new { message = "Doctor added successfully." });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"An error occurred while adding the doctor. {ex.Message}" });
-            }
-        }
-
+       
         [HttpGet("GetDoctorsByBranch")]
         public IActionResult GetDoctorsByBranch(string branchName)
         {
@@ -198,12 +157,6 @@ namespace HospitalSystemTeamTask.Controllers
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }
 
-                // If the user is a doctor, ensure they can only update their own details
-                if (userRole == "doctor")
-                {
-                    input.DID= userId; // Ensure the doctor can only update their own details
-                }
-
                 // Validate the input
                 if (input == null)
                 {
@@ -216,7 +169,7 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Call the service layer to update doctor details
-                _doctorServicee.UpdateDoctorDetails(input.DID, input);
+                _doctorServicee.UpdateDoctorDetails( input);
 
                 return Ok(new { message = "Doctor details updated successfully." });
             }

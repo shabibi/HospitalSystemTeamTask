@@ -2,6 +2,7 @@
 using HospitalSystemTeamTask.DTO_s;
 using HospitalSystemTeamTask.Models;
 using HospitalSystemTeamTask.Repositories;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
 
@@ -11,13 +12,13 @@ namespace HospitalSystemTeamTask.Services
     {
         private readonly IDoctorRepo _DoctorRepo;
         private readonly IUserService _UserService;
+        private readonly IBranchDepartmentService _branchDepartment;
 
-
-        public DoctorService(IDoctorRepo DoctorRepo, IUserService userService)
+        public DoctorService(IDoctorRepo DoctorRepo, IUserService userService, IBranchDepartmentService branchDepartment)
         {
             _DoctorRepo = DoctorRepo;
             _UserService = userService;
-
+            _branchDepartment = branchDepartment;
         }
         public IEnumerable<Doctor> GetAllDoctors()
         {
@@ -121,12 +122,8 @@ namespace HospitalSystemTeamTask.Services
                 CID = input.CID,
             };
 
-
-
             // Save the doctor
             _DoctorRepo.AddDoctor(doctor);
-
-
 
         }
 
@@ -180,41 +177,63 @@ namespace HospitalSystemTeamTask.Services
             return doctorDtos;
         }
 
-        public void UpdateDoctorDetails( int DID, DoctorUpdateDTO input)
+        public void UpdateDoctorDetails(DoctorUpdateDTO input)
         {
             if (input == null)
             {
                 throw new ArgumentException("Doctor update details are required.");
             }
 
-            // Get the user associated with the doctor
-            var existingUser = _UserService.GetUserById(DID);
-            if (existingUser == null)
+            if (input.DID == null)
             {
-                throw new KeyNotFoundException("Doctor user not found.");
+                throw new ArgumentException("Doctor ID is required.");
+            }
+            var branchDep = _branchDepartment.GetBranchDep(input.DepId, input.CurrentBrunch);
+            if(branchDep == null)
+                throw new ArgumentException("The department is not assigned to the given branch.");
+
+            // Get doctor and user entities
+            var existingDoctor = _DoctorRepo.GetDoctorById(input.DID);
+            var existingUser = _UserService.GetUserById(input.DID);
+
+            if (existingDoctor == null || existingUser == null)
+            {
+                throw new KeyNotFoundException("Doctor or associated user not found.");
             }
 
-            // Update user details
-           
-            existingUser.Phone = input.Phone;
-            _UserService.UpdateUser(existingUser);
-
-            // Get doctor entity
-            var existingDoctor = _DoctorRepo.GetDoctorById(DID);
-            if (existingDoctor == null)
+            if (!existingUser.IsActive)
             {
-                throw new KeyNotFoundException("Doctor entity not found.");
+                throw new InvalidOperationException("This doctor is no longer active in the system.");
             }
 
-            // Update doctor details
-            existingDoctor.CurrentBrunch = input.CurrentBrunch;
-            existingDoctor.Level = input.Level;
-            existingDoctor.Degree = input.Degree;
-            existingDoctor.DepId = input.DepId;
-            existingDoctor.WorkingYear = input.WorkingYear;
-          
-            _DoctorRepo.UpdateDoctor(existingDoctor);
+            // Validate input details
+            if (string.IsNullOrEmpty(input.Phone) || input.WorkingYear < 0)
+            {
+                throw new ArgumentException("Invalid input details.");
+            }
+
+            try
+            {
+                // Update user details
+                existingUser.Phone = input.Phone;
+                _UserService.UpdateUser(existingUser);
+
+                // Update doctor details
+                existingDoctor.CurrentBrunch = input.CurrentBrunch;
+                existingDoctor.Level = input.Level;
+                existingDoctor.Degree = input.Degree;
+                existingDoctor.DepId = input.DepId;
+                existingDoctor.WorkingYear = input.WorkingYear;
+
+                _DoctorRepo.UpdateDoctor(existingDoctor);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to update doctor details for ID: {input.DID}. Error: {ex.Message}");
+               
+            }
         }
+
 
         public void UpdateDoctor(Doctor doctor)
         {
