@@ -671,3 +671,130 @@ Test Case: SetClinicStatus_ValidId
     - Method: SetClinicStatus
     - Input: clinicId = 1, isActive = true
     - Expected Output: Clinic status updated to Active (
+
+
+
+
+
+
+
+
+    Booking_Service_test_case
+Test Case 1: ScheduledAppointments - Unauthorized Access
+Description: Test that an unauthorized user (non-admin or non-superAdmin) cannot access the ScheduledAppointments endpoint.
+Steps:
+1. Send a POST request to /api/Booking/ScheduledAppointments with invalid user role (e.g., "patient").
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 2: ScheduledAppointments - Successful Retrieval
+Description: Test that an authorized user (admin or superAdmin) can successfully retrieve scheduled appointments.
+Steps:
+1. Send a POST request to /api/Booking/ScheduledAppointments with valid user role ("admin" or "superAdmin").
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Scheduled appointments retrieved successfully."
+
+Test Case 3: BookAppointment - Unauthorized Access for Non-Patient
+Description: Test that a non-patient user cannot book an appointment.
+Steps:
+1. Send a POST request to /api/Booking/BookAppointment with user role other than "patient".
+2. Assert that the response status is 400 BadRequest.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 4: BookAppointment - Successful Booking
+Description: Test that a patient can successfully book an appointment.
+Steps:
+1. Send a POST request to /api/Booking/BookAppointment with valid user role ("patient") and a valid booking input.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment booked successfully."
+
+Test Case 5: GetAllBookings - Unauthorized Access
+Description: Test that an unauthorized user (non-admin or non-superAdmin) cannot access the GetAllBookings endpoint.
+Steps:
+1. Send a GET request to /api/Booking/all with invalid user role (e.g., "patient").
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 6: GetAllBookings - Successful Retrieval
+Description: Test that an authorized user (admin or superAdmin) can successfully retrieve all bookings.
+Steps:
+1. Send a GET request to /api/Booking/all with valid user role ("admin" or "superAdmin").
+2. Assert that the response status is 200 OK.
+3. Assert that the response contains the list of bookings.
+
+Test Case 7: GetAvailableAppointmentsBy - Invalid Parameters
+Description: Test that providing both clinicId and departmentId results in an error.
+Steps:
+1. Send a POST request to /api/Booking/availableAppointments with both clinicId and departmentId.
+2. Assert that the response status is 400 BadRequest.
+3. Assert that the response message is "Only one parameter can be provided at a time."
+
+Test Case 8: GetAvailableAppointmentsBy - Successful Retrieval
+Description: Test that providing a valid clinicId or departmentId returns available appointments.
+Steps:
+1. Send a POST request to /api/Booking/availableAppointments with a valid clinicId or departmentId.
+2. Assert that the response status is 200 OK.
+3. Assert that the response contains available appointments.
+
+Test Case 9: GetBookedAppointments - Unauthorized Access
+Description: Test that an unauthorized user cannot access another patient's appointments.
+Steps:
+1. Send a GET request to /api/Booking/bookedAppointments with a different patientId than the logged-in user.
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to view another patient's appointments."
+
+Test Case 10: GetBookedAppointments - Successful Retrieval for Patient
+Description: Test that a patient can only access their own booked appointments.
+Steps:
+1. Send a GET request to /api/Booking/bookedAppointments with valid user role ("patient") and the logged-in patientId.
+2. Assert that the response status is 200 OK.
+3. Assert that the response contains the logged-in patient's appointments.
+
+Test Case 11: CancelAppointment - Unauthorized Access
+Description: Test that a non-patient or non-authorized user cannot cancel an appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/cancelAppointment with user role other than "patient", "admin", "superAdmin", or "doctor".
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You do not have sufficient permissions to cancel this appointment."
+
+Test Case 12: CancelAppointment - Patient Cancelling Own Appointment
+Description: Test that a patient can successfully cancel their own appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/cancelAppointment with valid user role ("patient") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully canceled."
+
+Test Case 13: CancelAppointment - Admin Cancelling Appointment
+Description: Test that an admin can cancel any appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/cancelAppointment with valid user role ("admin") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully canceled."
+
+Test Case 14: UpdateAppointment - Unauthorized Access
+Description: Test that a non-patient cannot update an appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/updateAppointment with user role other than "patient".
+2. Assert that the response status is 400 BadRequest.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 15: UpdateAppointment - Successful Update
+Description: Test that a patient can successfully update their own appointment.
+Steps:
+1. Send a PATCH request to /api/Booking/updateAppointment with valid user role ("patient") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully updated."
+
+Test Case 16: DeleteAppointment - Unauthorized Access
+Description: Test that a non-admin cannot delete an appointment.
+Steps:
+1. Send a DELETE request to /api/Booking/deleteAppointment with user role other than "admin" or "superAdmin".
+2. Assert that the response status is 401 Unauthorized.
+3. Assert that the response message is "You are not authorized to perform this action."
+
+Test Case 17: DeleteAppointment - Successful Deletion
+Description: Test that an admin can successfully delete an appointment.
+Steps:
+1. Send a DELETE request to /api/Booking/deleteAppointment with valid user role ("admin") and valid appointment details.
+2. Assert that the response status is 200 OK.
+3. Assert that the response message is "Appointment successfully deleted."
