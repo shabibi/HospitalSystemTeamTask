@@ -4,9 +4,6 @@ namespace HospitalSystemTeamTask.DTO_s
 {
     public class DepartmentDTO
     {
-        [Required(ErrorMessage = "Department ID is required.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Department ID must be greater than 0.")]
-        public int DepId { get; set; }
 
         [Required(ErrorMessage = "Department name is required.")]
         [StringLength(100, ErrorMessage = "Department name cannot exceed 100 characters.")]

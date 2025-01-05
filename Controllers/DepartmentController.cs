@@ -79,17 +79,12 @@ namespace HospitalSystemTeamTask.Controllers
             }
         }
         [Authorize]
-        [HttpPatch("UpdateDepartment/{id}")]
-        public IActionResult UpdateDepartment(int id, [FromBody] DepartmentDTO departmentDto)
+        [HttpPatch("UpdateDepartment")]
+        public IActionResult UpdateDepartment([FromBody] DepDTO departmentDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-
-            if (id != departmentDto.DepId)
-            {
-                return BadRequest(new { message = "ID in the URL does not match ID in the body." });
             }
 
             try
@@ -104,7 +99,7 @@ namespace HospitalSystemTeamTask.Controllers
                 }
 
                 // Update the department
-                _departmentService.UpdateDepartment(id, departmentDto);
+                _departmentService.UpdateDepartment(departmentDto);
 
                 return Ok(new { message = "Department updated successfully." });
             }
@@ -117,6 +112,7 @@ namespace HospitalSystemTeamTask.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the department.", error = ex.Message });
             }
         }
+
 
         [Authorize]
         [HttpPatch("{id}/set-status")]
