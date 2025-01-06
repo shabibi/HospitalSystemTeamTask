@@ -44,7 +44,8 @@ namespace HospitalSystemTeamTask.Services
                 {
                 // Default password and email generation
                 String defaultPassword = "Super1234";
-                string generatedEmail = $"{InputUser.UserName}@gmail.com";
+                string sanitizedUserName = InputUser.UserName.Replace(" ", "");
+                string generatedEmail = $"{sanitizedUserName}@gmail.com";
                 string hashedPassword = HashingPassword.Hshing(defaultPassword);
 
 
@@ -79,6 +80,8 @@ namespace HospitalSystemTeamTask.Services
                 throw new ArgumentException("Invalid role. Only 'doctor' and 'admin' roles are allowed.", nameof(InputUser.Role));
 
             const string defaultPassword = "Staff1234";
+            // Sanitize the UserName to remove spaces
+            string sanitizedUserName = InputUser.UserName.Replace(" ", "");
 
             Random random = new Random();
             int randomNumber;
@@ -88,7 +91,7 @@ namespace HospitalSystemTeamTask.Services
             do
             {
                 randomNumber = random.Next(1000, 9999);
-                generatedEmail = $"{InputUser.UserName}{randomNumber}@gmail.com";
+                generatedEmail = $"{sanitizedUserName}{randomNumber}@gmail.com";
             } while (_userRepo.EmailExists(generatedEmail));
 
             string hashedPassword = HashingPassword.Hshing(defaultPassword);
