@@ -29,35 +29,65 @@ namespace HospitalSystemTeamTask.Controllers
             _configuration = configuration;
         }
 
-        [NonAction]
-        public string GenerateJwtToken(string PId, string username, string role)
+        [HttpPost("AddPatient")]
+        public IActionResult AddPatient(PatientInputDTO input)
         {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["SecretKey"];
-
-            var claims = new[]
+            try
             {
-                new Claim(JwtRegisteredClaimNames.Sub, PId),
-                new Claim(JwtRegisteredClaimNames.Name, username),
-                new Claim(JwtRegisteredClaimNames.UniqueName, role),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
-            };
+                // Add the patient
+                _PatientService.AddPatient(input);
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpiryInMinutes"])),
-                signingCredentials: creds
-            );
+                return Ok("Patient added successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+        [HttpGet("GetPatientData")]
+        public IActionResult GetPatientData(string? userName, int? uid)
+        {
+            try
+            {
+                string token = JwtHelper.ExtractToken(Request);
+                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
+                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                if (string.IsNullOrEmpty(userRole))
+                {
+                    return Unauthorized(new { message = "You are not authorized to perform this action." });
+                }
+
+                var patientData = _PatientService.GetPatientData(userName, uid);
+                // Check if the user's role allows them to perform this action
+                if (userRole == "patient" && userId != patientData.PID)
+                {
+                    return Unauthorized(new { message = "You are not authorized to view another patient's data." });
+                }
+
+
+                return Ok(patientData);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
-
-       
         [HttpPut("UpdatePatientphoneNumber")]
         public IActionResult UpdatePatientDetails( int UID, string phoneNumber)
         {
@@ -103,82 +133,7 @@ namespace HospitalSystemTeamTask.Controllers
         }
         
         //addmin
-        [HttpPost("AddPatient")]
-        public IActionResult AddPatient( PatientInputDTO input)
-        {
-            try
-            {
-                // Extract the token from the request and retrieve the user's role
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-
-                // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "superAdmin"))
-                {
-                    return BadRequest(new { message = "You are not authorized to perform this action." });
-                }
-
-                if (input == null)
-                {
-                    return BadRequest("Patient details are required.");
-                }
-
-                // Map DTO to Patient entity
-              
-
-                // Add the patient
-                _PatientService.AddPatient(input);
-               
-
-                return Ok("Patient added successfully.");
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
-
-        [HttpGet("GetPatientData")]
-        public IActionResult GetPatientData( string? userName, int? uid)
-        {
-            try
-            {
-                string token = JwtHelper.ExtractToken(Request);
-                var userRole = JwtHelper.GetClaimValue(token, "unique_name");
-                var userId = int.Parse(JwtHelper.GetClaimValue(token, "sub"));
-
-                if (string.IsNullOrEmpty(userRole))
-                {
-                    return Unauthorized(new { message = "You are not authorized to perform this action." });
-                }
-
-                var patientData = _PatientService.GetPatientData(userName, uid);
-                // Check if the user's role allows them to perform this action
-                if ( userRole == "patient" && userId != patientData.PID)
-                {
-                    return Unauthorized(new { message = "You are not authorized to view another patient's data." });
-                }
-               
-                
-                return Ok(patientData);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = ex.Message });
-            }
-        }
-
+ 
+    
     }
 }

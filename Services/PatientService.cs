@@ -163,7 +163,7 @@ namespace HospitalSystemTeamTask.Services
             string subject = "Hospital System Signing In";
             string body = $"Dear {patientInput.UserName},\n\nYour account has been created successfully for Hospital System.\n\nBest Regards,\nHospital System";
 
-            _sendEmail.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+            _sendEmail.SendEmailAsync(patientInput.Email, subject, body);
 
             // Delegate to repository
             _PatientRepo.AddPatient(patient);

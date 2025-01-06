@@ -68,6 +68,11 @@ namespace HospitalSystemTeamTask.Controllers
                 _bookingService.BookAppointment(bookingInput, userId);
                 return Ok(" Appointment booked successfully");
             }
+            catch (InvalidOperationException ex)
+            {
+                // Return a specific error response
+                return BadRequest(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 // Return a generic error response
