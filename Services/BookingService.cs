@@ -173,9 +173,9 @@ namespace HospitalSystemTeamTask.Services
                               "Please be on time for your appointment. If you need to reschedule, kindly contact us.\n\n" +
                               "Best regards,\n" +
                               "Your Hospital System Team";
-
+                var userEmail = _userService.GetUserById(patientId).Email;
                 // Send the email notification
-                _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+                _email.SendEmailAsync(userEmail, subject, body);
             }
             catch (FormatException ex)
             {
@@ -342,8 +342,9 @@ namespace HospitalSystemTeamTask.Services
                               "Best regards,\n" +
                               "Your Hospital System Team";
 
+                var userEmail = _userService.GetUserById(patientId).Email;
                 // Send the email notification
-                _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+                _email.SendEmailAsync(userEmail, subject, body);
             }
             catch (Exception ex)
             {
@@ -418,8 +419,10 @@ namespace HospitalSystemTeamTask.Services
                           "We apologize for any inconvenience this may have caused and are here to assist you with any questions or concerns.\n\n" +
                           "Best regards,\n" +
                           "Your Hospital System Team";
+
+            var userEmail = _userService.GetUserById(patientId).Email;
             // Send the email notification
-            _email.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
+            _email.SendEmailAsync(userEmail, subject, body);
         }
 
         public void DeleteAppointments(BookingInputDTO bookingInputDTO)
