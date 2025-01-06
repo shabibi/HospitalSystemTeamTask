@@ -123,33 +123,52 @@ namespace HospitalSystemTeamTask.Services
 
         public void AddPatient(PatientInputDTO patientInput)
         {
-            if (patientInput == null )
+            if (patientInput == null)
             {
                 throw new ArgumentException("Patient or User information is missing.");
             }
-           
-           var hashedPasswor = HashingPassword.Hshing(patientInput.Password);
-          
-            var user = new User { 
-                UserName = patientInput.UserName.ToLower(), 
-                Password = hashedPasswor,
-                Email = patientInput.Email, 
-                Role = "patient" ,
+
+            // Validate Gender (accept M, m, F, f)
+            if (string.IsNullOrWhiteSpace(patientInput.Gender) ||
+                !(patientInput.Gender.Equals("M", StringComparison.OrdinalIgnoreCase) ||
+                  patientInput.Gender.Equals("F", StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ArgumentException("Gender must be 'M' or 'F'.");
+            }
+
+            // Hash the password
+            var hashedPassword = HashingPassword.Hshing(patientInput.Password);
+
+            // Create a new user
+            var user = new User
+            {
+                UserName = patientInput.UserName.ToLower(),
+                Password = hashedPassword,
+                Email = patientInput.Email,
+                Role = "patient",
                 IsActive = true,
                 Phone = patientInput.Phone
             };
             _userService.AddUser(user);
-            // Delegate to repository
-           
-            var patient = new Patient {PID= user.UID, Age = patientInput.Age, Gender = patientInput.Gender };
 
+            // Save patient details
+            var patient = new Patient
+            {
+                PID = user.UID,
+                Age = patientInput.Age,
+                Gender = patientInput.Gender.ToUpper() // Normalize Gender to uppercase
+            };
+
+            // Send email notification
             string subject = "Hospital System Signing In";
-            string body = $"Dear {patientInput.UserName},\n\nYour  account has been created successfully for Hospital System.\n\n\nBest Regards,\nHospital System";
+            string body = $"Dear {patientInput.UserName},\n\nYour account has been created successfully for Hospital System.\n\nBest Regards,\nHospital System";
 
             _sendEmail.SendEmailAsync("hospitalproject2025@outlook.com", subject, body);
-            _PatientRepo.AddPatient(patient);
 
+            // Delegate to repository
+            _PatientRepo.AddPatient(patient);
         }
+
 
     }
 
