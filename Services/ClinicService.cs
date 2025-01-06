@@ -32,38 +32,16 @@ namespace HospitalSystemTeamTask.Services
         {
             if (input == null)
             {
-                throw new ArgumentException("Clinic details are required.");
+                throw new ArgumentException("Clinic details are required.", nameof(input));
             }
 
-            // Validate capacity
-            if (input.Capacity <= 0)
-            {
-                throw new ArgumentException("Capacity must be greater than 0.");
-            }
+            ValidateClinicInput(input);
+
+            var doctor = GetAndValidateDoctor(input.AssignDoctor);
 
             // Calculate slot time
             TimeSpan totalDuration = input.EndTime - input.StartTime;
             int slotTime = (int)(totalDuration.TotalMinutes / input.Capacity);
-
-            // Check if the doctor exists
-            var doctor = _doctorService.GetDoctorById(input.AssignDoctor);
-            if (doctor == null)
-            {
-                throw new KeyNotFoundException($"Doctor with ID {input.AssignDoctor} not found.");
-            }
-
-            // Check if the doctor is already assigned to a clinic
-            if (doctor.CID != null)
-            {
-                throw new InvalidOperationException($"Doctor with ID {input.AssignDoctor} is already assigned to Clinic ID {doctor.CID}.");
-            }
-
-            // Validate the branch and department combination using BranchDepartmentService
-            var branchDepartment = _branchDepartmentService.GetBranchDep(input.DepID,input.BID);
-            if (branchDepartment == null)
-            {
-                throw new ArgumentException($"The specified branch (ID: {input.BID}) and department (ID: {input.DepID}) combination does not exist.");
-            }
 
             // Create and add the clinic
             var clinic = new Clinic
@@ -75,25 +53,55 @@ namespace HospitalSystemTeamTask.Services
                 SlotDuration = slotTime,
                 Cost = input.Cost,
                 IsActive = input.IsActive,
-                DepID = input.DepID,
-                BID = input.BID,
+                DepID = doctor.DepId,
+                BID = doctor.CurrentBrunch,
                 AssignDoctor = input.AssignDoctor
             };
 
             _clinicRepo.AddClinic(clinic);
 
-            branchDepartment.DepartmentCapacity += input.Capacity;
+            UpdateBranchDepartmentCapacity(doctor.DepId, doctor.CurrentBrunch, input.Capacity);
 
-            // Update capacity in the BranchDepartment table
-            _branchDepartmentService.UpdateBranchDepartment(branchDepartment);
             // Assign clinic ID to the doctor
             doctor.CID = clinic.CID;
             _doctorService.UpdateDoctor(doctor);
-
-
         }
 
+        private void ValidateClinicInput(ClinicInput input)
+        {
+            if (input.Capacity <= 0)
+            {
+                throw new ArgumentException("Capacity must be greater than 0.");
+            }
 
+            if (input.EndTime <= input.StartTime)
+            {
+                throw new ArgumentException("End time must be later than start time.");
+            }
+        }
+
+        private Doctor GetAndValidateDoctor(int doctorId)
+        {
+            var doctor = _doctorService.GetDoctorById(doctorId);
+            if (doctor == null)
+            {
+                throw new KeyNotFoundException($"Doctor with ID {doctorId} not found.");
+            }
+
+            if (doctor.CID != null)
+            {
+                throw new InvalidOperationException($"Doctor with ID {doctorId} is already assigned to Clinic ID {doctor.CID}.");
+            }
+
+            return doctor;
+        }
+
+        private void UpdateBranchDepartmentCapacity(int depId, int branchId, int capacity)
+        {
+            var branchDepartment = _branchDepartmentService.GetBranchDep(depId, branchId);
+            branchDepartment.DepartmentCapacity += capacity;
+            _branchDepartmentService.UpdateBranchDepartment(branchDepartment);
+        }
 
 
         public Clinic GetClinicById(int clinicId)
@@ -176,6 +184,7 @@ namespace HospitalSystemTeamTask.Services
             }
 
             int slotTime = (int)(totalDuration.TotalMinutes / input.Capacity);
+            var doctor = _doctorService.GetDoctorById(input.AssignDoctor);
 
             // Map updated properties
             existingClinic.ClincName = input.ClincName;
@@ -185,8 +194,8 @@ namespace HospitalSystemTeamTask.Services
             existingClinic.SlotDuration = slotTime;
             existingClinic.Cost = input.Cost;
             existingClinic.IsActive = input.IsActive;
-            existingClinic.DepID = input.DepID;
-            existingClinic.BID = input.BID;
+            existingClinic.DepID = doctor.DepId;
+            existingClinic.BID = doctor.CurrentBrunch;
             existingClinic.AssignDoctor = input.AssignDoctor;
             
 
