@@ -45,7 +45,7 @@ namespace HospitalSystemTeamTask.Services
                 // Default password and email generation
                 String defaultPassword = "Super1234";
                 string sanitizedUserName = InputUser.UserName.Replace(" ", "");
-                string generatedEmail = $"{sanitizedUserName}@gmail.com";
+                string generatedEmail = $"{sanitizedUserName}@CodelineHospital.com";
                 string hashedPassword = HashingPassword.Hshing(defaultPassword);
 
 
@@ -91,7 +91,7 @@ namespace HospitalSystemTeamTask.Services
             do
             {
                 randomNumber = random.Next(1000, 9999);
-                generatedEmail = $"{sanitizedUserName}{randomNumber}@gmail.com";
+                generatedEmail = $"{sanitizedUserName}{randomNumber}@CodelineHospital.com";
             } while (_userRepo.EmailExists(generatedEmail));
 
             string hashedPassword = HashingPassword.Hshing(defaultPassword);
