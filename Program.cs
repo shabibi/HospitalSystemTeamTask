@@ -18,18 +18,8 @@ namespace HospitalSystemTeamTask
 
             // Add services to the container.
 
-           
-            builder.Services.AddScoped<IBranchRepository, BranchRepository>();
-            builder.Services.AddScoped<IBranchService, BranchService>();
-
-            builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-            builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-
-            builder.Services.AddScoped<IPatientRecordRepository, PatientRecordRepository>();
-            builder.Services.AddScoped< IPatientRecordService, PatientRecordService> ();
-
-            builder.Services.AddScoped<IUserRepo, UserRepo>();
-            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IBookingRepo, BookingRepo>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
 
             builder.Services.AddScoped<IPatientRepo, PatientRepo>();
             builder.Services.AddScoped<IPatientService, PatientService>();
@@ -37,14 +27,25 @@ namespace HospitalSystemTeamTask
             builder.Services.AddScoped<IClinicRepocs, ClinicRepo>();
             builder.Services.AddScoped<IClinicService, ClinicService>();
 
+            builder.Services.AddScoped<IPatientRecordRepository, PatientRecordRepository>();
+            builder.Services.AddScoped<IPatientRecordService, PatientRecordService>();
+
 
             builder.Services.AddScoped<IDoctorRepo, DoctorRepo>();
             builder.Services.AddScoped<IDoctorService, DoctorService>();
 
             builder.Services.AddScoped<IBranchDepartmentRepo, BranchDepartmentRepo>();
             builder.Services.AddScoped<IBranchDepartmentService, BranchDepartmentService>();
-            builder.Services.AddScoped<IBookingRepo, BookingRepo>();
-            builder.Services.AddScoped<IBookingService, BookingService>();
+
+            builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
+
+            builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+            builder.Services.AddScoped<IBranchService, BranchService>();
+
+            builder.Services.AddScoped<IUserRepo, UserRepo>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<ISendEmail, SendEmail>();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>

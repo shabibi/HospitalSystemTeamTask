@@ -35,10 +35,12 @@ namespace HospitalSystemTeamTask.Controllers
                 var userRole = JwtHelper.GetClaimValue(token, "unique_name");
 
                 // Check if the user's role allows them to perform this action
-                if (userRole == null || (userRole != "admin" && userRole != "supperAdmin"))
+                if (userRole == null && userRole != "admin" && userRole != "superAdmin")
                 {
                     return BadRequest(new { message = "You are not authorized to perform this action." });
                 }
+
+
                 if (input == null || input.UID <= 0)
                     return BadRequest("Invalid input. Doctor information and a valid ID are required.");
 
